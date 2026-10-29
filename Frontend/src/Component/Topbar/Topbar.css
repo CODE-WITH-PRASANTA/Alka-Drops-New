@@ -1,0 +1,210 @@
+/* Topbar main */
+.Topbar {
+  width: 100%;
+  height: 48px;
+  background: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.Topbar-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* White background */
+.Topbar-left {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  z-index: 1;
+}
+
+/* Diagonal white cutout */
+.Topbar-decoration {
+  position: absolute;
+  top: 0;
+  left: 40.9%;
+  width: 54px;
+  height: 100%;
+  background: #ffffff;
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+  z-index: 3;
+}
+
+/* Blue section with / diagonal start */
+.Topbar-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 59.1%;
+  height: 100%;
+  background: #087fbe;
+  color: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 38px;
+
+  padding: 0 35px 0 65px;
+  box-sizing: border-box;
+
+  /* Creates the diagonal / at the left edge */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 4.7% 100%);
+  z-index: 2;
+}
+
+/* Contact information */
+.Topbar-contact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+}
+
+.Topbar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #ffffff;
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.Topbar-icon {
+  font-size: 19px;
+  flex-shrink: 0;
+}
+
+/* Social icons */
+.Topbar-social {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.Topbar-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 16px;
+  text-decoration: none;
+  transition: opacity 0.25s ease;
+}
+
+.Topbar-social a:hover {
+  opacity: 0.7;
+}
+
+/* Laptop */
+@media (max-width: 1200px) {
+  .Topbar-decoration {
+    left: 30%;
+    width: 46px;
+  }
+
+  .Topbar-right {
+    width: 70%;
+    gap: 24px;
+    padding: 0 22px 0 42px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 3.5% 100%);
+  }
+
+  .Topbar-contact {
+    gap: 20px;
+  }
+
+  .Topbar-item {
+    font-size: 12px;
+  }
+
+  .Topbar-icon {
+    font-size: 16px;
+  }
+
+  .Topbar-social {
+    gap: 13px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .Topbar {
+    height: auto;
+    min-height: 44px;
+  }
+
+  .Topbar-left,
+  .Topbar-decoration {
+    display: none;
+  }
+
+  .Topbar-right {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 44px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 22px;
+    padding: 10px 16px;
+    clip-path: none;
+  }
+
+  .Topbar-contact {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 20px;
+  }
+
+  .Topbar-social {
+    gap: 16px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .Topbar-right {
+    padding: 12px 10px;
+  }
+
+  .Topbar-contact {
+    width: 100%;
+    gap: 12px 16px;
+  }
+
+  .Topbar-item {
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .Topbar-icon {
+    font-size: 14px;
+  }
+
+  .Topbar-email span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .Topbar-social {
+    gap: 20px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 360px) {
+  .Topbar-contact {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

@@ -4,10 +4,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
 import "./App.css";
-import Topbar from "./Component/Topbar/Topbar";
+import Topbar from "./Components/Topbar/Topbar";
 import Home from "./Pages/Home/Home";
-import Navbar from "./Component/Navbar/Navbar";
-import Footer from "./Component/Footer/Footer";
+import Navbar from "./Components/Navbar/Navbar";
+import Footer from "./Components/Footer/Footer";
 import About from "./Pages/About/About";
 
 const App = () => {

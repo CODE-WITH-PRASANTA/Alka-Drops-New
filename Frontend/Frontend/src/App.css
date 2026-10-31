@@ -1,0 +1,33 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+.App {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.App-main {
+  width: 100%;
+  min-height: calc(100vh - 64px);
+}
+
+@media (max-width: 900px) {
+  .App-main {
+    min-height: calc(100vh - 58px);
+  }
+}

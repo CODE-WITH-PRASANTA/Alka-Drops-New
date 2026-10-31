@@ -1,0 +1,933 @@
+/* =========================================================
+   NAVBAR COMPONENT STYLES
+   Breakpoints
+   - 1361px and up      : full desktop
+   - 1241px - 1360px    : compact desktop (tighter links)
+   - 1240px and down    : tablet + mobile drawer
+   - 640px and down     : phones
+   - 380px and down     : small phones
+   (1240px is also DESKTOP_MIN_WIDTH - 1 in Navbar.jsx)
+========================================================= */
+
+:root {
+  --primary-color: #004ea8;
+  --primary-hover: #003b80;
+  --primary-light: #e0f2fe;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --nav-height: 80px;
+}
+
+/* ---------------------------------------------------------
+   HEADER WRAPPER
+   The blur/background lives on ::before so it never becomes
+   a containing block for the fixed mobile drawer + backdrop.
+--------------------------------------------------------- */
+.navbar-wrapper {
+  --nb-height: 80px;
+  --nb-pad-x: 1.5rem;
+
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  isolation: isolate;
+}
+
+.navbar-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: #ffffff;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.navbar-wrapper.scrolled-state::before {
+  background-color: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  backdrop-filter: saturate(180%) blur(14px);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+}
+
+/* thin brand-colour glow line under the bar once scrolled */
+.navbar-wrapper::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #0284c7 25%, #004ea8 50%, #0284c7 75%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.navbar-wrapper.scrolled-state::after {
+  opacity: 0.85;
+}
+
+.navbar {
+  max-width: 1440px;
+  margin: 0 auto;
+  height: var(--nb-height);
+  padding: 0 var(--nb-pad-x);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------
+   LOGO
+--------------------------------------------------------- */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.navbar-logo {
+  height: 48px;
+  width: auto;
+  max-width: 46vw;
+  object-fit: contain;
+  transition: transform 0.25s ease;
+}
+
+.navbar-brand:hover .navbar-logo {
+  transform: scale(1.04);
+}
+
+/* ---------------------------------------------------------
+   DESKTOP MENU
+--------------------------------------------------------- */
+.navbar-menu-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.navbar-menu {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.25rem;
+}
+
+.navbar-item {
+  position: relative;
+}
+
+.navbar-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: 10px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.navbar-link:hover {
+  color: var(--primary-color);
+  background-color: #f1f7ff;
+}
+
+.navbar-link.active-link {
+  color: var(--primary-color);
+  font-weight: 600;
+  background-color: #eaf3ff;
+}
+
+.navbar-mobile-actions {
+  display: none;
+}
+
+/* ---------------------------------------------------------
+   RIGHT ACTIONS
+--------------------------------------------------------- */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0.75rem;
+}
+
+.navbar-icon-btn {
+  width: 42px;
+  height: 42px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  color: var(--text-dark);
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.navbar-icon-btn:hover {
+  background-color: var(--primary-light);
+  border-color: #bae6fd;
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.cart-icon-relative {
+  position: relative;
+}
+
+.navbar-cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(135deg, #0a63c9 0%, #004ea8 100%);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 19px;
+  height: 19px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  box-sizing: border-box;
+  box-shadow: 0 0 0 2px #ffffff, 0 3px 8px rgba(0, 78, 168, 0.4);
+  line-height: 1;
+  animation: navbarBadgePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---------------------------------------------------------
+   PROFILE PILL + DROPDOWN
+--------------------------------------------------------- */
+.navbar-profile-wrapper {
+  position: relative;
+}
+
+.navbar-profile-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background-color: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  padding: 4px 14px 4px 4px;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.navbar-profile-pill-btn:hover {
+  background-color: #e0f2fe;
+  border-color: #93c5fd;
+  box-shadow: 0 4px 12px rgba(0, 78, 168, 0.12);
+}
+
+.navbar-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #004ea8 0%, #0284c7 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 78, 168, 0.25);
+  flex-shrink: 0;
+}
+
+.navbar-user-avatar.large {
+  width: 42px;
+  height: 42px;
+  font-size: 16px;
+}
+
+.navbar-user-name-text {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0f172a;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-profile-arrow {
+  font-size: 14px;
+  color: #64748b;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.navbar-profile-arrow.open {
+  transform: rotate(180deg);
+}
+
+.navbar-profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(250px, calc(100vw - 2rem));
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+  z-index: 1002;
+  animation: navbarFadeDown 0.2s ease-out;
+}
+
+/* little notch pointing to the pill */
+.navbar-profile-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: 22px;
+  width: 11px;
+  height: 11px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  border-left: 1px solid #e2e8f0;
+  transform: rotate(45deg);
+}
+
+.navbar-dropdown-user-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 6px 10px 6px;
+  cursor: pointer;
+}
+
+.navbar-dropdown-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.navbar-dropdown-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-dropdown-email {
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-dropdown-divider {
+  height: 1px;
+  background-color: #f1f5f9;
+  margin: 8px 0;
+}
+
+.navbar-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.navbar-dropdown-item svg {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.navbar-dropdown-item:hover {
+  background-color: #f1f7ff;
+  color: #004ea8;
+}
+
+.navbar-dropdown-item.logout {
+  color: #dc2626;
+}
+
+.navbar-dropdown-item.logout:hover {
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+/* ---------------------------------------------------------
+   BUTTONS
+--------------------------------------------------------- */
+.navbar-btn-primary {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(135deg, #0a63c9 0%, #004ea8 55%, #003b80 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.6rem 1.3rem;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0, 78, 168, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* shine sweep */
+.navbar-btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+  z-index: -1;
+}
+
+.navbar-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0, 78, 168, 0.36);
+}
+
+.navbar-btn-primary:hover::before {
+  left: 130%;
+}
+
+.navbar-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.navbar-btn-secondary {
+  background: #ffffff;
+  color: var(--text-dark);
+  border: 1.5px solid #cbd5e1;
+  padding: 0.55rem 1.15rem;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.navbar-btn-secondary:hover {
+  background-color: #f1f7ff;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.navbar-btn-secondary:active {
+  transform: scale(0.98);
+}
+
+/* ---------------------------------------------------------
+   HAMBURGER TOGGLE (44px+ tap target)
+--------------------------------------------------------- */
+.navbar-toggle {
+  position: relative;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: content-box;
+  width: 24px;
+  height: 18px;
+  padding: 13px 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  z-index: 1000;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.navbar-toggle:hover {
+  background: var(--primary-light);
+  border-color: #bae6fd;
+}
+
+.hamburger-line {
+  width: 100%;
+  height: 2.5px;
+  background-color: var(--text-dark);
+  border-radius: 9999px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* (18px height - 3 x 2.5px) / 2 = 5.25px gap, + 2.5px line = 7.75px travel */
+.navbar-toggle.is-open .hamburger-line:nth-child(1) {
+  transform: translateY(7.75px) rotate(45deg);
+}
+
+.navbar-toggle.is-open .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.navbar-toggle.is-open .hamburger-line:nth-child(3) {
+  transform: translateY(-7.75px) rotate(-45deg);
+}
+
+.navbar-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+  animation: navbarFadeIn 0.3s ease;
+}
+
+/* ---------------------------------------------------------
+   MOBILE DRAWER USER BOX
+--------------------------------------------------------- */
+.navbar-mobile-user-box {
+  background: linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%);
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.navbar-mobile-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-mobile-user-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.navbar-mobile-user-name {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-mobile-user-email {
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-btn-logout-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.navbar-btn-logout-mobile:hover {
+  background: #fca5a5;
+  color: #991b1b;
+}
+
+/* ---------------------------------------------------------
+   KEYFRAMES
+--------------------------------------------------------- */
+@keyframes navbarFadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes navbarFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes navbarSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes navbarBadgePop {
+  0% {
+    transform: scale(0.4);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ---------------------------------------------------------
+   KEYBOARD FOCUS
+--------------------------------------------------------- */
+.navbar-link:focus-visible,
+.navbar-icon-btn:focus-visible,
+.navbar-toggle:focus-visible,
+.navbar-profile-pill-btn:focus-visible,
+.navbar-btn-primary:focus-visible,
+.navbar-btn-secondary:focus-visible,
+.navbar-btn-logout-mobile:focus-visible,
+.navbar-dropdown-item:focus-visible,
+.navbar-mobile-user-box:focus-visible,
+.navbar-brand:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   DESKTOP ONLY (1241px and up)
+========================================================= */
+@media (min-width: 1241px) {
+  .navbar-backdrop {
+    display: none;
+  }
+
+  /* animated underline indicator */
+  .navbar-link::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 3px;
+    width: 0;
+    height: 2.5px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #0284c7, #004ea8);
+    transform: translateX(-50%);
+    transition: width 0.25s ease;
+  }
+
+  .navbar-link:hover::after {
+    width: 34%;
+  }
+
+  .navbar-link.active-link::after {
+    width: 56%;
+  }
+}
+
+/* =========================================================
+   COMPACT DESKTOP (1241px - 1360px)
+========================================================= */
+@media (min-width: 1241px) and (max-width: 1360px) {
+  .navbar {
+    gap: 0.75rem;
+  }
+
+  .navbar-menu {
+    gap: 0;
+  }
+
+  .navbar-link {
+    padding: 0.5rem 0.55rem;
+    font-size: 0.86rem;
+  }
+
+  .navbar-actions {
+    gap: 0.6rem;
+  }
+
+  .navbar-btn-primary,
+  .navbar-btn-secondary {
+    padding: 0.5rem 0.95rem;
+    font-size: 0.84rem;
+  }
+
+  .navbar-user-name-text {
+    max-width: 100px;
+  }
+}
+
+/* =========================================================
+   TABLET + MOBILE DRAWER (1240px and down)
+========================================================= */
+@media (max-width: 1240px) {
+  .navbar-wrapper {
+    --nb-height: 72px;
+  }
+
+  .navbar-toggle {
+    display: flex;
+  }
+
+  .hide-on-mobile {
+    display: none;
+  }
+
+  /* cart / avatar / toggle stay tappable above the open drawer */
+  .navbar-actions {
+    position: relative;
+    z-index: 1001;
+  }
+
+  .navbar-menu-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(86vw, 380px);
+    height: 100vh;
+    height: 100dvh;
+    flex: none;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    padding:
+      calc(var(--nb-height) + 1rem)
+      max(1.25rem, env(safe-area-inset-right, 0px))
+      calc(1.5rem + env(safe-area-inset-bottom, 0px))
+      1.25rem;
+    background: linear-gradient(180deg, #eaf3ff 0, #ffffff 200px);
+    border-radius: 24px 0 0 24px;
+    box-shadow: -16px 0 44px rgba(15, 23, 42, 0.2);
+    transform: translateX(105%);
+    visibility: hidden;
+    transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1), visibility 0s linear 0.38s;
+    z-index: 999;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .navbar-menu-container.is-open {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1), visibility 0s;
+  }
+
+  .navbar-menu {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .navbar-item {
+    width: 100%;
+  }
+
+  .navbar-menu-container.is-open .navbar-item {
+    animation: navbarSlideIn 0.4s ease both;
+    animation-delay: calc(var(--i, 0) * 35ms + 120ms);
+  }
+
+  .navbar-link {
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    font-size: 1.02rem;
+    border-radius: 12px;
+  }
+
+  .navbar-link::after {
+    content: "\203A";
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #94a3b8;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .navbar-link:hover::after {
+    transform: translateX(3px);
+    color: var(--primary-color);
+  }
+
+  .navbar-link.active-link {
+    background: linear-gradient(90deg, #dbeafe 0%, #eff6ff 100%);
+    box-shadow: inset 3px 0 0 var(--primary-color);
+  }
+
+  .navbar-link.active-link::after {
+    color: var(--primary-color);
+  }
+
+  .navbar-mobile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 1.25rem;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .full-width {
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 0.98rem;
+    text-align: center;
+  }
+}
+
+/* =========================================================
+   PHONES (640px and down)
+========================================================= */
+@media (max-width: 640px) {
+  .navbar-wrapper {
+    --nb-height: 64px;
+    --nb-pad-x: 1rem;
+  }
+
+  .navbar {
+    gap: 0.5rem;
+  }
+
+  .navbar-logo {
+    height: 40px;
+  }
+
+  .navbar-actions {
+    gap: 0.4rem;
+  }
+
+  .navbar-icon-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.15rem;
+  }
+
+  .navbar-toggle {
+    padding: 12px 9px;
+  }
+
+  /* avatar-only pill on phones */
+  .navbar-profile-pill-btn {
+    padding: 3px;
+    gap: 0;
+  }
+
+  .navbar-user-name-text,
+  .navbar-profile-arrow {
+    display: none;
+  }
+
+  /* dropdown pinned to the screen so it can never overflow on small widths */
+  .navbar-profile-dropdown {
+    position: fixed;
+    top: calc(var(--nb-height) + 8px);
+    right: 1rem;
+    width: min(280px, calc(100vw - 2rem));
+  }
+
+  .navbar-profile-dropdown::before {
+    display: none;
+  }
+
+  .navbar-menu-container {
+    width: min(88vw, 360px);
+    padding-left: 1rem;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES (380px and down)
+========================================================= */
+@media (max-width: 380px) {
+  .navbar-wrapper {
+    --nb-pad-x: 0.75rem;
+  }
+
+  .navbar-logo {
+    height: 34px;
+  }
+
+  .navbar-actions {
+    gap: 0.3rem;
+  }
+
+  .navbar-icon-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .navbar-user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .navbar-toggle {
+    padding: 11px 8px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .navbar-wrapper *,
+  .navbar-wrapper *::before,
+  .navbar-wrapper *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+}

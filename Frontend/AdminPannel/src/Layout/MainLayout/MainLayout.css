@@ -1,0 +1,63 @@
+.MainLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.MainLayout-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 260px; /* Width of expanded sidebar */
+  transition: margin-left 0.3s ease;
+  min-width: 0; /* Prevents flex items from breaking layout boundaries */
+}
+
+/* Shift container when sidebar is collapsed */
+.MainLayout.sidebar-collapsed .MainLayout-container {
+  margin-left: 70px;
+}
+
+.MainLayout-content {
+  padding: 24px;
+  flex: 1;
+}
+
+.MainLayout-placeholder {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  color: #64748b;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.MainLayout-placeholder h2 {
+  color: #0066cc;
+  margin-bottom: 10px;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .MainLayout-container, 
+  .MainLayout.sidebar-collapsed .MainLayout-container {
+    margin-left: 0;
+  }
+  
+  .MainLayout-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 98;
+  }
+  
+  .MainLayout-content {
+    padding: 16px;
+  }
+}

@@ -1,0 +1,1055 @@
+
+/* ==================================================
+   ALKA DROPS FOOTER — PREMIUM BLUE THEME
+================================================== */
+
+.Footer {
+  --Footer-navy: #032c59;
+  --Footer-deep-blue: #063d78;
+  --Footer-blue: #087bc4;
+  --Footer-cyan: #18c8f5;
+  --Footer-aqua: #76e8ff;
+  --Footer-white: #ffffff;
+  --Footer-muted: #d5eaff;
+
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 80vh;
+  min-height: 650px;
+  overflow: hidden;
+  color: var(--Footer-white);
+  background:
+    radial-gradient(
+      ellipse at 5% 75%,
+      rgba(0, 145, 225, 0.19),
+      transparent 32%
+    ),
+    radial-gradient(
+      ellipse at 95% 60%,
+      rgba(0, 165, 250, 0.15),
+      transparent 32%
+    ),
+    linear-gradient(
+      120deg,
+      #063d78 0%,
+      #032c59 55%,
+      #06417d 100%
+    );
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.Footer,
+.Footer * {
+  box-sizing: border-box;
+}
+
+.Footer a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.Footer button {
+  font: inherit;
+}
+
+/* ==================================================
+   DECORATIVE WATER BUBBLES
+================================================== */
+
+.Footer-background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.Footer-bubble {
+  position: absolute;
+  display: block;
+  width: 11px;
+  height: 11px;
+  border: 1px solid rgba(143, 235, 255, 0.7);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 25%,
+    #ffffff,
+    #48d4ff 24%,
+    #0875c0 72%,
+    #03427c
+  );
+  box-shadow: 0 0 12px rgba(29, 197, 255, 0.2);
+  opacity: 0.8;
+}
+
+.Footer-bubble-1 {
+  top: 18%;
+  left: 2%;
+  width: 17px;
+  height: 17px;
+}
+
+.Footer-bubble-2 {
+  top: 35%;
+  left: 1%;
+  width: 8px;
+  height: 8px;
+}
+
+.Footer-bubble-3 {
+  top: 48%;
+  left: 2%;
+  width: 22px;
+  height: 22px;
+}
+
+.Footer-bubble-4 {
+  top: 66%;
+  left: 4%;
+  width: 9px;
+  height: 9px;
+}
+
+.Footer-bubble-5 {
+  top: 78%;
+  left: 1%;
+  width: 15px;
+  height: 15px;
+}
+
+.Footer-bubble-6 {
+  top: 20%;
+  right: 3%;
+  width: 10px;
+  height: 10px;
+}
+
+.Footer-bubble-7 {
+  top: 39%;
+  right: 2%;
+  width: 20px;
+  height: 20px;
+}
+
+.Footer-bubble-8 {
+  top: 51%;
+  right: 1%;
+  width: 8px;
+  height: 8px;
+}
+
+.Footer-bubble-9 {
+  top: 69%;
+  right: 4%;
+  width: 15px;
+  height: 15px;
+}
+
+.Footer-bubble-10 {
+  top: 83%;
+  right: 8%;
+  width: 8px;
+  height: 8px;
+}
+
+.Footer-bubble-11 {
+  top: 28%;
+  left: 17%;
+  width: 6px;
+  height: 6px;
+}
+
+.Footer-bubble-12 {
+  top: 56%;
+  right: 18%;
+  width: 6px;
+  height: 6px;
+}
+
+.Footer-bubble-13 {
+  top: 75%;
+  left: 22%;
+  width: 8px;
+  height: 8px;
+}
+
+.Footer-bubble-14 {
+  top: 32%;
+  right: 25%;
+  width: 7px;
+  height: 7px;
+}
+
+/* ==================================================
+   MAIN FOOTER LAYOUT
+================================================== */
+
+.Footer-main {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.28fr)
+    minmax(0, 0.72fr)
+    minmax(0, 0.9fr)
+    minmax(0, 1.15fr);
+  align-items: center;
+  gap: 30px;
+  width: 100%;
+  max-width: 1600px;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 35px 45px 65px;
+}
+
+/* ==================================================
+   BRAND COLUMN
+================================================== */
+
+.Footer-brand-column {
+  min-width: 0;
+  padding-right: 28px;
+  border-right: 1px solid rgba(24, 200, 245, 0.7);
+}
+
+.Footer-brand {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 18px;
+  text-decoration: none;
+}
+
+.Footer-logo {
+  display: block;
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  max-height: 85px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.Footer-brand-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0 0 13px;
+  color: #ffffff;
+  font-size: clamp(22px, 1.8vw, 28px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.Footer-brand-heading span {
+  color: #36d5ff;
+}
+
+.Footer-brand-description {
+  max-width: 370px;
+  margin: 0 0 18px;
+  color: #d9eaff;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+/* ==================================================
+   REFRESH CARD
+================================================== */
+
+.Footer-refresh-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  max-width: 350px;
+  min-height: 62px;
+  padding: 9px 12px;
+  border: 1px solid #14bdf2;
+  border-radius: 15px;
+  background: linear-gradient(
+    110deg,
+    rgba(0, 143, 220, 0.2),
+    rgba(0, 61, 123, 0.3)
+  );
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.Footer-refresh-card:hover {
+  border-color: #76e8ff;
+  background: rgba(0, 142, 218, 0.24);
+}
+
+.Footer-refresh-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 39px;
+  height: 39px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 25%,
+    #d1fbff,
+    #24b8f1 48%,
+    #0755ad 100%
+  );
+  color: #ffffff;
+  font-size: 21px;
+  box-shadow: 0 0 14px rgba(0, 187, 255, 0.2);
+}
+
+.Footer-refresh-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.Footer-refresh-content strong {
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.Footer-refresh-content span {
+  color: #d4eaff;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* ==================================================
+   SOCIAL ICONS
+================================================== */
+
+.Footer-socials {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 11px;
+  margin-top: 19px;
+}
+
+.Footer-social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 37px;
+  height: 37px;
+  border: 1px solid rgba(102, 223, 255, 0.4);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #098fda, #0669bf);
+  color: #ffffff;
+  font-size: 14px;
+  text-decoration: none;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.Footer-social-link:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(145deg, #2bd0fa, #0789d8);
+  box-shadow: 0 6px 18px rgba(0, 191, 255, 0.24);
+}
+
+.Footer-quality-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  color: #bceaff;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.Footer-quality-note svg {
+  flex-shrink: 0;
+  color: #47e6c0;
+  font-size: 12px;
+}
+
+/* ==================================================
+   LINK COLUMNS
+================================================== */
+
+.Footer-links-column {
+  min-width: 0;
+  padding-right: 20px;
+  border-right: 1px solid rgba(24, 200, 245, 0.7);
+}
+
+.Footer-column-title {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.Footer-title-underline {
+  display: block;
+  width: 42px;
+  height: 4px;
+  margin-bottom: 22px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #1ac9f5;
+}
+
+.Footer-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.Footer-links-list li {
+  margin: 0;
+  padding: 0;
+}
+
+.Footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #e2efff;
+  font-size: 13px;
+  line-height: 1.5;
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.Footer-link svg {
+  flex-shrink: 0;
+  color: #21d0ff;
+  font-size: 11px;
+  transition: transform 0.2s ease;
+}
+
+.Footer-link:hover {
+  transform: translateX(4px);
+  color: #70e5ff;
+}
+
+.Footer-link:hover svg {
+  transform: translateX(3px);
+}
+
+/* ==================================================
+   NEED WATER CARD
+================================================== */
+
+.Footer-water-help {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 235px;
+  min-height: 59px;
+  margin-top: 21px;
+  padding: 9px 11px;
+  border: 1px solid rgba(0, 194, 255, 0.8);
+  border-radius: 15px;
+  background: linear-gradient(
+    115deg,
+    rgba(0, 141, 217, 0.24),
+    rgba(3, 63, 127, 0.36)
+  );
+  color: #ffffff;
+  text-decoration: none;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.Footer-water-help:hover {
+  transform: translateY(-2px);
+  border-color: #8ceeff;
+}
+
+.Footer-water-help-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 37px;
+  height: 37px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 25%,
+    #d3faff,
+    #1ab7f0 52%,
+    #065bb1
+  );
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.Footer-water-help-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.Footer-water-help-content strong {
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.Footer-water-help-content small {
+  color: #d3eaff;
+  font-size: 11px;
+}
+
+/* ==================================================
+   CONTACT COLUMN
+================================================== */
+
+.Footer-contact-column {
+  min-width: 0;
+}
+
+.Footer-contact-intro {
+  margin: 0 0 19px;
+  color: #e0efff;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.Footer-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+
+.Footer-contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  min-width: 0;
+}
+
+.Footer-contact-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 25%,
+    #38d8ff,
+    #078bd4 72%
+  );
+  color: #ffffff;
+  font-size: 14px;
+  box-shadow: 0 5px 15px rgba(0, 153, 232, 0.2);
+}
+
+.Footer-contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.Footer-contact-details strong {
+  color: #45dcff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.Footer-contact-details a,
+.Footer-contact-details > span {
+  color: #e3f0ff;
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.Footer-contact-details a:hover {
+  color: #74e8ff;
+}
+
+/* ==================================================
+   CONTACT BUTTON
+================================================== */
+
+.Footer-contact-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  min-height: 42px;
+  margin-top: 21px;
+  padding: 0 16px;
+  border: 1px solid rgba(121, 235, 255, 0.7);
+  border-radius: 40px;
+  background: linear-gradient(110deg, #1ac5f3, #0787db);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 5px 17px rgba(0, 154, 231, 0.16);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.Footer-contact-button svg {
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.Footer-contact-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 181, 255, 0.28);
+}
+
+.Footer-contact-button:hover svg {
+  transform: translateX(4px);
+}
+
+/* ==================================================
+   DECORATIVE WATER WAVES
+================================================== */
+
+.Footer-wave-art {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 75px;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.Footer-wave-art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ==================================================
+   COPYRIGHT BAR
+================================================== */
+
+.Footer-bottom {
+  position: relative;
+  z-index: 3;
+  flex-shrink: 0;
+  width: 100%;
+  border-top: 1px solid rgba(24, 200, 245, 0.7);
+  background: linear-gradient(
+    100deg,
+    #052b57,
+    #06417d 55%,
+    #053466
+  );
+}
+
+.Footer-bottom-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 1600px;
+  min-height: 65px;
+  margin: 0 auto;
+  padding: 12px 78px 12px 45px;
+}
+
+.Footer-copyright {
+  margin: 0;
+  color: #dcecff;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.Footer-copyright strong {
+  color: #ffffff;
+}
+
+.Footer-bottom-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.Footer-made-with {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: #dcecff;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.Footer-heart {
+  color: #42d8ff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.Footer-bottom-divider {
+  width: 1px;
+  height: 22px;
+  background: #19c9f4;
+}
+
+.Footer-developed {
+  color: #dcecff;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.Footer-developed a {
+  color: #ffffff;
+  font-weight: 800;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.Footer-developed a:hover {
+  color: #50ddff;
+}
+
+/* ==================================================
+   BACK TO TOP
+================================================== */
+
+.Footer-back-to-top {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 43px;
+  border: 1px solid #36d7ff;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #0c91d8, #064e9c);
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 4px rgba(19, 182, 246, 0.1),
+    0 0 20px rgba(20, 198, 255, 0.2);
+  transform: translateY(-50%);
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.Footer-back-to-top:hover {
+  background: linear-gradient(145deg, #23c9f6, #0876d4);
+  box-shadow: 0 0 0 5px rgba(15, 182, 246, 0.15), 0 0 25px rgba(20, 198, 255, 0.35);
+  transform: translateY(calc(-50% - 3px));
+}
+
+/* ==================================================
+   ACCESSIBILITY
+================================================== */
+
+.Footer a:focus-visible,
+.Footer button:focus-visible {
+  outline: 2px solid #8ceeff;
+  outline-offset: 4px;
+}
+
+/* ==================================================
+   LAPTOP
+================================================== */
+
+@media (max-width: 1200px) {
+  .Footer-main {
+    grid-template-columns:
+      minmax(0, 1.1fr)
+      minmax(0, 0.7fr)
+      minmax(0, 0.82fr)
+      minmax(0, 1fr);
+    gap: 20px;
+    padding: 30px 25px 55px;
+  }
+
+  .Footer-brand-column {
+    padding-right: 17px;
+  }
+
+  .Footer-links-column {
+    padding-right: 13px;
+  }
+
+  .Footer-logo {
+    max-width: 210px;
+    max-height: 72px;
+  }
+
+  .Footer-brand-heading {
+    font-size: 23px;
+  }
+
+  .Footer-column-title {
+    font-size: 17px;
+  }
+
+  .Footer-title-underline {
+    margin-bottom: 19px;
+  }
+
+  .Footer-links-list {
+    gap: 13px;
+  }
+
+  .Footer-link {
+    gap: 7px;
+    font-size: 11px;
+  }
+
+  .Footer-brand-description {
+    font-size: 12px;
+  }
+
+  .Footer-refresh-card {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .Footer-contact-details a,
+  .Footer-contact-details > span {
+    font-size: 10px;
+  }
+
+  .Footer-bottom-inner {
+    padding-left: 25px;
+  }
+}
+
+/* ==================================================
+   TABLET
+================================================== */
+
+@media (max-width: 900px) {
+  .Footer {
+    max-height: none;
+    min-height: 80vh;
+    overflow: hidden;
+  }
+
+  .Footer-main {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 32px 28px;
+    padding: 38px 30px 85px;
+  }
+
+  .Footer-brand-column {
+    padding-right: 23px;
+  }
+
+  .Footer-links-column:nth-of-type(2) {
+    border-right: none;
+    padding-right: 0;
+  }
+
+  .Footer-links-column:nth-of-type(3) {
+    border-right: 1px solid rgba(24, 200, 245, 0.7);
+  }
+
+  .Footer-contact-column {
+    padding-right: 5px;
+  }
+
+  .Footer-bottom-inner {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+    gap: 8px;
+    padding: 16px 75px 16px 30px;
+  }
+
+  .Footer-bottom-center {
+    justify-content: flex-start;
+  }
+}
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+@media (max-width: 600px) {
+  .Footer {
+    max-height: none;
+    min-height: 80vh;
+  }
+
+  .Footer-main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 32px 22px 65px;
+  }
+
+  .Footer-brand-column,
+  .Footer-links-column,
+  .Footer-links-column:nth-of-type(3) {
+    border-right: none;
+    border-bottom: 1px solid rgba(24, 200, 245, 0.4);
+    padding: 0 0 25px;
+  }
+
+  .Footer-contact-column {
+    padding: 0 0 8px;
+  }
+
+  .Footer-logo {
+    max-width: 245px;
+    max-height: 80px;
+  }
+
+  .Footer-brand-heading {
+    font-size: 25px;
+  }
+
+  .Footer-brand-description {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .Footer-refresh-card {
+    max-width: 380px;
+  }
+
+  .Footer-socials {
+    gap: 12px;
+  }
+
+  .Footer-social-link {
+    width: 39px;
+    height: 39px;
+  }
+
+  .Footer-column-title {
+    font-size: 19px;
+  }
+
+  .Footer-links-list {
+    gap: 13px;
+  }
+
+  .Footer-link {
+    font-size: 13px;
+  }
+
+  .Footer-contact-intro {
+    font-size: 12px;
+  }
+
+  .Footer-contact-list {
+    gap: 18px;
+  }
+
+  .Footer-wave-art {
+    height: 42px;
+  }
+
+  .Footer-bottom-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 17px 60px 17px 22px;
+  }
+
+  .Footer-bottom-center {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .Footer-bottom-divider {
+    height: 17px;
+  }
+
+  .Footer-copyright,
+  .Footer-made-with,
+  .Footer-developed {
+    font-size: 10px;
+  }
+
+  .Footer-back-to-top {
+    right: 13px;
+    width: 39px;
+    height: 39px;
+  }
+}
+
+/* ==================================================
+   SMALL MOBILE
+================================================== */
+
+@media (max-width: 360px) {
+  .Footer-main {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .Footer-logo {
+    max-width: 220px;
+  }
+
+  .Footer-brand-heading {
+    font-size: 22px;
+  }
+
+  .Footer-refresh-card {
+    gap: 9px;
+    padding: 9px;
+  }
+
+  .Footer-refresh-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .Footer-bottom-inner {
+    padding-left: 16px;
+  }
+
+  .Footer-bottom-center {
+    flex-wrap: wrap;
+  }
+}
+
+/* ==================================================
+   REDUCED MOTION
+================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .Footer *,
+  .Footer *::before,
+  .Footer *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

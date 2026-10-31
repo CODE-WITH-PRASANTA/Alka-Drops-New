@@ -1,0 +1,252 @@
+/* =====================================
+   TEAM MEET SECTION
+===================================== */
+
+.team-meet-section {
+  width: 100%;
+  padding: 55px 25px 60px;
+  background: #ffffff;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.team-meet-container {
+  width: 100%;
+  max-width: 1170px;
+  margin: 0 auto;
+}
+
+/* =====================================
+   HEADING
+===================================== */
+
+.team-meet-heading {
+  text-align: center;
+  margin-bottom: 27px;
+}
+
+.team-meet-heading span {
+  display: block;
+  color: #087dc1;
+  font-size: 9px;
+  font-weight: 700;
+  margin-bottom: 13px;
+}
+
+.team-meet-heading h2 {
+  font-size: 23px;
+  line-height: 1.3;
+  font-weight: 700;
+  color: #080808;
+  margin: 0;
+}
+
+/* =====================================
+   TEAM GRID
+===================================== */
+
+.team-meet-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 15px;
+  row-gap: 30px;
+  width: 100%;
+}
+
+/* =====================================
+   TEAM CARD
+===================================== */
+
+.team-meet-card {
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+  padding: 0 5px 12px;
+  box-sizing: border-box;
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+
+  border-radius: 8px;
+}
+
+/* Hover popup effect */
+
+.team-meet-card:hover {
+  transform: translateY(-9px) scale(1.025);
+}
+
+/* =====================================
+   TEAM IMAGE
+===================================== */
+
+.team-meet-image-wrapper {
+  width: 100%;
+  max-width: 135px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto 18px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #eeeeee;
+}
+
+.team-meet-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+
+  transition:
+    transform 0.45s ease,
+    filter 0.45s ease;
+}
+
+.team-meet-card:hover .team-meet-image {
+  transform: scale(1.1);
+}
+
+/* =====================================
+   TEAM INFORMATION
+===================================== */
+
+.team-meet-info {
+  text-align: center;
+}
+
+.team-meet-info h3 {
+  font-size: 11px;
+  font-weight: 700;
+  color: #080808;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.team-meet-info p {
+  font-size: 9px;
+  font-weight: 400;
+  color: #40547d;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* =====================================
+   LARGE LAPTOP
+===================================== */
+
+@media (max-width: 1100px) {
+  .team-meet-container {
+    max-width: 950px;
+  }
+
+  .team-meet-grid {
+    column-gap: 12px;
+  }
+
+  .team-meet-image-wrapper {
+    max-width: 125px;
+  }
+}
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (max-width: 768px) {
+  .team-meet-section {
+    padding: 45px 20px;
+  }
+
+  .team-meet-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
+    row-gap: 30px;
+  }
+
+  .team-meet-image-wrapper {
+    max-width: 145px;
+  }
+
+  .team-meet-heading h2 {
+    font-size: 22px;
+  }
+
+  .team-meet-info h3 {
+    font-size: 12px;
+  }
+
+  .team-meet-info p {
+    font-size: 10px;
+  }
+}
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 480px) {
+  .team-meet-section {
+    padding: 40px 12px;
+  }
+
+  .team-meet-heading {
+    margin-bottom: 25px;
+  }
+
+  .team-meet-heading h2 {
+    font-size: 21px;
+  }
+
+  .team-meet-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 10px;
+    row-gap: 25px;
+  }
+
+  .team-meet-image-wrapper {
+    max-width: 120px;
+    margin-bottom: 13px;
+  }
+
+  .team-meet-info h3 {
+    font-size: 11px;
+  }
+
+  .team-meet-info p {
+    font-size: 9px;
+  }
+
+  .team-meet-card:hover {
+    transform: translateY(-5px) scale(1.015);
+  }
+}
+
+/* =====================================
+   SMALL MOBILE
+===================================== */
+
+@media (max-width: 340px) {
+  .team-meet-image-wrapper {
+    max-width: 100px;
+  }
+
+  .team-meet-grid {
+    column-gap: 5px;
+  }
+
+  .team-meet-info h3 {
+    font-size: 10px;
+  }
+}
+
+/* =====================================
+   REDUCED MOTION
+===================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .team-meet-card,
+  .team-meet-image {
+    transition: none;
+  }
+}

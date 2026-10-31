@@ -1,0 +1,602 @@
+
+/* ==========================================
+   BLOG COMMENTS SECTION
+========================================== */
+
+.blog-comments-section {
+  width: 100%;
+  padding: 35px 20px 60px;
+  box-sizing: border-box;
+  background: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+.blog-comments-container {
+  width: 100%;
+  max-width: 995px;
+  margin: 0 auto;
+  position: relative;
+  left: -100px;
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   HEADINGS
+========================================== */
+
+.blog-comments-title,
+.blog-reply-title {
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #080808;
+  margin: 0;
+}
+
+/* ==========================================
+   COMMENT LIST
+========================================== */
+
+.blog-comments-list {
+  width: 100%;
+  max-width: 880px;
+  margin-top: 30px;
+}
+
+/* ==========================================
+   COMMENT CARD
+========================================== */
+
+.blog-comment-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+
+  width: 100%;
+  max-width: 880px;
+  min-height: 155px;
+
+  padding: 25px 28px;
+  margin-bottom: 20px;
+
+  border: 2px solid #e0ecff;
+  border-radius: 3px;
+  background: #fff;
+
+  box-sizing: border-box;
+
+  animation: blogCommentAppear 0.5s ease both;
+  transition: border-color 0.3s ease;
+}
+
+.blog-comment-card:hover {
+  border-color: #c7dfff;
+}
+
+/* ==========================================
+   AVATAR
+========================================== */
+
+.blog-comment-avatar {
+  display: block;
+  width: 85px;
+  height: 85px;
+  min-width: 85px;
+
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #e1edff;
+  color: #087dc1;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ==========================================
+   COMMENT CONTENT
+========================================== */
+
+.blog-comment-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.blog-comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.blog-comment-header h4 {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #080808;
+}
+
+.blog-comment-header span {
+  font-size: 13px;
+  color: #080808;
+}
+
+.blog-comment-content p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #40547d;
+  margin: 0 0 10px;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   REPLY BUTTON
+========================================== */
+
+.blog-reply-btn {
+  border: none;
+  padding: 0;
+
+  background: transparent;
+  color: #0079c8;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.blog-reply-btn:hover {
+  color: #004c88;
+  text-decoration: underline;
+}
+
+/* ==========================================
+   NESTED COMMENTS
+========================================== */
+
+.nested-comment {
+  width: calc(100% - 35px);
+  max-width: none;
+  min-height: 145px;
+
+  margin: 25px 0 10px 35px;
+}
+
+/* ==========================================
+   REPLY FORM SECTION
+========================================== */
+
+.blog-reply-section {
+  width: 100%;
+  max-width: 880px;
+  margin-top: 45px;
+}
+
+.blog-reply-title {
+  margin-bottom: 23px;
+}
+
+.blog-cancel-reply {
+  display: block;
+
+  background: none;
+  border: none;
+
+  color: #087dc1;
+  font-size: 12px;
+
+  margin: -10px 0 15px;
+  padding: 0;
+
+  cursor: pointer;
+}
+
+/* ==========================================
+   FORM
+========================================== */
+
+.blog-comment-form {
+  width: 100%;
+}
+
+.blog-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 21px;
+  margin-bottom: 20px;
+}
+
+.blog-comment-form input,
+.blog-comment-form textarea {
+  display: block;
+  width: 100%;
+
+  border: 3px solid #e0ecff;
+  border-radius: 3px;
+
+  outline: none;
+  background: #fff;
+  color: #333;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.blog-comment-form input {
+  height: 53px;
+  padding: 0 15px;
+}
+
+.blog-comment-form textarea {
+  height: 125px;
+  padding: 12px 15px;
+
+  resize: vertical;
+  margin-bottom: 20px;
+}
+
+.blog-comment-form input::placeholder,
+.blog-comment-form textarea::placeholder {
+  color: #77849a;
+  opacity: 1;
+}
+
+.blog-comment-form input:focus,
+.blog-comment-form textarea:focus {
+  border-color: #8bbcf3;
+  box-shadow: 0 0 0 3px rgba(0, 121, 200, 0.07);
+}
+
+/* ==========================================
+   POST COMMENT BUTTON
+========================================== */
+
+.blog-post-comment-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  width: 143px;
+  height: 43px;
+
+  border: none;
+  border-radius: 7px;
+
+  background: #087dc1;
+  color: #fff;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.blog-post-comment-btn span {
+  position: relative;
+  z-index: 2;
+}
+
+.blog-button-ripple {
+  position: absolute;
+  z-index: 1;
+
+  width: 15px;
+  height: 15px;
+
+  left: 50%;
+  top: 50%;
+
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.65s ease;
+}
+
+.blog-post-comment-btn:hover {
+  background: #0069aa;
+
+  transform: translateY(-4px) scale(1.035);
+
+  box-shadow: 0 9px 20px rgba(0, 105, 170, 0.25);
+}
+
+.blog-post-comment-btn:hover .blog-button-ripple {
+  transform: translate(-50%, -50%) scale(16);
+}
+
+.blog-post-comment-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.blog-post-comment-btn:focus-visible {
+  outline: 3px solid #9bcfff;
+  outline-offset: 4px;
+}
+
+/* ==========================================
+   SUCCESS MESSAGE
+========================================== */
+
+.blog-comment-success {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 11px 13px;
+  margin-bottom: 17px;
+
+  border: 1px solid #cce9d8;
+  border-radius: 4px;
+
+  background: #f0fbf4;
+  color: #247b47;
+
+  font-size: 12px;
+
+  animation: blogCommentAppear 0.4s ease both;
+}
+
+.blog-comment-success span {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+/* ==========================================
+   COMMENT ANIMATION
+========================================== */
+
+@keyframes blogCommentAppear {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================
+   LARGE LAPTOP
+========================================== */
+
+@media (max-width: 1200px) {
+  .blog-comments-container {
+    left: 0;
+  }
+
+  .blog-comments-list,
+  .blog-reply-section {
+    max-width: 880px;
+  }
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 991px) {
+  .blog-comments-section {
+    padding: 35px 25px 50px;
+  }
+
+  .blog-comments-container {
+    max-width: 100%;
+    left: 0;
+  }
+
+  .blog-comments-list,
+  .blog-reply-section {
+    max-width: 100%;
+  }
+
+  .blog-comment-card {
+    padding: 20px;
+    gap: 18px;
+    min-height: 140px;
+  }
+
+  .blog-comment-avatar {
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+  }
+
+  .blog-comment-header h4 {
+    font-size: 13px;
+  }
+
+  .blog-comment-header span {
+    font-size: 12px;
+  }
+
+  .blog-comment-content p {
+    font-size: 13px;
+  }
+
+  .nested-comment {
+    width: calc(100% - 25px);
+    margin-left: 25px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+  .blog-comments-section {
+    padding: 28px 15px 40px;
+  }
+
+  .blog-comments-title,
+  .blog-reply-title {
+    font-size: 20px;
+  }
+
+  .blog-comments-list {
+    margin-top: 22px;
+  }
+
+  .blog-comment-card {
+    width: 100%;
+    min-height: auto;
+
+    padding: 15px 12px;
+    gap: 12px;
+
+    border-width: 2px;
+    margin-bottom: 17px;
+  }
+
+  .blog-comment-avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+  }
+
+  .blog-comment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .blog-comment-header h4 {
+    font-size: 12px;
+    margin: 0;
+  }
+
+  .blog-comment-header span {
+    font-size: 10px;
+    white-space: normal;
+  }
+
+  .blog-comment-content p {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .blog-reply-btn {
+    font-size: 12px;
+  }
+
+  .nested-comment {
+    width: calc(100% - 15px);
+    margin: 18px 0 5px 15px;
+    padding: 12px 9px;
+  }
+
+  .nested-comment .blog-comment-avatar {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+
+  .blog-reply-section {
+    margin-top: 35px;
+  }
+
+  .blog-reply-title {
+    margin-bottom: 20px;
+  }
+
+  .blog-form-row {
+    grid-template-columns: 1fr;
+    gap: 13px;
+    margin-bottom: 13px;
+  }
+
+  .blog-comment-form input {
+    height: 48px;
+    font-size: 12px;
+  }
+
+  .blog-comment-form textarea {
+    height: 115px;
+    font-size: 12px;
+    margin-bottom: 17px;
+  }
+
+  .blog-post-comment-btn {
+    width: 143px;
+    height: 43px;
+    font-size: 12px;
+  }
+}
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 380px) {
+  .blog-comments-section {
+    padding: 22px 12px 35px;
+  }
+
+  .blog-comment-card {
+    padding: 12px 9px;
+    gap: 9px;
+  }
+
+  .blog-comment-avatar {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+
+  .blog-comment-header span {
+    font-size: 9px;
+  }
+
+  .blog-comment-content p {
+    font-size: 11px;
+  }
+
+  .nested-comment {
+    width: calc(100% - 10px);
+    margin-left: 10px;
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-comments-section *,
+  .blog-comments-section *::before,
+  .blog-comments-section *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,524 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap');
+
+.contact {
+  --blue: #0575c3;
+  --blue-dark: #045a98;
+  --ink: #0b0b1a;
+  --muted: #55596a;
+  --line: #d9dde3;
+  --error: #d6334a;
+  --ok: #19a974;
+
+  position: relative;
+  width: 100%;
+  padding-bottom: 60px;
+  font-family: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background: #fff;
+}
+
+.contact *,
+.contact *::before,
+.contact *::after {
+  box-sizing: border-box;
+}
+
+/* ---------- Map ---------- */
+.contact__map {
+  width: 100%;
+  height: 313px;
+  background: #e8eef3;
+}
+.contact__map iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ---------- Card ---------- */
+.contact__card {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 321px;
+  gap: 22px;
+  max-width: 878px;
+  margin: -42px auto 0;
+  padding: 45px 38px;
+  background: #fff;
+  box-shadow: 0 10px 40px rgba(12, 30, 60, 0.1);
+}
+
+.contact__title {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.contact__sub {
+  margin: 10px 0 30px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Form ---------- */
+.cf-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 19px 22px;
+}
+
+.cf-field {
+  position: relative;
+}
+.cf-field--full {
+  grid-column: 1 / -1;
+}
+
+.cf-field input,
+.cf-field textarea {
+  display: block;
+  width: 100%;
+  height: 45px;
+  padding: 16px 17px 0;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  appearance: none;
+}
+.cf-field textarea {
+  height: 112px;
+  padding-top: 24px;
+  resize: vertical;
+  min-height: 112px;
+}
+
+.cf-field label {
+  position: absolute;
+  left: 18px;
+  top: 14px;
+  font-size: 13px;
+  color: #8a8f9c;
+  pointer-events: none;
+  transform-origin: left top;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.cf-field input:focus + label,
+.cf-field input:not(:placeholder-shown) + label,
+.cf-field textarea:focus + label,
+.cf-field textarea:not(:placeholder-shown) + label {
+  transform: translateY(-10px) scale(0.82);
+  color: var(--blue);
+}
+
+.cf-field input:focus,
+.cf-field textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 6px 18px rgba(5, 117, 195, 0.12);
+}
+
+/* animated underline accent */
+.cf-field__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--blue);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+  pointer-events: none;
+}
+.cf-field input:focus ~ .cf-field__bar,
+.cf-field textarea:focus ~ .cf-field__bar {
+  transform: scaleX(1);
+}
+
+.cf-field.is-invalid input,
+.cf-field.is-invalid textarea {
+  border-color: var(--error);
+}
+.cf-field.is-invalid label {
+  color: var(--error);
+}
+.cf-field.is-invalid .cf-field__bar {
+  background: var(--error);
+  transform: scaleX(1);
+}
+.cf-field__error {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--error);
+  animation: cf-shake 0.35s ease;
+}
+@keyframes cf-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* ---------- Button ---------- */
+.cf-btn {
+  position: relative;
+  grid-column: 1 / -1;
+  justify-self: start;
+  min-width: 151px;
+  height: 45px;
+  margin-top: 4px;
+  padding: 0 24px;
+  overflow: hidden;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: #fff;
+  background: var(--blue);
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+}
+.cf-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.28) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+.cf-btn:hover:not(:disabled) {
+  background: var(--blue-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(5, 117, 195, 0.35);
+}
+.cf-btn:hover:not(:disabled)::after {
+  transform: translateX(120%);
+  transition: transform 0.7s ease;
+}
+.cf-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+.cf-btn:focus-visible,
+.contact__top:focus-visible {
+  outline: 3px solid rgba(5, 117, 195, 0.4);
+  outline-offset: 3px;
+}
+.cf-btn:disabled {
+  cursor: progress;
+}
+.cf-btn__label {
+  transition: opacity 0.2s;
+}
+.cf-btn__loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  opacity: 0;
+}
+.cf-btn.is-loading .cf-btn__label {
+  opacity: 0;
+}
+.cf-btn.is-loading .cf-btn__loader {
+  opacity: 1;
+  animation: cf-spin 0.7s linear infinite;
+}
+@keyframes cf-spin {
+  to { transform: rotate(360deg); }
+}
+.cf-btn__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.cf-btn--ghost {
+  grid-column: auto;
+  justify-self: center;
+  margin-top: 22px;
+  color: var(--blue);
+  background: transparent;
+  border: 1.5px solid var(--blue);
+}
+.cf-btn--ghost:hover:not(:disabled) {
+  color: #fff;
+}
+
+/* ---------- Success state ---------- */
+.cf-success {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 385px;
+  padding: 10px 6px;
+  text-align: center;
+  animation: cf-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes cf-rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.cf-success h3 {
+  margin: 20px 0 8px;
+  font-size: 30px;
+  font-weight: 600;
+}
+.cf-success p {
+  max-width: 340px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.cf-success p strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+.cf-success__ref {
+  margin-top: 18px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--blue-dark);
+  background: rgba(5, 117, 195, 0.08);
+  border-radius: 40px;
+}
+
+.cf-success__check {
+  position: relative;
+  z-index: 1;
+  width: 92px;
+  height: 92px;
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.cf-success__ring {
+  stroke: var(--ok);
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  animation: cf-draw 0.7s 0.1s ease forwards;
+}
+.cf-success__tick {
+  stroke: var(--ok);
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: cf-draw 0.45s 0.7s ease forwards;
+}
+@keyframes cf-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* confetti-style burst around the check */
+.cf-success__burst {
+  position: absolute;
+  top: calc(50% - 130px);
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+.cf-success__burst i {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+  opacity: 0;
+  animation: cf-burst 0.9s 0.85s ease-out forwards;
+  transform: rotate(calc(var(--i) * 30deg));
+}
+.cf-success__burst i:nth-child(3n) { background: var(--ok); }
+.cf-success__burst i:nth-child(3n + 1) { background: #f5b72f; width: 6px; height: 6px; }
+@keyframes cf-burst {
+  0% { opacity: 1; transform: rotate(calc(var(--i) * 30deg)) translateY(-34px) scale(1); }
+  100% { opacity: 0; transform: rotate(calc(var(--i) * 30deg)) translateY(-78px) scale(0.3); }
+}
+
+/* ---------- Info panel ---------- */
+.contact__info {
+  align-self: start;
+  padding: 36px 24px 38px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.14), transparent 55%),
+    var(--blue);
+}
+.contact__info h3 {
+  margin: 0 0 24px;
+  font-size: 23px;
+  font-weight: 600;
+}
+
+.ci {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 38px;
+}
+.ci:last-child {
+  margin-bottom: 0;
+}
+.ci__icon {
+  flex: 0 0 41px;
+  width: 41px;
+  height: 41px;
+  display: grid;
+  place-items: center;
+  color: var(--blue);
+  background: #fff;
+  transition: transform 0.3s ease;
+}
+.ci:hover .ci__icon {
+  transform: translateY(-3px) rotate(-4deg);
+}
+.ci__icon svg {
+  width: 24px;
+  height: 24px;
+}
+.ci h4 {
+  margin: 0 0 9px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ci p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.ci a {
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.3s;
+}
+.ci a:hover,
+.ci a:focus-visible {
+  background-size: 100% 1px;
+  outline: none;
+}
+
+/* ---------- Back to top ---------- */
+.contact__top {
+  position: fixed;
+  right: 33px;
+  bottom: 28px;
+  z-index: 20;
+  width: 53px;
+  height: 53px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--blue);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(5, 117, 195, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  transition: opacity 0.3s, transform 0.3s, visibility 0.3s, background 0.25s;
+}
+.contact__top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.contact__top:hover {
+  background: var(--blue-dark);
+  transform: translateY(-3px);
+}
+.contact__top svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 991px) {
+  .contact__card {
+    grid-template-columns: 1fr;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+    width: calc(100% - 40px);
+    gap: 34px;
+    padding: 36px 30px;
+  }
+  .contact__info {
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 575px) {
+  .contact__map {
+    height: 240px;
+  }
+  .contact__card {
+    width: calc(100% - 24px);
+    margin-top: -28px;
+    padding: 28px 18px;
+  }
+  .contact__title {
+    font-size: 28px;
+  }
+  .cf-form {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .cf-btn:not(.cf-btn--ghost) {
+    width: 100%;
+    justify-self: stretch;
+  }
+  .contact__info {
+    padding: 28px 18px;
+  }
+  .cf-success {
+    min-height: 340px;
+  }
+  .cf-success h3 {
+    font-size: 26px;
+  }
+  .contact__top {
+    right: 16px;
+    bottom: 16px;
+    width: 46px;
+    height: 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact *,
+  .contact *::before,
+  .contact *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+  }
+  .cf-success__ring,
+  .cf-success__tick {
+    stroke-dashoffset: 0;
+  }
+}

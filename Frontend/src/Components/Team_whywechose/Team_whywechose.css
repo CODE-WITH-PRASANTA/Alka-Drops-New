@@ -1,0 +1,408 @@
+/* ======================================
+   WHY CHOOSE US SECTION
+====================================== */
+
+.team-why-section {
+  width: 100%;
+  padding: 90px 25px 50px;
+  background: #fff;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.team-why-container {
+  width: 100%;
+  max-width: 1175px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 570px 1fr;
+  column-gap: 78px;
+
+  align-items: start;
+  box-sizing: border-box;
+}
+
+/* ======================================
+   LEFT IMAGE
+====================================== */
+
+.team-why-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 609px;
+}
+
+.team-why-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ======================================
+   EXPERIENCE BADGE
+====================================== */
+
+.team-experience-badge {
+  position: absolute;
+  right: 0;
+  bottom: 60px;
+
+  width: 346px;
+  height: 99px;
+
+  background: #fff;
+  border-left: 10px solid #087dc1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+.team-experience-number {
+  font-size: 70px;
+  font-weight: 800;
+  line-height: 1;
+  color: #087dc1;
+}
+
+.team-experience-text {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.8;
+  color: #080808;
+}
+
+/* ======================================
+   RIGHT CONTENT
+====================================== */
+
+.team-why-content {
+  width: 100%;
+  max-width: 480px;
+  padding-top: 0;
+  box-sizing: border-box;
+}
+
+.team-why-subtitle {
+  display: block;
+  color: #087dc1;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 23px;
+}
+
+.team-why-heading {
+  font-size: 43px;
+  line-height: 1.3;
+  font-weight: 700;
+  color: #080808;
+
+  margin: 0 0 32px;
+}
+
+.team-why-description {
+  font-size: 16px;
+  line-height: 1.9;
+  color: #40547d;
+
+  margin: 0 0 38px;
+}
+
+/* ======================================
+   PROGRESS BARS
+====================================== */
+
+.team-progress-list {
+  width: 100%;
+  max-width: 350px;
+}
+
+.team-progress-item {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.team-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 9px;
+
+  color: #080808;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.team-progress-track {
+  width: 100%;
+  height: 3px;
+  background: #ededed;
+  overflow: hidden;
+}
+
+.team-progress-fill {
+  height: 100%;
+  background: #087dc1;
+  transition: width 0.1s linear;
+  will-change: width;
+}
+
+/* ======================================
+   SCROLL TO TOP BUTTON
+====================================== */
+
+.team-scroll-top {
+  position: fixed;
+
+  right: 45px;
+  bottom: 45px;
+
+  width: 70px;
+  height: 70px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #087dc1;
+  color: #fff;
+
+  font-size: 28px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  z-index: 999;
+
+  box-shadow: 0 8px 25px rgba(0, 125, 193, 0.15);
+
+  transition: all 0.3s ease;
+}
+
+.team-scroll-top:hover {
+  background: #0069aa;
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 105, 170, 0.3);
+}
+
+/* ======================================
+   LARGE LAPTOP
+====================================== */
+
+@media (max-width: 1250px) {
+  .team-why-container {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    column-gap: 55px;
+  }
+
+  .team-why-image-wrapper {
+    height: 570px;
+  }
+
+  .team-why-heading {
+    font-size: 38px;
+  }
+}
+
+/* ======================================
+   TABLET
+====================================== */
+
+@media (max-width: 991px) {
+  .team-why-section {
+    padding: 65px 30px 50px;
+  }
+
+  .team-why-container {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 35px;
+  }
+
+  .team-why-image-wrapper {
+    height: 480px;
+  }
+
+  .team-why-content {
+    max-width: 100%;
+  }
+
+  .team-why-heading {
+    font-size: 32px;
+    margin-bottom: 23px;
+  }
+
+  .team-why-description {
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 28px;
+  }
+
+  .team-experience-badge {
+    width: 285px;
+    height: 85px;
+    bottom: 45px;
+    gap: 20px;
+  }
+
+  .team-experience-number {
+    font-size: 55px;
+  }
+
+  .team-experience-text {
+    font-size: 14px;
+  }
+
+  .team-scroll-top {
+    width: 55px;
+    height: 55px;
+    right: 25px;
+    bottom: 25px;
+  }
+}
+
+/* ======================================
+   MOBILE
+====================================== */
+
+@media (max-width: 767px) {
+  .team-why-section {
+    padding: 45px 20px 45px;
+  }
+
+  .team-why-container {
+    grid-template-columns: 1fr;
+    row-gap: 45px;
+  }
+
+  .team-why-image-wrapper {
+    width: 100%;
+    height: 450px;
+  }
+
+  .team-why-image {
+    object-position: center;
+  }
+
+  .team-experience-badge {
+    width: 270px;
+    height: 80px;
+    bottom: 25px;
+    gap: 20px;
+  }
+
+  .team-experience-number {
+    font-size: 52px;
+  }
+
+  .team-experience-text {
+    font-size: 14px;
+  }
+
+  .team-why-content {
+    max-width: 100%;
+  }
+
+  .team-why-subtitle {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+
+  .team-why-heading {
+    font-size: 32px;
+    line-height: 1.3;
+    margin-bottom: 22px;
+  }
+
+  .team-desktop-break {
+    display: none;
+  }
+
+  .team-why-description {
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 30px;
+  }
+
+  .team-progress-list {
+    max-width: 100%;
+  }
+
+  .team-progress-item {
+    margin-bottom: 25px;
+  }
+
+  .team-scroll-top {
+    width: 48px;
+    height: 48px;
+    right: 17px;
+    bottom: 17px;
+    font-size: 23px;
+  }
+}
+
+/* ======================================
+   SMALL MOBILE
+====================================== */
+
+@media (max-width: 420px) {
+  .team-why-section {
+    padding: 35px 15px;
+  }
+
+  .team-why-image-wrapper {
+    height: 350px;
+  }
+
+  .team-experience-badge {
+    width: 235px;
+    height: 72px;
+    bottom: 20px;
+    border-left-width: 7px;
+    gap: 15px;
+  }
+
+  .team-experience-number {
+    font-size: 45px;
+  }
+
+  .team-experience-text {
+    font-size: 12px;
+  }
+
+  .team-why-heading {
+    font-size: 27px;
+  }
+
+  .team-why-description {
+    font-size: 13px;
+  }
+
+  .team-progress-info {
+    font-size: 13px;
+  }
+}
+
+/* ======================================
+   REDUCED MOTION
+====================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .team-why-section *,
+  .team-why-section *::before,
+  .team-why-section *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

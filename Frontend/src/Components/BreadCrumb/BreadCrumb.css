@@ -12,7 +12,7 @@
 }
 
 .breadcrumb-overlay {
-  background: rgba(0, 0, 0, 0.45); /* Slightly darker overlay for better text contrast */
+  background: rgba(0, 0, 0, 0.6); /* Slightly darker overlay for better text contrast */
   height: 100%;
   width: 100%;
   display: flex;
@@ -23,10 +23,10 @@
 }
 
 .breadcrumb-title {
-  font-size: 5rem; /* Larger font size to match the bold header in your screenshot */
+  font-size: 2.3rem; /* Larger font size to match the bold header in your screenshot */
   font-weight: 600;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1;
 }
 
 .breadcrumb-nav {
@@ -52,4 +52,14 @@
   .breadcrumb-title {
     font-size: 3rem;
   }
+}
+.breadcrumb-home {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.breadcrumb-home:hover,
+.breadcrumb-home:focus {
+  color: #ffffff;
+  text-decoration: none;
 }

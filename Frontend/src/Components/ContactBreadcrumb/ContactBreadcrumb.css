@@ -1,0 +1,65 @@
+/* Using Poppins font for the clean, geometric look */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+.Contact-Breadcrumb-wrapper {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 400px;
+  width: 100%;
+  position: relative;
+  font-family: 'Poppins', sans-serif;
+}
+
+.Contact-Breadcrumb-overlay {
+  background: rgba(0, 0, 0, 0.6); /* Slightly darker overlay for better text contrast */
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+}
+
+.Contact-Breadcrumb-title {
+  font-size: 2.3rem; /* Larger font size to match the bold header in your screenshot */
+  font-weight: 600;
+  margin: 0;
+  line-height: 1;
+}
+
+.Contact-Breadcrumb-nav {
+  font-size: 1.1rem;
+  font-weight: 400;
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+  text-transform: capitalize;
+}
+
+.Contact-Breadcrumb-divider {
+  color: #4d97ff; /* Red divider */
+  font-weight: 700;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .Contact-Breadcrumb-wrapper {
+    height: 250px;
+  }
+  
+  .Contact-Breadcrumb-title {
+    font-size: 3rem;
+  }
+}
+.Contact-Breadcrumb-home {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.Contact-Breadcrumb-home:hover,
+.Contact-Breadcrumb-home:focus {
+  color: #ffffff;
+  text-decoration: none;
+}

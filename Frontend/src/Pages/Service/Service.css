@@ -1,0 +1,22 @@
+.service-page-transition {
+  width: 100%;
+  animation: servicePageEnter 0.65s ease-out both;
+}
+
+@keyframes servicePageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-page-transition {
+    animation: none;
+  }
+}

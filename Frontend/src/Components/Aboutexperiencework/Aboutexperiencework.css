@@ -1,0 +1,474 @@
+/* ==========================================
+   EXPERIENCED WORKERS SECTION
+========================================== */
+
+.experience-section {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  width: 100%;
+  min-height: 450px;
+
+  background: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.experience-section *,
+.experience-section *::before,
+.experience-section *::after {
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   LEFT BLUE PANEL
+========================================== */
+
+.experience-content {
+  position: relative;
+  z-index: 1;
+  height: 500px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  min-width: 0;
+   padding: 55px 35px 55px 24px; 
+   margin-top: 130px;
+
+  color: #ffffff;
+  background: #087bc0;
+  isolation: isolate;
+}
+
+/* Dotted world-map-inspired background */
+
+.experience-map-pattern {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.23) 2px,
+    transparent 2.8px
+  );
+
+  background-size: 9px 9px;
+
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse 30% 35% at 35% 27%,
+      #000 45%,
+      transparent 75%
+    ),
+    radial-gradient(
+      ellipse 35% 55% at 67% 43%,
+      #000 45%,
+      transparent 76%
+    ),
+    radial-gradient(
+      ellipse 20% 25% at 48% 82%,
+      #000 35%,
+      transparent 75%
+    );
+
+  mask-image:
+    radial-gradient(
+      ellipse 30% 35% at 35% 27%,
+      #000 45%,
+      transparent 75%
+    ),
+    radial-gradient(
+      ellipse 35% 55% at 67% 43%,
+      #000 45%,
+      transparent 76%
+    ),
+    radial-gradient(
+      ellipse 20% 25% at 48% 82%,
+      #000 35%,
+      transparent 75%
+    );
+
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
+
+  pointer-events: none;
+}
+
+/* Content alignment */
+
+.experience-inner {
+  width: 100%;
+  max-width: 475px;
+}
+
+/* Heading */
+
+.experience-heading {
+  margin: 0 0 26px;
+
+  color: #ffffff;
+  font-size: clamp(27px, 2.4vw, 38px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.4px;
+}
+
+/* Description */
+
+.experience-description {
+  max-width: 470px;
+  margin: 0 0 25px;
+
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.9;
+}
+
+/* ==========================================
+   FEATURES
+========================================== */
+
+.experience-features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px 20px;
+
+  margin: 0 0 28px;
+  padding: 0;
+
+  list-style: none;
+}
+
+.experience-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+
+  min-width: 0;
+
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.experience-check {
+  display: inline-flex;
+  flex: 0 0 15px;
+
+  width: 15px;
+  height: 15px;
+  margin-top: 1px;
+
+  color: #ffffff;
+}
+
+.experience-check svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================
+   READ MORE BUTTON
+========================================== */
+
+.experience-read-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-height: 38px;
+  padding: 9px 17px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 5px;
+
+  color: #ffffff;
+  background: transparent;
+
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.experience-read-more:hover {
+  color: #087bc0;
+  background: #ffffff;
+  border-color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.experience-read-more:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
+}
+
+.experience-read-more span {
+  transition: transform 0.25s ease;
+}
+
+.experience-read-more:hover span {
+  transform: translateX(3px);
+}
+
+/* ==========================================
+   RIGHT IMAGE
+========================================== */
+
+.experience-image {
+  position: relative;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  width: 100%;
+  height: 650px;
+  min-height: 450px;
+
+  overflow: hidden;
+  background: #e7eef2;
+}
+
+.experience-image img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+  min-height: 450px;
+
+  object-fit: cover;
+  object-position: center;
+
+  transition: transform 0.65s ease;
+}
+
+.experience-image:hover img {
+  transform: scale(1.025);
+}
+
+/* ==========================================
+   BACK TO TOP
+========================================== */
+
+.experience-back-to-top {
+  position: absolute;
+  z-index: 5;
+
+  right: 25px;
+  bottom: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 54px;
+  height: 54px;
+
+  border: none;
+  border-radius: 50%;
+
+  color: #ffffff;
+  background: #087bc0;
+
+  font-size: 24px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow: 0 5px 18px rgba(0, 73, 130, 0.12);
+
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.experience-back-to-top:hover {
+  background: #0569a8;
+  transform: translateY(-3px);
+}
+
+.experience-back-to-top:focus-visible {
+  outline: 2px solid #087bc0;
+  outline-offset: 4px;
+}
+
+/* ==========================================
+   LARGE DESKTOPS
+========================================== */
+
+@media (min-width: 1500px) {
+  .experience-section {
+    min-height: 450px;
+  }
+
+  .experience-content {
+    padding-right: 35px;
+  }
+
+  .experience-inner {
+    max-width: 475px;
+  }
+
+  .experience-image,
+  .experience-image img {
+    min-height: 450px;
+  }
+}
+
+/* ==========================================
+   TABLETS
+========================================== */
+
+@media (max-width: 1000px) {
+  .experience-section {
+    grid-template-columns: 1fr 1fr;
+    min-height: 380px;
+  }
+
+  .experience-content {
+    padding: 40px 25px;
+  }
+
+  .experience-heading {
+    font-size: 29px;
+    margin-bottom: 20px;
+  }
+
+  .experience-description {
+    font-size: 12px;
+    margin-bottom: 22px;
+  }
+
+  .experience-features {
+    gap: 12px;
+  }
+
+  .experience-features li {
+    font-size: 11px;
+  }
+
+  .experience-image,
+  .experience-image img {
+    min-height: 380px;
+  }
+
+  .experience-back-to-top {
+    right: 18px;
+    bottom: 18px;
+
+    width: 46px;
+    height: 46px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 700px) {
+  .experience-section {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .experience-content {
+    justify-content: center;
+    padding: 45px 25px;
+  }
+
+  .experience-inner {
+    max-width: 540px;
+  }
+
+  .experience-heading {
+    font-size: clamp(27px, 6vw, 34px);
+    margin-bottom: 19px;
+  }
+
+  .experience-description {
+    max-width: 100%;
+    font-size: 13px;
+    line-height: 1.85;
+  }
+
+  .experience-features {
+    gap: 14px 12px;
+    margin-bottom: 26px;
+  }
+
+  .experience-features li {
+    font-size: 12px;
+  }
+
+  .experience-image {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .experience-image img {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .experience-back-to-top {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+
+    width: 44px;
+    height: 44px;
+    font-size: 21px;
+  }
+}
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 380px) {
+  .experience-content {
+    padding: 35px 18px;
+  }
+
+  .experience-heading {
+    font-size: 26px;
+  }
+
+  .experience-features {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .experience-features li {
+    font-size: 12px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .experience-section *,
+  .experience-section *::before,
+  .experience-section *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

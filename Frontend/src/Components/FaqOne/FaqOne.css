@@ -1,0 +1,561 @@
+
+.FaqOne-section {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 70px 40px;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #183b56;
+  background: #ffffff;
+}
+
+.FaqOne-info-section {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 55px;
+  align-items: stretch;
+  margin-bottom: 70px;
+}
+
+.FaqOne-info-left-panel,
+.FaqOne-info-right-panel {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.FaqOne-info-left-panel {
+  padding: 20px 10px;
+}
+
+.FaqOne-info-eyebrow {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #0878c9;
+}
+
+.FaqOne-info-main-heading {
+  margin: 0 0 22px;
+  font-size: 42px;
+  line-height: 1.2;
+  font-weight: 750;
+  color: #103b59;
+}
+
+.FaqOne-info-description,
+.FaqOne-info-sub-description {
+  margin: 0 0 18px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #5b6b78;
+}
+
+.FaqOne-info-sub-heading {
+  margin: 30px 0 14px;
+  font-size: 25px;
+  line-height: 1.35;
+  font-weight: 700;
+  color: #123e5c;
+}
+
+/* FEATURES */
+
+.FaqOne-info-features-list {
+  margin: 28px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.FaqOne-info-features-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 15px;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: #345568;
+}
+
+.FaqOne-checkmark {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e7f7ff;
+  color: #0878c9;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* BUSINESS CONTACT */
+
+.FaqOne-business-contact-box {
+  margin-top: 32px;
+  padding: 25px;
+  border: 1px solid #dcecf5;
+  border-radius: 16px;
+  background: #f7fcff;
+  box-shadow: 0 10px 30px rgba(15, 94, 135, 0.06);
+}
+
+.FaqOne-business-contact-box h3 {
+  margin: 0 0 15px;
+  font-size: 20px;
+  color: #123e5c;
+}
+
+.FaqOne-business-contact-box p {
+  margin: 9px 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #5c6d78;
+}
+
+.FaqOne-business-contact-box a {
+  color: #0878c9;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.FaqOne-business-contact-box a:hover {
+  text-decoration: underline;
+}
+
+/* RIGHT FAQ PANEL */
+
+.FaqOne-info-right-panel {
+  padding: 32px;
+  border: 1px solid #e0edf4;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 15px 45px rgba(21, 76, 105, 0.08);
+}
+
+.FaqOne-section-title {
+  margin: 0 0 25px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e5eef3;
+  font-size: 26px;
+  line-height: 1.35;
+  font-weight: 700;
+  color: #123e5c;
+}
+
+/* ACCORDION */
+
+.FaqOne-accordion-group {
+  width: 100%;
+}
+
+.FaqOne-accordion-item {
+  border-bottom: 1px solid #e5edf2;
+}
+
+.FaqOne-accordion-item:last-child {
+  border-bottom: none;
+}
+
+.FaqOne-accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 4px;
+  border: none;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.FaqOne-accordion-header:hover .FaqOne-faq-question {
+  color: #0878c9;
+}
+
+.FaqOne-toggle-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #c9dce7;
+  border-radius: 50%;
+  background: #f6fbfe;
+  color: #0878c9;
+  font-size: 19px;
+  line-height: 1;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.FaqOne-toggle-icon.FaqOne-active {
+  background: #0878c9;
+  border-color: #0878c9;
+  color: #ffffff;
+}
+
+.FaqOne-faq-question {
+  flex: 1;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 650;
+  color: #294b5f;
+  transition: color 0.25s ease;
+}
+
+.FaqOne-accordion-content {
+  padding: 0 10px 20px 47px;
+  animation: FaqOne-faqOpen 0.25s ease;
+}
+
+.FaqOne-accordion-content p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #687985;
+}
+
+@keyframes FaqOne-faqOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* PRICING SECTION */
+
+.FaqOne-pricing-section {
+  align-items: center;
+}
+
+.FaqOne-pricing-section .FaqOne-info-left-panel {
+  padding: 35px;
+  border-radius: 22px;
+  background: linear-gradient(
+    145deg,
+    #f2fbff 0%,
+    #ffffff 65%,
+    #eef9ff 100%
+  );
+  border: 1px solid #dceff8;
+}
+
+.FaqOne-center-btn-panel {
+  min-height: 100%;
+}
+
+/* PRICING CONTACT CARD */
+
+.FaqOne-pricing-contact-card {
+  margin-top: 28px;
+  padding: 25px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #dcecf5;
+  box-shadow: 0 10px 30px rgba(15, 94, 135, 0.08);
+}
+
+.FaqOne-pricing-contact-card h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  color: #123e5c;
+}
+
+.FaqOne-pricing-contact-card p {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #637581;
+}
+
+/* CALL BUTTON */
+
+.FaqOne-read-more-btn-blue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 175px;
+  padding: 13px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #0878c9;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.FaqOne-read-more-btn-blue:hover {
+  background: #0566aa;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(8, 120, 201, 0.25);
+}
+
+/* LOCAL SEO SECTION */
+
+.FaqOne-local-seo-section {
+  width: 100%;
+  margin-top: 20px;
+  padding: 45px;
+  border-radius: 22px;
+  background: #f7fcff;
+  border: 1px solid #deedf5;
+}
+
+.FaqOne-local-seo-section h2 {
+  margin: 0 0 20px;
+  font-size: 31px;
+  line-height: 1.35;
+  color: #123e5c;
+}
+
+.FaqOne-local-seo-section p {
+  max-width: 1100px;
+  margin: 0 0 18px;
+  font-size: 15px;
+  line-height: 1.85;
+  color: #5e707c;
+}
+
+.FaqOne-local-seo-section strong {
+  color: #244e65;
+  font-weight: 700;
+}
+
+/* LOCAL BUSINESS DETAILS */
+
+.FaqOne-local-business-details {
+  margin-top: 30px;
+  padding: 25px;
+  border-radius: 15px;
+  background: #ffffff;
+  border-left: 4px solid #0878c9;
+  box-shadow: 0 8px 25px rgba(20, 76, 105, 0.06);
+}
+
+.FaqOne-local-business-details h3 {
+  margin: 0 0 15px;
+  font-size: 20px;
+  color: #123e5c;
+}
+
+.FaqOne-local-business-details p {
+  margin: 7px 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.FaqOne-local-business-details a {
+  color: #0878c9;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.FaqOne-local-business-details a:hover {
+  text-decoration: underline;
+}
+
+/* TABLET RESPONSIVE */
+
+@media (max-width: 1100px) {
+  .FaqOne-section {
+    padding: 55px 25px;
+  }
+
+  .FaqOne-info-section {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .FaqOne-info-main-heading {
+    font-size: 36px;
+  }
+
+  .FaqOne-info-right-panel {
+    padding: 28px;
+  }
+
+  .FaqOne-pricing-section .FaqOne-info-left-panel {
+    padding: 30px;
+  }
+}
+
+/* MOBILE RESPONSIVE */
+
+@media (max-width: 768px) {
+  .FaqOne-section {
+    padding: 40px 16px;
+  }
+
+  .FaqOne-info-section {
+    gap: 25px;
+    margin-bottom: 45px;
+  }
+
+  .FaqOne-info-left-panel {
+    padding: 5px 0;
+  }
+
+  .FaqOne-info-main-heading {
+    font-size: 29px;
+    line-height: 1.25;
+  }
+
+  .FaqOne-info-sub-heading {
+    font-size: 22px;
+  }
+
+  .FaqOne-info-description,
+  .FaqOne-info-sub-description {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .FaqOne-info-eyebrow {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .FaqOne-info-features-list li {
+    font-size: 14px;
+  }
+
+  .FaqOne-info-right-panel {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .FaqOne-section-title {
+    font-size: 21px;
+    margin-bottom: 15px;
+  }
+
+  .FaqOne-accordion-header {
+    padding: 17px 0;
+    gap: 10px;
+  }
+
+  .FaqOne-toggle-icon {
+    width: 25px;
+    height: 25px;
+    font-size: 17px;
+  }
+
+  .FaqOne-faq-question {
+    font-size: 14px;
+  }
+
+  .FaqOne-accordion-content {
+    padding: 0 5px 18px 35px;
+  }
+
+  .FaqOne-accordion-content p {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .FaqOne-pricing-section .FaqOne-info-left-panel {
+    padding: 25px 18px;
+    border-radius: 18px;
+  }
+
+  .FaqOne-pricing-contact-card {
+    padding: 20px;
+  }
+
+  .FaqOne-local-seo-section {
+    padding: 28px 20px;
+    border-radius: 18px;
+  }
+
+  .FaqOne-local-seo-section h2 {
+    font-size: 24px;
+  }
+
+  .FaqOne-local-seo-section p {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .FaqOne-business-contact-box {
+    padding: 20px;
+  }
+}
+
+/* SMALL MOBILE */
+
+@media (max-width: 480px) {
+  .FaqOne-section {
+    padding: 30px 12px;
+  }
+
+  .FaqOne-info-main-heading {
+    font-size: 25px;
+  }
+
+  .FaqOne-info-sub-heading {
+    font-size: 20px;
+  }
+
+  .FaqOne-info-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.8px;
+  }
+
+  .FaqOne-info-right-panel {
+    padding: 18px 13px;
+  }
+
+  .FaqOne-section-title {
+    font-size: 19px;
+  }
+
+  .FaqOne-faq-question {
+    font-size: 13px;
+  }
+
+  .FaqOne-accordion-content {
+    padding-left: 34px;
+  }
+
+  .FaqOne-local-seo-section {
+    padding: 23px 16px;
+  }
+
+  .FaqOne-local-seo-section h2 {
+    font-size: 21px;
+  }
+
+  .FaqOne-read-more-btn-blue {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .FaqOne-business-contact-box h3,
+  .FaqOne-pricing-contact-card h3,
+  .FaqOne-local-business-details h3 {
+    font-size: 18px;
+  }
+}

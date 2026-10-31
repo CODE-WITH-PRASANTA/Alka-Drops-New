@@ -1,0 +1,1613 @@
+
+/* =========================================
+   SHOP CARDS - MAIN SECTION
+========================================= */
+
+.ShopCards {
+  width: 100%;
+  min-height: 100vh;
+  padding: 85px 0 100px;
+  background: #ffffff;
+  font-family: "Inter", "Poppins", sans-serif;
+  color: #171d2b;
+  position: relative;
+  overflow: hidden;
+}
+
+.ShopCards * {
+  box-sizing: border-box;
+}
+
+.ShopCards-container {
+  width: 100%;
+  max-width: 1530px;
+  padding: 0 30px;
+  margin: 0 auto;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.ShopCards-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 30px;
+  margin-bottom: 45px;
+}
+
+.ShopCards-heading {
+  max-width: 650px;
+}
+
+.ShopCards-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #087fc4;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 15px;
+}
+
+.ShopCards-eyebrowDot,
+.ShopCards-liveDot {
+  width: 8px;
+  height: 8px;
+  background: #0786cf;
+  border-radius: 50%;
+}
+
+.ShopCards-heading h2 {
+  font-size: clamp(30px, 4vw, 45px);
+  font-weight: 750;
+  letter-spacing: -1.5px;
+  margin: 0 0 14px;
+  line-height: 1.2;
+}
+
+.ShopCards-heading h2 span {
+  color: #087fc4;
+}
+
+.ShopCards-heading p {
+  color: #777f8e;
+  font-size: 14px;
+  line-height: 1.9;
+  margin: 0;
+  max-width: 570px;
+}
+
+.ShopCards-headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ShopCards-headerButton {
+  position: relative;
+  height: 45px;
+  padding: 0 17px;
+  border: 1px solid #e7eaf0;
+  border-radius: 6px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: #313b4d;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.ShopCards-headerButton:hover {
+  border-color: #0786cf;
+  color: #0786cf;
+  background: #f1f9ff;
+}
+
+.ShopCards-actionCount {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 50px;
+  color: white;
+  background: #0786cf;
+  font-size: 10px;
+}
+
+/* =========================================
+   TOOLBAR
+========================================= */
+
+.ShopCards-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 0;
+  border-top: 1px solid #eceef2;
+  border-bottom: 1px solid #eceef2;
+  margin-bottom: 22px;
+}
+
+.ShopCards-categories {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.ShopCards-category {
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: #f5f7fa;
+  color: #657080;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.ShopCards-category:hover {
+  background: #eaf6ff;
+  color: #0786cf;
+}
+
+.ShopCards-category.active {
+  color: #ffffff;
+  background: #087fc4;
+  border-color: #087fc4;
+  box-shadow: 0 4px 12px rgba(8, 127, 196, 0.16);
+}
+
+.ShopCards-toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ShopCards-search {
+  width: 220px;
+  height: 43px;
+  padding: 0 12px;
+  border: 1px solid #e5e8ed;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #929aa7;
+  transition: 0.3s;
+}
+
+.ShopCards-search:focus-within {
+  border-color: #0786cf;
+  box-shadow: 0 0 0 3px rgba(8, 134, 207, 0.08);
+}
+
+.ShopCards-search input {
+  width: 100%;
+  min-width: 0;
+  outline: none;
+  border: none;
+  background: transparent;
+  color: #202a3a;
+  font-size: 12px;
+}
+
+.ShopCards-search input::placeholder {
+  color: #a1a8b3;
+}
+
+.ShopCards-search button {
+  background: transparent;
+  border: none;
+  color: #8a93a0;
+  cursor: pointer;
+  display: flex;
+}
+
+.ShopCards-sort {
+  height: 43px;
+  padding: 0 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e5e8ed;
+  border-radius: 5px;
+  color: #7b8492;
+}
+
+.ShopCards-sort select {
+  width: 135px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #465163;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* =========================================
+   RESULTS INFO
+========================================= */
+
+.ShopCards-resultsInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 25px 0 20px;
+  scroll-margin-top: 30px;
+}
+
+.ShopCards-resultsInfo p {
+  color: #8a92a0;
+  font-size: 12px;
+  margin: 0;
+}
+
+.ShopCards-resultsInfo strong {
+  color: #252d3c;
+}
+
+.ShopCards-resultsInfo > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #7c8794;
+}
+
+.ShopCards-liveDot {
+  width: 7px;
+  height: 7px;
+  background: #2cb67d;
+  box-shadow: 0 0 0 4px rgba(44, 182, 125, 0.10);
+}
+
+/* =========================================
+   PRODUCT GRID
+========================================= */
+
+.ShopCards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 36px 36px;
+}
+
+.ShopCards-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e9eaed;
+  border-radius: 7px;
+  background: #ffffff;
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.ShopCards-card:hover {
+  transform: translateY(-5px);
+  border-color: #d7e9f6;
+  box-shadow: 0 15px 35px rgba(21, 62, 94, 0.09);
+}
+
+/* =========================================
+   PRODUCT IMAGE
+========================================= */
+
+.ShopCards-imageWrapper {
+  height: 375px;
+  margin: 25px 25px 0;
+  position: relative;
+  background: #eff3f9;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ShopCards-productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  padding: 25px;
+  transition: transform 0.55s ease;
+}
+
+.ShopCards-card:hover .ShopCards-productImage {
+  transform: scale(1.07);
+}
+
+.ShopCards-productBadge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+  padding: 7px 12px;
+  border-radius: 3px;
+  background: #087fc4;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.ShopCards-quickActions {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transform: translate(-15px, -50%);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s ease;
+  z-index: 3;
+}
+
+.ShopCards-card:hover .ShopCards-quickActions {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, -50%);
+}
+
+.ShopCards-iconButton {
+  width: 43px;
+  height: 43px;
+  background: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b1b6bd;
+  cursor: pointer;
+  transition: 0.25s;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+.ShopCards-iconButton:hover,
+.ShopCards-iconButton.selected {
+  background: #087fc4;
+  color: white;
+}
+
+.ShopCards-cartIcon:hover {
+  background: #152d45;
+}
+
+.ShopCards-imageCartButton {
+  position: absolute;
+  left: 50%;
+  bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 19px;
+  background: #ffffff;
+  color: #087fc4;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transform: translate(-50%, 15px);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s ease;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.10);
+  z-index: 3;
+}
+
+.ShopCards-card:hover .ShopCards-imageCartButton {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.ShopCards-imageCartButton:hover {
+  background: #087fc4;
+  color: white;
+}
+
+/* =========================================
+   PRODUCT CONTENT
+========================================= */
+
+.ShopCards-productContent {
+  padding: 23px 22px 25px;
+  text-align: center;
+}
+
+.ShopCards-productCategory {
+  font-size: 10px;
+  color: #8a99a9;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  margin-bottom: 8px;
+}
+
+.ShopCards-productName {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #101b2b;
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.ShopCards-productName:hover {
+  color: #087fc4;
+}
+
+.ShopCards-productDescription {
+  max-width: 310px;
+  min-height: 36px;
+  margin: 7px auto 11px;
+  color: #9299a4;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.ShopCards-rating {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.ShopCards-rating strong {
+  color: #3e4858;
+  font-size: 11px;
+}
+
+.ShopCards-rating span {
+  color: #a0a6b0;
+  font-size: 10px;
+}
+
+.ShopCards-priceRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding-top: 5px;
+}
+
+.ShopCards-prices {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ShopCards-currentPrice {
+  color: #101b2b;
+  font-size: 20px;
+  font-weight: 750;
+}
+
+.ShopCards-oldPrice {
+  color: #89909c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ShopCards-addButton {
+  width: 37px;
+  height: 37px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  background: #087fc4;
+  cursor: pointer;
+  transition: 0.3s;
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.ShopCards-card:hover .ShopCards-addButton {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ShopCards-addButton:hover {
+  background: #102d48;
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.ShopCards-empty {
+  padding: 85px 20px;
+  text-align: center;
+  border: 1px dashed #dce3eb;
+  background: #f9fbfd;
+  border-radius: 8px;
+}
+
+.ShopCards-emptyIcon {
+  width: 75px;
+  height: 75px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: #e9f5ff;
+  color: #087fc4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ShopCards-empty h3 {
+  font-size: 21px;
+  margin: 0 0 10px;
+}
+
+.ShopCards-empty p {
+  color: #929aa7;
+  font-size: 13px;
+}
+
+.ShopCards-empty button {
+  border: none;
+  border-radius: 4px;
+  background: #087fc4;
+  color: white;
+  padding: 12px 22px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* =========================================
+   PAGINATION
+========================================= */
+
+.ShopCards-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin: 55px 0 60px;
+}
+
+.ShopCards-pageArrow,
+.ShopCards-pageNumber {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e6eaf0;
+  border-radius: 5px;
+  background: white;
+  color: #667184;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.ShopCards-pageArrow:hover:not(:disabled),
+.ShopCards-pageNumber:hover {
+  border-color: #087fc4;
+  color: #087fc4;
+  background: #f0f8ff;
+}
+
+.ShopCards-pageNumber.active {
+  background: #087fc4;
+  border-color: #087fc4;
+  color: white;
+  box-shadow: 0 4px 12px rgba(8, 127, 196, 0.18);
+}
+
+.ShopCards-pageArrow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   BOTTOM NOTE
+========================================= */
+
+.ShopCards-bottomNote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 17px;
+  padding: 25px;
+  border: 1px solid #e8edf3;
+  background: #f8fbfe;
+  border-radius: 7px;
+}
+
+.ShopCards-bottomIcon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5f3ff;
+  color: #087fc4;
+  border-radius: 50%;
+}
+
+.ShopCards-bottomNote h4 {
+  font-size: 14px;
+  margin: 0 0 5px;
+}
+
+.ShopCards-bottomNote p {
+  margin: 0;
+  color: #8d96a4;
+  font-size: 11px;
+}
+
+/* =========================================
+   TOAST NOTIFICATION
+========================================= */
+
+.ShopCards-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border-radius: 6px;
+  background: #122c43;
+  color: white;
+  font-size: 13px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.17);
+  animation: ShopCards-toastIn 0.3s ease;
+  transform: translateX(-50%);
+  max-width: calc(100% - 30px);
+}
+
+.ShopCards-toast svg {
+  flex-shrink: 0;
+  color: #55d99a;
+}
+
+@keyframes ShopCards-toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 15px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* =========================================
+   MODAL OVERLAY
+========================================= */
+
+.ShopCards-modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(10, 25, 40, 0.58);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: ShopCards-overlayIn 0.25s ease;
+}
+
+@keyframes ShopCards-overlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================================
+   QUICK VIEW MODAL
+========================================= */
+
+.ShopCards-quickModal {
+  width: 100%;
+  max-width: 850px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 35px;
+  align-items: center;
+  padding: 35px;
+  background: white;
+  border-radius: 9px;
+  animation: ShopCards-modalIn 0.3s ease;
+}
+
+@keyframes ShopCards-modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ShopCards-modalClose {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 37px;
+  height: 37px;
+  border: none;
+  background: #f1f4f7;
+  color: #384658;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.ShopCards-modalImage {
+  height: 370px;
+  background: #eff3f9;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.ShopCards-modalImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  padding: 20px;
+}
+
+.ShopCards-modalCategory {
+  color: #087fc4;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.ShopCards-modalContent h2 {
+  font-size: 25px;
+  line-height: 1.35;
+  margin: 12px 0;
+}
+
+.ShopCards-modalRating {
+  justify-content: flex-start;
+  margin-bottom: 18px;
+}
+
+.ShopCards-modalContent > p {
+  font-size: 13px;
+  color: #818b99;
+  line-height: 1.8;
+}
+
+.ShopCards-modalPrice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0;
+  font-size: 25px;
+  font-weight: 750;
+}
+
+.ShopCards-modalPrice del {
+  color: #a2a9b3;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.ShopCards-modalAdd,
+.ShopCards-modalWishlist {
+  width: 100%;
+  min-height: 46px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.ShopCards-modalAdd {
+  border: none;
+  color: white;
+  background: #087fc4;
+}
+
+.ShopCards-modalAdd:hover {
+  background: #102d48;
+}
+
+.ShopCards-modalWishlist {
+  margin-top: 10px;
+  border: 1px solid #e3e7ed;
+  background: white;
+  color: #3e4b5b;
+}
+
+.ShopCards-modalWishlist:hover {
+  color: #087fc4;
+  border-color: #087fc4;
+}
+
+/* =========================================
+   CART DRAWER
+========================================= */
+
+.ShopCards-cartOverlay {
+  justify-content: flex-end;
+  padding: 0;
+}
+
+.ShopCards-cartDrawer {
+  height: 100%;
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  animation: ShopCards-drawerIn 0.3s ease;
+}
+
+@keyframes ShopCards-drawerIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.ShopCards-cartHeader {
+  padding: 27px 25px;
+  border-bottom: 1px solid #e9edf2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ShopCards-cartHeader h3 {
+  font-size: 21px;
+  margin: 0 0 6px;
+}
+
+.ShopCards-cartHeader span {
+  font-size: 12px;
+  color: #919aa7;
+}
+
+.ShopCards-cartHeader button,
+.ShopCards-compareHeader button {
+  border: none;
+  background: #f3f5f8;
+  width: 37px;
+  height: 37px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.ShopCards-cartItems {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 25px;
+}
+
+.ShopCards-cartItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.ShopCards-cartItem > img {
+  width: 78px;
+  height: 85px;
+  object-fit: contain;
+  padding: 5px;
+  background: #eff3f9;
+  border-radius: 4px;
+  mix-blend-mode: multiply;
+}
+
+.ShopCards-cartItemInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.ShopCards-cartItemInfo h4 {
+  font-size: 12px;
+  margin: 0 0 8px;
+}
+
+.ShopCards-cartItemInfo > strong {
+  font-size: 13px;
+  color: #087fc4;
+}
+
+.ShopCards-quantity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ShopCards-quantity button {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #e6eaf0;
+  border-radius: 3px;
+  background: white;
+  cursor: pointer;
+}
+
+.ShopCards-quantity span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ShopCards-removeCart {
+  background: transparent;
+  border: none;
+  color: #c2c7cf;
+  cursor: pointer;
+}
+
+.ShopCards-removeCart:hover {
+  color: #e04444;
+}
+
+.ShopCards-cartFooter {
+  padding: 24px 25px;
+  border-top: 1px solid #e9edf2;
+}
+
+.ShopCards-cartSubtotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+}
+
+.ShopCards-cartFooter > p {
+  font-size: 11px;
+  color: #929aa7;
+  margin: 10px 0 20px;
+}
+
+.ShopCards-checkoutButton {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  background: #087fc4;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ShopCards-checkoutButton:hover {
+  background: #102d48;
+}
+
+.ShopCards-clearCart {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #929aa7;
+  font-size: 12px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.ShopCards-cartEmpty {
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #9ba5b2;
+}
+
+.ShopCards-cartEmpty h3 {
+  color: #263449;
+  font-size: 18px;
+  margin: 18px 0 5px;
+}
+
+.ShopCards-cartEmpty p {
+  font-size: 12px;
+}
+
+.ShopCards-cartEmpty button {
+  margin-top: 12px;
+  background: #087fc4;
+  color: white;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* =========================================
+   COMPARE MODAL
+========================================= */
+
+.ShopCards-compareModal {
+  width: 100%;
+  max-width: 850px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+}
+
+.ShopCards-compareHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.ShopCards-compareHeader h3 {
+  margin: 0 0 7px;
+  font-size: 22px;
+}
+
+.ShopCards-compareHeader p {
+  margin: 0;
+  font-size: 12px;
+  color: #929aa7;
+}
+
+.ShopCards-compareList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.ShopCards-compareItem {
+  padding: 14px;
+  border: 1px solid #e9edf2;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ShopCards-compareItem img {
+  width: 100%;
+  height: 150px;
+  background: #eff3f9;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.ShopCards-compareItem h4 {
+  font-size: 13px;
+  margin: 0;
+}
+
+.ShopCards-compareItem strong {
+  color: #087fc4;
+  font-size: 16px;
+}
+
+.ShopCards-compareItem span {
+  color: #7e8998;
+  font-size: 11px;
+}
+
+.ShopCards-compareItem button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid #e6eaf0;
+  background: white;
+  padding: 9px;
+  border-radius: 4px;
+  color: #db5151;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.ShopCards-compareEmpty {
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 15px;
+  color: #9ba5b2;
+  font-size: 13px;
+}
+
+/* =========================================
+   BACK TO TOP
+========================================= */
+
+.ShopCards-backToTop {
+  position: fixed;
+  right: 65px;
+  bottom: 55px;
+  z-index: 100;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: #007fc5;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 10px 35px rgba(0, 105, 170, 0.17);
+  transition: 0.3s;
+}
+
+.ShopCards-backToTop:hover {
+  transform: translateY(-6px);
+  background: #102d48;
+}
+
+/* =========================================
+   COMPACT SHOP CARDS - UPDATED
+========================================= */
+
+.ShopCards-container {
+  max-width: 1450px;
+}
+
+.ShopCards-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 25px 28px;
+}
+
+.ShopCards-card {
+  border-radius: 6px;
+}
+
+.ShopCards-imageWrapper {
+  height: 280px;
+  margin: 18px 18px 0;
+}
+
+.ShopCards-productImage {
+  padding: 18px;
+}
+
+.ShopCards-productContent {
+  padding: 17px 16px 19px;
+}
+
+.ShopCards-productName {
+  font-size: 15px;
+}
+
+.ShopCards-productDescription {
+  font-size: 11px;
+  min-height: 32px;
+  margin: 6px auto 9px;
+}
+
+.ShopCards-rating {
+  margin-bottom: 10px;
+}
+
+.ShopCards-currentPrice {
+  font-size: 18px;
+}
+
+.ShopCards-oldPrice {
+  font-size: 12px;
+}
+
+.ShopCards-priceRow {
+  gap: 12px;
+}
+
+.ShopCards-addButton {
+  width: 33px;
+  height: 33px;
+}
+
+/* Tablet */
+@media (max-width: 1100px) {
+  .ShopCards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .ShopCards-imageWrapper {
+    height: 250px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 650px) {
+  .ShopCards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+  }
+
+  .ShopCards-imageWrapper {
+    height: 175px;
+    margin: 8px 8px 0;
+  }
+
+  .ShopCards-productContent {
+    padding: 12px 8px 14px;
+  }
+
+  .ShopCards-productName {
+    font-size: 12px;
+  }
+
+  .ShopCards-productDescription {
+    font-size: 10px;
+    min-height: 43px;
+  }
+
+  .ShopCards-currentPrice {
+    font-size: 14px;
+  }
+
+  .ShopCards-oldPrice {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .ShopCards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ShopCards-imageWrapper {
+    height: 230px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE - TABLETS
+========================================= */
+
+@media (max-width: 1100px) {
+  .ShopCards-container {
+    padding: 0 25px;
+  }
+
+  .ShopCards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 25px;
+  }
+
+  .ShopCards-imageWrapper {
+    height: 330px;
+  }
+
+  .ShopCards-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ShopCards-toolbarRight {
+    width: 100%;
+  }
+
+  .ShopCards-search {
+    flex: 1;
+  }
+
+  .ShopCards-backToTop {
+    width: 62px;
+    height: 62px;
+    right: 25px;
+    bottom: 25px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE - MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+  .ShopCards {
+    padding: 55px 0 65px;
+  }
+
+  .ShopCards-container {
+    padding: 0 15px;
+  }
+
+  .ShopCards-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .ShopCards-heading h2 {
+    font-size: 32px;
+  }
+
+  .ShopCards-heading p {
+    font-size: 12px;
+  }
+
+  .ShopCards-headerActions {
+    width: 100%;
+  }
+
+  .ShopCards-headerButton {
+    flex: 1;
+  }
+
+  .ShopCards-toolbar {
+    gap: 15px;
+  }
+
+  .ShopCards-categories {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    scrollbar-width: none;
+  }
+
+  .ShopCards-categories::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ShopCards-category {
+    flex-shrink: 0;
+    padding: 10px 13px;
+  }
+
+  .ShopCards-toolbarRight {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ShopCards-search,
+  .ShopCards-sort {
+    width: 100%;
+  }
+
+  .ShopCards-sort select {
+    flex: 1;
+  }
+
+  .ShopCards-resultsInfo {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ShopCards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+  }
+
+  .ShopCards-imageWrapper {
+    height: 205px;
+    margin: 9px 9px 0;
+  }
+
+  .ShopCards-productImage {
+    padding: 10px;
+  }
+
+  .ShopCards-productContent {
+    padding: 14px 9px 15px;
+  }
+
+  .ShopCards-productName {
+    font-size: 12px;
+  }
+
+  .ShopCards-productDescription {
+    font-size: 10px;
+    min-height: 50px;
+  }
+
+  .ShopCards-rating {
+    gap: 3px;
+  }
+
+  .ShopCards-rating span {
+    font-size: 9px;
+  }
+
+  .ShopCards-currentPrice {
+    font-size: 15px;
+  }
+
+  .ShopCards-oldPrice {
+    font-size: 10px;
+  }
+
+  .ShopCards-priceRow {
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .ShopCards-addButton {
+    width: 29px;
+    height: 29px;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .ShopCards-addButton svg {
+    width: 16px;
+  }
+
+  .ShopCards-quickActions {
+    top: 8px;
+    right: 8px;
+    left: auto;
+    flex-direction: row;
+    gap: 4px;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .ShopCards-iconButton {
+    width: 29px;
+    height: 29px;
+    border-radius: 3px;
+  }
+
+  .ShopCards-iconButton svg {
+    width: 14px;
+  }
+
+  .ShopCards-imageCartButton {
+    display: none;
+  }
+
+  .ShopCards-productBadge {
+    top: 8px;
+    left: 8px;
+    font-size: 8px;
+    padding: 5px 7px;
+  }
+
+  .ShopCards-pagination {
+    gap: 5px;
+    margin: 35px 0;
+  }
+
+  .ShopCards-pageArrow,
+  .ShopCards-pageNumber {
+    width: 36px;
+    height: 36px;
+  }
+
+  .ShopCards-bottomNote {
+    padding: 17px;
+  }
+
+  .ShopCards-bottomNote p {
+    line-height: 1.6;
+  }
+
+  .ShopCards-backToTop {
+    width: 48px;
+    height: 48px;
+    right: 15px;
+    bottom: 18px;
+  }
+
+  .ShopCards-backToTop svg {
+    width: 19px;
+  }
+
+  .ShopCards-quickModal {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .ShopCards-modalImage {
+    height: 240px;
+  }
+
+  .ShopCards-modalContent h2 {
+    font-size: 20px;
+  }
+
+  .ShopCards-compareModal {
+    padding: 20px;
+  }
+
+  .ShopCards-compareList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 380px) {
+  .ShopCards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ShopCards-imageWrapper {
+    height: 260px;
+    margin: 12px 12px 0;
+  }
+
+  .ShopCards-productName {
+    font-size: 15px;
+  }
+
+  .ShopCards-productDescription {
+    min-height: auto;
+    font-size: 11px;
+  }
+
+  .ShopCards-currentPrice {
+    font-size: 18px;
+  }
+
+  .ShopCards-compareList {
+    grid-template-columns: 1fr;
+  }
+}

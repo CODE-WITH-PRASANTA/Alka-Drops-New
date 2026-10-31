@@ -1,0 +1,423 @@
+/* Custom Variable Palette */
+:root {
+  --topbar-bg: rgba(255, 255, 255, 0.88);
+  --topbar-border: #e2e8f0;
+  --primary-blue: #0284c7;
+  --primary-blue-hover: #0369a1;
+  --primary-light-bg: #f0f9ff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 25px -5px rgba(2, 132, 199, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+.Topbar {
+  height: 64px;
+  background: var(--topbar-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--topbar-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  transition: all 0.25s ease;
+}
+
+.Topbar-left, .Topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Sidebar Toggle */
+.Topbar-toggle-btn {
+  background: #ffffff;
+  border: 1px solid var(--topbar-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.Topbar-toggle-btn:hover {
+  background-color: var(--primary-light-bg);
+  color: var(--primary-blue);
+  border-color: #bae6fd;
+  transform: translateY(-1px);
+}
+
+/* Breadcrumbs */
+.Topbar-path {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.Topbar-path-parent {
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  font-size: 11px;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.Topbar-path-separator {
+  color: #cbd5e1;
+}
+
+.Topbar-path-current {
+  color: var(--primary-blue);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Search Bar */
+.Topbar-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.Topbar-search-icon {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  pointer-events: none;
+  transition: color 0.2s;
+}
+
+.Topbar-search-input {
+  background-color: #f8fafc;
+  border: 1px solid var(--topbar-border);
+  padding: 8px 42px 8px 38px;
+  border-radius: 20px;
+  outline: none;
+  width: 220px;
+  font-size: 13px;
+  color: var(--text-main);
+  transition: all 0.25s ease;
+}
+
+.Topbar-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.Topbar-search-input:focus {
+  width: 260px;
+  border-color: var(--primary-blue);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
+}
+
+.Topbar-search-input:focus + .Topbar-search-icon {
+  color: var(--primary-blue);
+}
+
+.Topbar-search-shortcut {
+  position: absolute;
+  right: 12px;
+  font-size: 10px;
+  font-family: inherit;
+  font-weight: 600;
+  color: #94a3b8;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Actions Wrapper */
+.Topbar-action-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+/* Action Button */
+.Topbar-action-btn {
+  background: #ffffff;
+  border: 1px solid var(--topbar-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.Topbar-action-btn:hover, .Topbar-action-btn.active {
+  color: var(--primary-blue);
+  background-color: var(--primary-light-bg);
+  border-color: #bae6fd;
+}
+
+.Topbar-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  height: 18px;
+  min-width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+/* User Card Button */
+.Topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 4px 10px 4px 5px;
+  border-radius: 30px;
+  position: relative;
+  user-select: none;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.Topbar-user:hover, .Topbar-user.active {
+  background-color: #ffffff;
+  border-color: var(--topbar-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.Topbar-avatar-wrapper {
+  position: relative;
+  display: flex;
+}
+
+.Topbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e0f2fe;
+}
+
+.Topbar-status-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 9px;
+  height: 9px;
+  background-color: #10b981;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+}
+
+.Topbar-user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.Topbar-username {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.Topbar-role {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.Topbar-chevron {
+  color: var(--text-muted);
+  transition: transform 0.25s ease;
+}
+
+.Topbar-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Universal Dropdown Styling */
+.Topbar-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  animation: topbarDropdownSlide 0.2s ease-out;
+}
+
+@keyframes topbarDropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.Topbar-user-dropdown {
+  width: 210px;
+}
+
+.Topbar-user-card {
+  padding: 8px 10px;
+}
+
+.Topbar-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.Topbar-card-email {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 2px 0 0 0;
+  word-break: break-all;
+}
+
+.Topbar-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-main);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.Topbar-dropdown-item:hover {
+  background-color: var(--primary-light-bg);
+  color: var(--primary-blue);
+}
+
+.Topbar-dropdown-item.logout {
+  color: #ef4444;
+}
+
+.Topbar-dropdown-item.logout:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.Topbar-dropdown-divider {
+  height: 1px;
+  background-color: #f1f5f9;
+  margin: 4px 0;
+}
+
+/* Notification Dropdown Specifics */
+.Topbar-notifications-dropdown {
+  width: 280px;
+  padding: 12px;
+}
+
+.Topbar-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 8px;
+}
+
+.Topbar-dropdown-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.Topbar-dropdown-badge {
+  font-size: 10px;
+  background: var(--primary-light-bg);
+  color: var(--primary-blue);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.Topbar-notification-item {
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.15s;
+}
+
+.Topbar-notification-item:hover {
+  background-color: #f8fafc;
+}
+
+.Topbar-notification-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--primary-blue);
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.Topbar-notification-text {
+  font-size: 12px;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.Topbar-notification-time {
+  font-size: 10px;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 2px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .Topbar-search-box, 
+  .Topbar-user-info,
+  .Topbar-path {
+    display: none;
+  }
+
+  .Topbar {
+    padding: 0 16px;
+  }
+}

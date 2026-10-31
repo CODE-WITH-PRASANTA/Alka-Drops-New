@@ -1,7 +1,6 @@
-import React from 'react'
-import Contactform from '../../Components/Contactform/Contactform'
-import BreadCrumb from "../../Components/BreadCrumb/BreadCrumb"
-import ContactBreadcrumb from '../../Components/ContactBreadcrumb/ContactBreadcrumb'
+import React from "react";
+import Contactform from "../../Components/Contactform/Contactform";
+import ContactBreadcrumb from "../../Components/ContactBreadcrumb/ContactBreadcrumb";
 
 const Contact = () => {
   return (
@@ -9,7 +8,7 @@ const Contact = () => {
       <ContactBreadcrumb />
       <Contactform />
     </div>
-  )
-}
+  );
+};
 
-export default Contact
+export default Contact;

@@ -1,30 +1,33 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Servicereview.css";
 
+/* ---------------------------------------------------------
+   Edit these numbers and labels to match your real figures
+--------------------------------------------------------- */
 const statistics = [
   {
     value: 35000,
-    suffix: "",
+    suffix: "+",
     label: "Happy Customers",
     icon: "customer",
   },
   {
     value: 541,
     suffix: "+",
-    label: "Projects Done",
-    icon: "project",
+    label: "Daily Deliveries",
+    icon: "truck",
   },
   {
     value: 40,
     suffix: "+",
-    label: "Awards Win",
-    icon: "award",
+    label: "Areas Served",
+    icon: "location",
   },
   {
     value: 678,
-    suffix: "",
-    label: "Client Works",
-    icon: "chart",
+    suffix: "+",
+    label: "Business Clients",
+    icon: "business",
   },
 ];
 
@@ -32,14 +35,20 @@ const features = [
   {
     title: "Maximum Purity",
     description:
-      "The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog MTV quiz graced.",
+      "Every drop of Alka Drops is carefully treated and tested, so you and your family get clean, safe and refreshing drinking water.",
     icon: "purity",
   },
   {
     title: "5 Steps Filtration",
     description:
-      "The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog MTV quiz graced.",
+      "Our five-step filtration process removes impurities while keeping the natural freshness and smooth taste of your water.",
     icon: "filtration",
+  },
+  {
+    title: "pH 8.5+ Alkaline",
+    description:
+      "Naturally balanced alkaline water for everyday hydration, sealed hygienically and delivered free to your doorstep.",
+    icon: "alkaline",
   },
 ];
 
@@ -49,7 +58,7 @@ function FeatureIcon({ type, className = "" }) {
     viewBox: "0 0 48 48",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.7,
+    strokeWidth: 1.8,
     strokeLinecap: "round",
     strokeLinejoin: "round",
     "aria-hidden": true,
@@ -59,36 +68,37 @@ function FeatureIcon({ type, className = "" }) {
     case "customer":
       return (
         <svg {...common}>
-          <circle cx="24" cy="12" r="7" />
-          <path d="M17 10h14M19 17l-2 3h14l-2-3" />
-          <path d="M10 39c0-8 5-13 14-13s14 5 14 13" />
-          <path d="m19 29 5 5 5-5M24 34v5" />
+          <circle cx="24" cy="15" r="7" />
+          <path d="M10 41c0-8.5 6-14 14-14s14 5.5 14 14" />
+          <path d="m19 15 3.5 3.5L29 12" />
         </svg>
       );
 
-    case "project":
+    case "truck":
       return (
         <svg {...common}>
-          <path d="M12 6h24v36H12z" />
-          <path d="M16 12h16M16 17h16M16 22h16M16 27h16M16 32h11" />
-          <path d="M9 9v32M39 9v32" />
+          <path d="M5 12h22v21H5z" />
+          <path d="M27 19h8l7 7v7H27z" />
+          <circle cx="14" cy="35" r="4" />
+          <circle cx="34" cy="35" r="4" />
         </svg>
       );
 
-    case "award":
+    case "location":
       return (
         <svg {...common}>
-          <path d="m24 5 7 9 12 2-8 9 2 13-13-6-13 6 2-13-8-9 12-2z" />
-          <path d="m15 14 9 18 9-18M5 16h8M35 16h8" />
+          <path d="M24 43S11 30 11 20a13 13 0 0 1 26 0c0 10-13 23-13 23Z" />
+          <circle cx="24" cy="20" r="5" />
         </svg>
       );
 
-    case "chart":
+    case "business":
       return (
         <svg {...common}>
-          <path d="M24 5a19 19 0 1 0 19 19H24z" />
-          <path d="M29 5v14h14A19 19 0 0 0 29 5z" />
-          <path d="M24 10v14" />
+          <path d="M8 42V14h18v28" />
+          <path d="M26 42V24h14v18" />
+          <path d="M13 20h8M13 26h8M13 32h8M31 30h4M31 36h4" />
+          <path d="M5 42h38" />
         </svg>
       );
 
@@ -98,6 +108,15 @@ function FeatureIcon({ type, className = "" }) {
           <path d="M10 7 14 40h20L38 7" />
           <path d="M15 12c2 4 4 4 6 0 2 4 4 4 6 0 2 4 4 4 6 0" />
           <path d="M24 22v10M21 29l3 3 3-3" />
+        </svg>
+      );
+
+    case "alkaline":
+      return (
+        <svg {...common}>
+          <path d="M24 5S11 21 11 29a13 13 0 0 0 26 0C37 21 24 5 24 5Z" />
+          <path d="M19 30a6 6 0 0 0 6 6" />
+          <path d="M20 23h8M24 19v8" />
         </svg>
       );
 
@@ -112,13 +131,21 @@ function FeatureIcon({ type, className = "" }) {
         </svg>
       );
 
+    case "drop":
+      return (
+        <svg {...common}>
+          <path d="M24 5S11 21 11 29a13 13 0 0 0 26 0C37 21 24 5 24 5Z" />
+          <path d="M19 30a6 6 0 0 0 6 6" />
+        </svg>
+      );
+
     case "purity":
     default:
       return (
         <svg {...common}>
           <path d="M23 5S10 21 10 29a13 13 0 0 0 26 0C36 21 23 5 23 5Z" />
           <path d="M18 30a6 6 0 0 0 6 6" />
-          <circle cx="34" cy="34" r="8" fill="#e5f2fa" />
+          <circle cx="34" cy="34" r="8" fill="#e8f1ff" />
           <path d="m31 34 2 2 4-5" />
         </svg>
       );
@@ -129,7 +156,7 @@ function AnimatedNumber({ value, suffix, active }) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!active) return;
+    if (!active) return undefined;
 
     let frame;
     const duration = 1800;
@@ -137,8 +164,6 @@ function AnimatedNumber({ value, suffix, active }) {
 
     const animate = (currentTime) => {
       const progress = Math.min((currentTime - startTime) / duration, 1);
-
-      // Smooth ease-out counting animation
       const easedProgress = 1 - Math.pow(1 - progress, 3);
 
       setCount(Math.floor(value * easedProgress));
@@ -171,11 +196,11 @@ export default function Servicereview() {
   useEffect(() => {
     const section = sectionRef.current;
 
-    if (!section) return;
+    if (!section) return undefined;
 
     if (!("IntersectionObserver" in window)) {
       setIsVisible(true);
-      return;
+      return undefined;
     }
 
     const observer = new IntersectionObserver(
@@ -185,7 +210,7 @@ export default function Servicereview() {
           observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     );
 
     observer.observe(section);
@@ -194,7 +219,7 @@ export default function Servicereview() {
   }, []);
 
   useEffect(() => {
-    if (!videoOpen) return;
+    if (!videoOpen) return undefined;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") setVideoOpen(false);
@@ -212,13 +237,91 @@ export default function Servicereview() {
   return (
     <section
       ref={sectionRef}
-      className={`water-experience ${
-        isVisible ? "water-experience-visible" : ""
-      }`}
+      className={`water-experience ${isVisible ? "water-experience-visible" : ""}`}
     >
-      {/* Top blue statistics strip */}
-      <div className="water-experience-stats">
-        <div className="water-experience-stats-inner">
+      <span className="water-experience-bg water-experience-bg-left" aria-hidden="true"></span>
+      <span className="water-experience-bg water-experience-bg-right" aria-hidden="true"></span>
+
+      <div className="water-experience-inner">
+        {/* ================= HEADING ================= */}
+        <div className="water-experience-heading">
+          <div className="water-experience-eyebrow">
+            <FeatureIcon type="drop" />
+            <span>Why Alka Drops</span>
+          </div>
+
+          <h2>
+            Purity You Can Taste,
+            <span> Trust You Can Feel</span>
+          </h2>
+
+          <p>
+            From the first filter to your front door, every step is designed to
+            give your family safe, fresh and healthy alkaline water.
+          </p>
+        </div>
+
+        {/* ================= MAIN ================= */}
+        <div className="water-experience-main">
+          {/* Video preview */}
+          <div className="water-experience-video">
+            <img
+              src="https://images.unsplash.com/photo-1532634896-26909d0d4b25?w=1400&auto=format&fit=crop&q=85"
+              alt="A person enjoying clean drinking water"
+              loading="lazy"
+              onError={(event) => {
+                event.currentTarget.src =
+                  "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=1400&auto=format&fit=crop&q=85";
+              }}
+            />
+
+            <div className="water-experience-video-overlay" />
+
+            <div className="water-experience-video-chip">
+              <FeatureIcon type="drop" />
+              pH 8.5+ Alkaline Water
+            </div>
+
+            <button
+              type="button"
+              className="water-experience-play"
+              onClick={() => setVideoOpen(true)}
+              aria-label="Play water purification video"
+            >
+              <FeatureIcon type="play" />
+            </button>
+
+            <div className="water-experience-video-caption">
+              <strong>See how Alka Drops is purified</strong>
+              <span>Watch the video</span>
+            </div>
+          </div>
+
+          {/* Feature cards */}
+          <div className="water-experience-features">
+            {features.map((feature, index) => (
+              <article
+                className="water-experience-feature-card"
+                key={feature.title}
+                style={{ "--feature-index": index }}
+              >
+                <div className="water-experience-feature-icon">
+                  <FeatureIcon type={feature.icon} />
+                </div>
+
+                <div className="water-experience-feature-body">
+                  <h3>{feature.title}</h3>
+                  <p>{feature.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        {/* ================= STATS ================= */}
+        <div className="water-experience-stats">
+          <span className="water-experience-stats-glow" aria-hidden="true"></span>
+
           {statistics.map((item, index) => (
             <div
               className="water-experience-stat"
@@ -238,63 +341,14 @@ export default function Servicereview() {
                   />
                 </div>
 
-                <div className="water-experience-stat-label">
-                  {item.label}
-                </div>
+                <div className="water-experience-stat-label">{item.label}</div>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Main feature and video section */}
-      <div className="water-experience-main">
-        <div className="water-experience-features">
-          {features.map((feature, index) => (
-            <article
-              className="water-experience-feature-card"
-              key={feature.title}
-              style={{ "--feature-index": index }}
-            >
-              <div className="water-experience-feature-heading">
-                <div className="water-experience-feature-icon">
-                  <FeatureIcon type={feature.icon} />
-                </div>
-
-                <h3>{feature.title}</h3>
-              </div>
-
-              <p>{feature.description}</p>
-            </article>
-          ))}
-        </div>
-
-        {/* Video preview */}
-        <div className="water-experience-video">
-          <img
-            src="https://images.unsplash.com/photo-1532634896-26909d0d4b25?w=1200&auto=format&fit=crop&q=85"
-            alt="A person enjoying clean drinking water"
-            loading="lazy"
-            onError={(event) => {
-              event.currentTarget.src =
-                "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=1200&auto=format&fit=crop&q=85";
-            }}
-          />
-
-          <div className="water-experience-video-overlay" />
-
-          <button
-            type="button"
-            className="water-experience-play"
-            onClick={() => setVideoOpen(true)}
-            aria-label="Play water purification video"
-          >
-            <FeatureIcon type="play" />
-          </button>
-        </div>
-      </div>
-
-      {/* Video modal */}
+      {/* ================= VIDEO MODAL ================= */}
       {videoOpen && (
         <div
           className="water-experience-modal"

@@ -1,12 +1,10 @@
 import React from "react";
-import Contactform from "../../Components/Contactform/Contactform";
-import ContactBreadcrumb from "../../Components/ContactBreadcrumb/ContactBreadcrumb";
+import ContactMain from "../../Components/ContactMain/ContactMain";
 
 const Contact = () => {
   return (
     <div>
-      <ContactBreadcrumb />
-      <Contactform />
+      <ContactMain/>
     </div>
   );
 };

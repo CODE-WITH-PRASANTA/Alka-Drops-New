@@ -12,7 +12,7 @@
 }
 
 .Cart-Breadcrumb-overlay {
-  background: rgba(0, 0, 0, 0.45); /* Slightly darker overlay for better text contrast */
+  background: rgba(0, 0, 0, 0.6); /* Consistent 0.6 darker overlay for contrast */
   height: 100%;
   width: 100%;
   display: flex;
@@ -23,10 +23,10 @@
 }
 
 .Cart-Breadcrumb-title {
-  font-size: 5rem; /* Larger font size to match the bold header in your screenshot */
+  font-size: 2.3rem;
   font-weight: 600;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1;
 }
 
 .Cart-Breadcrumb-nav {
@@ -39,8 +39,23 @@
 }
 
 .Cart-Breadcrumb-divider {
-  color: #4d97ff; /* Red divider */
+  color: #4d97ff;
   font-weight: 700;
+}
+
+.Cart-Breadcrumb-home {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.Cart-Breadcrumb-home:hover,
+.Cart-Breadcrumb-home:focus {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.Cart-Breadcrumb-active {
+  color: #ffffff;
 }
 
 /* Responsive adjustments */
@@ -48,7 +63,7 @@
   .Cart-Breadcrumb-wrapper {
     height: 250px;
   }
-  
+
   .Cart-Breadcrumb-title {
     font-size: 3rem;
   }

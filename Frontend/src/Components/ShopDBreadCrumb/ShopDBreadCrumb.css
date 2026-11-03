@@ -1,7 +1,7 @@
 /* Using Poppins font for the clean, geometric look */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-.ShopD-BreadCrumb-wrapper {
+.Shop-Breadcrumb-wrapper {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -11,8 +11,8 @@
   font-family: 'Poppins', sans-serif;
 }
 
-.ShopD-BreadCrumb-overlay {
-  background: rgba(0, 0, 0, 0.45); /* Slightly darker overlay for better text contrast */
+.Shop-Breadcrumb-overlay {
+  background: rgba(0, 0, 0, 0.6); /* Slightly darker overlay for better text contrast */
   height: 100%;
   width: 100%;
   display: flex;
@@ -22,14 +22,14 @@
   color: #ffffff;
 }
 
-.ShopD-BreadCrumb-title {
-  font-size: 5rem; /* Larger font size to match the bold header in your screenshot */
+.Shop-Breadcrumb-title {
+  font-size: 2.3rem;
   font-weight: 600;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1;
 }
 
-.ShopD-BreadCrumb-nav {
+.Shop-Breadcrumb-nav {
   font-size: 1.1rem;
   font-weight: 400;
   display: flex;
@@ -38,18 +38,29 @@
   text-transform: capitalize;
 }
 
-.ShopD-BreadCrumb-divider {
-  color: #4d97ff; /* Red divider */
+.Shop-Breadcrumb-divider {
+  color: #4d97ff;
   font-weight: 700;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .ShopD-BreadCrumb-wrapper {
+  .Shop-Breadcrumb-wrapper {
     height: 250px;
   }
   
-  .ShopD-BreadCrumb-title {
+  .Shop-Breadcrumb-title {
     font-size: 3rem;
   }
+}
+
+.Shop-Breadcrumb-home {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.Shop-Breadcrumb-home:hover,
+.Shop-Breadcrumb-home:focus {
+  color: #ffffff;
+  text-decoration: none;
 }

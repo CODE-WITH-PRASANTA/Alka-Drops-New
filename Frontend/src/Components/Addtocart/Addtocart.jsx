@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FiTrash2,
@@ -15,6 +14,8 @@ import {
   FiPackage,
   FiShoppingCart,
   FiRefreshCw,
+  FiDroplet,
+  FiHeadphones,
 } from "react-icons/fi";
 
 import "./Addtocart.css";
@@ -77,6 +78,7 @@ const fallbackImage =
 
 const Addtocart = () => {
   const navigate = useNavigate();
+  const notificationTimer = useRef(null);
 
   // =====================================
   // INITIAL CART DATA
@@ -107,10 +109,7 @@ const Addtocart = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem(
-        CART_STORAGE_KEY,
-        JSON.stringify(cart)
-      );
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
     } catch (error) {
       console.error("Unable to save cart:", error);
     }
@@ -142,14 +141,17 @@ const Addtocart = () => {
     };
   }, []);
 
+  // clear pending notification timer on unmount
+  useEffect(() => () => window.clearTimeout(notificationTimer.current), []);
+
   // =====================================
   // NOTIFICATION
   // =====================================
 
   const showNotification = (message) => {
     setNotification(message);
-
-    window.setTimeout(() => {
+    window.clearTimeout(notificationTimer.current);
+    notificationTimer.current = window.setTimeout(() => {
       setNotification("");
     }, 2200);
   };
@@ -177,9 +179,7 @@ const Addtocart = () => {
 
   const cartSubtotal = cart.reduce(
     (total, item) =>
-      total +
-      (Number(item.price) || 0) *
-        Math.max(0, Number(item.qty) || 0),
+      total + (Number(item.price) || 0) * Math.max(0, Number(item.qty) || 0),
     0
   );
 
@@ -283,36 +283,37 @@ const Addtocart = () => {
 
   return (
     <section className="Addtocart">
+      {/* decorative background */}
+      <div className="Addtocart-bg" aria-hidden="true">
+        <span className="Addtocart-bg-glow Addtocart-bg-glow--one" />
+        <span className="Addtocart-bg-glow Addtocart-bg-glow--two" />
+        <span className="Addtocart-bg-dots" />
+      </div>
 
       <div className="Addtocart-container">
-
-        {/* =====================================
-            NOTIFICATION
-        ===================================== */}
-
+        {/* NOTIFICATION */}
         {notification && (
-          <div className="Addtocart-notification">
+          <div className="Addtocart-notification" role="status">
             <FiCheckCircle />
             <span>{notification}</span>
           </div>
         )}
 
-        {/* =====================================
-            PAGE TOP HEADER
-        ===================================== */}
-
-        <div className="Addtocart-page-header">
-
-          <div className="Addtocart-breadcrumb">
-            <span onClick={handleReturnToShop}>Home</span>
+        {/* PAGE HEADER */}
+        <header className="Addtocart-page-header">
+          <nav className="Addtocart-breadcrumb" aria-label="Breadcrumb">
+            <button type="button" onClick={handleReturnToShop}>
+              Shop
+            </button>
             <FiArrowRight />
             <span>Shopping Cart</span>
-          </div>
+          </nav>
 
           <div className="Addtocart-header-content">
-            <div>
+            <div className="Addtocart-header-text">
               <span className="Addtocart-eyebrow">
-                YOUR SHOPPING EXPERIENCE
+                <i className="Addtocart-eyebrow-dot" />
+                YOUR ALKA DROPS ORDER
               </span>
 
               <h1>
@@ -321,52 +322,48 @@ const Addtocart = () => {
 
               <p>
                 Review your selected products and get ready for checkout.
+                Pure pH 8.5+ alkaline water, delivered with care.
               </p>
             </div>
 
-            <div className="Addtocart-header-icon">
+            <div className="Addtocart-header-badge" aria-hidden="true">
               <FiShoppingBag />
+              <strong>{cartTotalCount}</strong>
+              <em>{cartTotalCount === 1 ? "ITEM" : "ITEMS"}</em>
             </div>
           </div>
+        </header>
 
-        </div>
-
-        {/* =====================================
-            EMPTY CART
-        ===================================== */}
-
+        {/* EMPTY CART */}
         {cart.length === 0 ? (
-
           <div className="Addtocart-empty">
-
             <div className="Addtocart-empty-illustration">
               <div className="Addtocart-empty-circle">
                 <FiShoppingBag />
               </div>
-
               <span className="Addtocart-empty-decoration decoration-one">
-                +
+                <FiDroplet />
               </span>
-
               <span className="Addtocart-empty-decoration decoration-two">
-                ✦
+                <FiDroplet />
               </span>
             </div>
 
             <span className="Addtocart-empty-label">
+              <i className="Addtocart-eyebrow-dot" />
               NOTHING HERE YET
             </span>
 
             <h2>Your Shopping Cart is Empty</h2>
 
             <p>
-              Your favourite products are waiting for you.
-              Explore our collection and add something wonderful.
+              Your favourite products are waiting for you. Explore our
+              collection and add something wonderful.
             </p>
 
             <div className="Addtocart-empty-actions">
-
               <button
+                type="button"
                 className="Addtocart-primary-button"
                 onClick={handleReturnToShop}
               >
@@ -375,31 +372,23 @@ const Addtocart = () => {
               </button>
 
               <button
+                type="button"
                 className="Addtocart-demo-button"
                 onClick={restoreDemoProducts}
               >
                 <FiRefreshCw />
                 Load Demo Products
               </button>
-
             </div>
-
           </div>
-
         ) : (
-
-          /* =====================================
-              ACTIVE CART
-          ===================================== */
-
+          /* ACTIVE CART */
           <div className="Addtocart-active">
-
-            {/* CART TOP BAR */}
-
+            {/* TOP BAR */}
             <div className="Addtocart-cart-topbar">
-
               <div>
                 <span className="Addtocart-cart-label">
+                  <i className="Addtocart-eyebrow-dot" />
                   SHOPPING BAG
                 </span>
 
@@ -419,73 +408,61 @@ const Addtocart = () => {
                 <FiTrash2 />
                 Clear All
               </button>
-
             </div>
 
-            {/* CART PROGRESS */}
-
-            <div className="Addtocart-progress">
-
+            {/* PROGRESS */}
+            <div className="Addtocart-progress" aria-label="Checkout progress">
               <div className="Addtocart-progress-step active">
-                <span><FiShoppingCart /></span>
+                <span>
+                  <FiShoppingCart />
+                </span>
                 <p>Shopping Cart</p>
               </div>
 
-              <div className="Addtocart-progress-line"></div>
+              <div className="Addtocart-progress-line active" />
 
               <div className="Addtocart-progress-step">
-                <span><FiTruck /></span>
+                <span>
+                  <FiTruck />
+                </span>
                 <p>Delivery</p>
               </div>
 
-              <div className="Addtocart-progress-line"></div>
+              <div className="Addtocart-progress-line" />
 
               <div className="Addtocart-progress-step">
-                <span><FiShield /></span>
+                <span>
+                  <FiShield />
+                </span>
                 <p>Checkout</p>
               </div>
-
             </div>
 
             {/* MAIN GRID */}
-
             <div className="Addtocart-main-grid">
-
-              {/* =====================================
-                  LEFT PRODUCTS COLUMN
-              ===================================== */}
-
+              {/* LEFT: PRODUCTS */}
               <div className="Addtocart-products-section">
-
                 <div className="Addtocart-products-heading">
                   <h3>Cart Items</h3>
                   <span>{cart.length} Different Products</span>
                 </div>
 
                 <div className="Addtocart-products-list">
-
                   {cart.map((item) => {
-
                     const price = Number(item.price) || 0;
                     const oldPrice = Number(item.oldPrice) || 0;
                     const quantity = Number(item.qty) || 1;
                     const lineTotal = price * quantity;
 
                     return (
-
-                      <article
-                        className="Addtocart-product-card"
-                        key={item.id}
-                      >
-
-                        {/* PRODUCT IMAGE */}
-
+                      <article className="Addtocart-product-card" key={item.id}>
+                        {/* IMAGE */}
                         <div className="Addtocart-product-image-wrapper">
-
                           <img
                             src={item.image || fallbackImage}
                             alt={item.name}
                             className="Addtocart-product-image"
+                            loading="lazy"
                             onError={(event) => {
                               event.currentTarget.onerror = null;
                               event.currentTarget.src = fallbackImage;
@@ -497,20 +474,15 @@ const Addtocart = () => {
                               {item.badge}
                             </span>
                           )}
-
                         </div>
 
-                        {/* PRODUCT INFORMATION */}
-
+                        {/* INFO */}
                         <div className="Addtocart-product-info">
-
                           <span className="Addtocart-product-category">
                             {item.category || "General"}
                           </span>
 
-                          <h3 className="Addtocart-product-name">
-                            {item.name}
-                          </h3>
+                          <h3 className="Addtocart-product-name">{item.name}</h3>
 
                           <p className="Addtocart-product-description">
                             {item.description ||
@@ -518,13 +490,8 @@ const Addtocart = () => {
                           </p>
 
                           <div className="Addtocart-product-price">
-
                             <strong>{formatPrice(price)}</strong>
-
-                            {oldPrice > price && (
-                              <del>{formatPrice(oldPrice)}</del>
-                            )}
-
+                            {oldPrice > price && <del>{formatPrice(oldPrice)}</del>}
                           </div>
 
                           {oldPrice > price && (
@@ -532,42 +499,35 @@ const Addtocart = () => {
                               You save {formatPrice(oldPrice - price)}
                             </span>
                           )}
-
                         </div>
 
-                        {/* QUANTITY AND TOTAL */}
-
+                        {/* ACTIONS */}
                         <div className="Addtocart-product-actions">
+                          <div className="Addtocart-quantity-wrap">
+                            <span className="Addtocart-quantity-label">
+                              QUANTITY
+                            </span>
 
-                          <span className="Addtocart-quantity-label">
-                            QUANTITY
-                          </span>
+                            <div className="Addtocart-quantity-control">
+                              <button
+                                type="button"
+                                onClick={() => updateQuantity(item.id, -1)}
+                                disabled={quantity <= 1}
+                                aria-label="Decrease quantity"
+                              >
+                                <FiMinus />
+                              </button>
 
-                          <div className="Addtocart-quantity-control">
+                              <span aria-live="polite">{quantity}</span>
 
-                            <button
-                              type="button"
-                              onClick={() =>
-                                updateQuantity(item.id, -1)
-                              }
-                              disabled={quantity <= 1}
-                              aria-label="Decrease quantity"
-                            >
-                              <FiMinus />
-                            </button>
-
-                            <span>{quantity}</span>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                updateQuantity(item.id, 1)
-                              }
-                              aria-label="Increase quantity"
-                            >
-                              <FiPlus />
-                            </button>
-
+                              <button
+                                type="button"
+                                onClick={() => updateQuantity(item.id, 1)}
+                                aria-label="Increase quantity"
+                              >
+                                <FiPlus />
+                              </button>
+                            </div>
                           </div>
 
                           <div className="Addtocart-line-total">
@@ -583,21 +543,14 @@ const Addtocart = () => {
                             <FiTrash2 />
                             Remove
                           </button>
-
                         </div>
-
                       </article>
-
                     );
-
                   })}
-
                 </div>
 
-                {/* CONTINUE SHOPPING */}
-
+                {/* CONTINUE */}
                 <div className="Addtocart-continue-row">
-
                   <button
                     type="button"
                     onClick={handleReturnToShop}
@@ -611,21 +564,17 @@ const Addtocart = () => {
                     <FiPackage />
                     Quality products, delivered to your door
                   </div>
-
                 </div>
-
               </div>
 
-              {/* =====================================
-                  RIGHT ORDER SUMMARY
-              ===================================== */}
-
+              {/* RIGHT: SUMMARY */}
               <aside className="Addtocart-summary-section">
-
                 <div className="Addtocart-summary-card">
-
                   <div className="Addtocart-summary-heading">
-                    <div>
+                    <span className="Addtocart-summary-circle one" aria-hidden="true" />
+                    <span className="Addtocart-summary-circle two" aria-hidden="true" />
+
+                    <div className="Addtocart-summary-heading-text">
                       <span>YOUR ORDER</span>
                       <h3>Order Summary</h3>
                     </div>
@@ -635,138 +584,118 @@ const Addtocart = () => {
                     </div>
                   </div>
 
-                  {/* SUMMARY ITEMS */}
+                  <div className="Addtocart-summary-body">
+                    {/* ITEMS */}
+                    <div className="Addtocart-summary-items">
+                      {cart.map((item) => (
+                        <div className="Addtocart-summary-product" key={item.id}>
+                          <div>
+                            <strong>{item.name}</strong>
+                            <span>Qty: {item.qty}</span>
+                          </div>
 
-                  <div className="Addtocart-summary-items">
-
-                    {cart.map((item) => (
-                      <div
-                        className="Addtocart-summary-product"
-                        key={item.id}
-                      >
-                        <div>
-                          <strong>{item.name}</strong>
-                          <span>Qty: {item.qty}</span>
+                          <span>
+                            {formatPrice(
+                              (Number(item.price) || 0) * (Number(item.qty) || 1)
+                            )}
+                          </span>
                         </div>
-
-                        <span>
-                          {formatPrice(
-                            (Number(item.price) || 0) *
-                            (Number(item.qty) || 1)
-                          )}
-                        </span>
-                      </div>
-                    ))}
-
-                  </div>
-
-                  {/* PRICE BREAKDOWN */}
-
-                  <div className="Addtocart-summary-breakdown">
-
-                    <div className="Addtocart-summary-row">
-                      <span>Subtotal ({cartTotalCount} items)</span>
-                      <strong>{formatPrice(cartSubtotal)}</strong>
+                      ))}
                     </div>
 
-                    <div className="Addtocart-summary-row">
-                      <span>Delivery Charges</span>
-                      <strong className="Addtocart-free">
-                        FREE
-                      </strong>
-                    </div>
-
-                    {totalSavings > 0 && (
+                    {/* BREAKDOWN */}
+                    <div className="Addtocart-summary-breakdown">
                       <div className="Addtocart-summary-row">
-                        <span>Product Savings</span>
-                        <strong className="Addtocart-savings">
-                          -{formatPrice(totalSavings)}
-                        </strong>
+                        <span>Subtotal ({cartTotalCount} items)</span>
+                        <strong>{formatPrice(cartSubtotal)}</strong>
                       </div>
-                    )}
 
-                    <div className="Addtocart-summary-divider"></div>
+                      <div className="Addtocart-summary-row">
+                        <span>Delivery Charges</span>
+                        <strong className="Addtocart-free">FREE</strong>
+                      </div>
 
-                    <div className="Addtocart-grand-total">
-                      <span>Total Amount</span>
-                      <strong>{formatPrice(cartTotal)}</strong>
+                      {totalSavings > 0 && (
+                        <div className="Addtocart-summary-row">
+                          <span>Product Savings</span>
+                          <strong className="Addtocart-savings">
+                            -{formatPrice(totalSavings)}
+                          </strong>
+                        </div>
+                      )}
+
+                      <div className="Addtocart-summary-divider" />
+
+                      <div className="Addtocart-grand-total">
+                        <span>Total Amount</span>
+                        <strong>{formatPrice(cartTotal)}</strong>
+                      </div>
                     </div>
 
+                    {/* CHECKOUT */}
+                    <button
+                      type="button"
+                      className="Addtocart-checkout-button"
+                      onClick={handleCheckout}
+                    >
+                      <FiZap />
+                      Proceed to Checkout
+                      <FiArrowRight />
+                    </button>
+
+                    <p className="Addtocart-checkout-caption">
+                      Review your order details before proceeding.
+                    </p>
+
+                    {/* TRUST */}
+                    <div className="Addtocart-trust-section">
+                      <div className="Addtocart-trust-item">
+                        <FiShield />
+                        <div>
+                          <strong>Safe Shopping</strong>
+                          <span>Secure browsing experience</span>
+                        </div>
+                      </div>
+
+                      <div className="Addtocart-trust-item">
+                        <FiTruck />
+                        <div>
+                          <strong>Free Delivery</strong>
+                          <span>Standard delivery included</span>
+                        </div>
+                      </div>
+
+                      <div className="Addtocart-trust-item">
+                        <FiCheckCircle />
+                        <div>
+                          <strong>Quality Products</strong>
+                          <span>Selected for your needs</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-
-                  {/* CHECKOUT */}
-
-                  <button
-                    type="button"
-                    className="Addtocart-checkout-button"
-                    onClick={handleCheckout}
-                  >
-                    <FiZap />
-                    Proceed to Checkout
-                    <FiArrowRight />
-                  </button>
-
-                  <p className="Addtocart-checkout-caption">
-                    Review your order details before proceeding.
-                  </p>
-
-                  {/* TRUST INFORMATION */}
-
-                  <div className="Addtocart-trust-section">
-
-                    <div className="Addtocart-trust-item">
-                      <FiShield />
-                      <div>
-                        <strong>Safe Shopping</strong>
-                        <span>Secure browsing experience</span>
-                      </div>
-                    </div>
-
-                    <div className="Addtocart-trust-item">
-                      <FiTruck />
-                      <div>
-                        <strong>Free Delivery</strong>
-                        <span>Standard delivery included</span>
-                      </div>
-                    </div>
-
-                    <div className="Addtocart-trust-item">
-                      <FiCheckCircle />
-                      <div>
-                        <strong>Quality Products</strong>
-                        <span>Selected for your needs</span>
-                      </div>
-                    </div>
-
-                  </div>
-
                 </div>
 
-                {/* SUPPORT CARD */}
-
+                {/* SUPPORT */}
                 <div className="Addtocart-support-card">
                   <div className="Addtocart-support-icon">
-                    <FiShoppingBag />
+                    <FiHeadphones />
                   </div>
 
                   <div>
                     <strong>Need help with your order?</strong>
-                    <p>
-                      Contact our team for product and delivery enquiries.
-                    </p>
+                    <p>Contact our team for product and delivery enquiries.</p>
                   </div>
                 </div>
-
               </aside>
-
             </div>
 
             {/* BOTTOM BENEFITS */}
-
             <div className="Addtocart-benefits">
-
               <div className="Addtocart-benefit">
-                <FiTruck />
+                <span className="Addtocart-benefit-icon">
+                  <FiTruck />
+                </span>
                 <div>
                   <strong>Free Delivery</strong>
                   <span>On your current order</span>
@@ -774,7 +703,9 @@ const Addtocart = () => {
               </div>
 
               <div className="Addtocart-benefit">
-                <FiShield />
+                <span className="Addtocart-benefit-icon">
+                  <FiShield />
+                </span>
                 <div>
                   <strong>Safe Shopping</strong>
                   <span>Shop with confidence</span>
@@ -782,21 +713,18 @@ const Addtocart = () => {
               </div>
 
               <div className="Addtocart-benefit">
-                <FiRefreshCw />
+                <span className="Addtocart-benefit-icon">
+                  <FiRefreshCw />
+                </span>
                 <div>
                   <strong>Easy Cart Updates</strong>
                   <span>Manage items anytime</span>
                 </div>
               </div>
-
             </div>
-
           </div>
-
         )}
-
       </div>
-
     </section>
   );
 };

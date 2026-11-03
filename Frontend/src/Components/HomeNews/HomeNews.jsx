@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./HomeNews.css";
 
-import news1 from "../../assets/homenews-1.jpg";
-import news2 from "../../assets/homenews-2.jpg";
-import news3 from "../../assets/homenews-3.jpg";
-import news4 from "../../assets/homenews-4.jpg";
-import news5 from "../../assets/homenews-5.jpg";
-import news6 from "../../assets/homenews-6.webp";
+import news1 from "../../assets/homenews-1.png";
+import news2 from "../../assets/homenews-2.png";
+import news3 from "../../assets/homenews-3.png";
+import news4 from "../../assets/homenews-4.png";
+import news5 from "../../assets/homenews-5.png";
+import news6 from "../../assets/homenews-6.png";
 
 const AUTOPLAY_DELAY = 3000; // ms between slides
 const MAX_PER_VIEW = 3; // clones needed for a seamless loop

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./ServiceBreadCumb.css";
-import backgroundImage from "../../assets/breadcrum.jpeg";
+import backgroundImage from "../../assets/breadcrum.png";
 
 const ServiceBreadCrumb = ({ title = "Service", activePage }) => {
   const pageTitle = activePage || title;
@@ -19,7 +19,7 @@ const ServiceBreadCrumb = ({ title = "Service", activePage }) => {
             Home
           </Link>
 
-          <span className="Service-Breadcrumb-divider">|</span>
+          <span className="Service-Breadcrumb-divider">//</span>
 
           <span className="Service-Breadcrumb-active">{pageTitle}</span>
         </div>

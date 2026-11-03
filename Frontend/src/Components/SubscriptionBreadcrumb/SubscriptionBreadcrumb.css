@@ -12,7 +12,7 @@
 }
 
 .Subscription-Breadcrumb-overlay {
-  background: rgba(0, 0, 0, 0.45); /* Slightly darker overlay for better text contrast */
+  background: rgba(0, 0, 0, 0.6); /* Slightly darker overlay for better text contrast */
   height: 100%;
   width: 100%;
   display: flex;
@@ -23,10 +23,10 @@
 }
 
 .Subscription-Breadcrumb-title {
-  font-size: 5rem; /* Larger font size to match the bold header in your screenshot */
+  font-size: 2.3rem;
   font-weight: 600;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1;
 }
 
 .Subscription-Breadcrumb-nav {
@@ -39,7 +39,7 @@
 }
 
 .Subscription-Breadcrumb-divider {
-  color: #4d97ff; /* Red divider */
+  color: #4d97ff;
   font-weight: 700;
 }
 
@@ -52,4 +52,15 @@
   .Subscription-Breadcrumb-title {
     font-size: 3rem;
   }
+}
+
+.Subscription-Breadcrumb-home {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.Subscription-Breadcrumb-home:hover,
+.Subscription-Breadcrumb-home:focus {
+  color: #ffffff;
+  text-decoration: none;
 }

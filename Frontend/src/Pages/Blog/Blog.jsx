@@ -1,19 +1,15 @@
 import React from 'react'
-import NewsBlogStandard from '../../Components/NewsBlogStandard/NewsBlogStandard'
-import BlogCommentsSection from '../../Components/BlogCommentsSection/BlogCommentsSection'
 import BlogbreadCrumb from '../../Components/BlogBreadcrumb/BlogBreadcrumb'
+import BlogMain from '../../Components/BlogMain/BlogMain'
 
 const Blog = () => {
   
   return (
     <div>
         <BlogbreadCrumb/>
-        <NewsBlogStandard/>
-        <BlogCommentsSection/>
+        <BlogMain/>
     </div>
   )
 }
 
 export default Blog
-
-//

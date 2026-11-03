@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Gallarybreadcrumb.css";
-import backgroundImage from "../../assets/breadcrum.jpeg";
+import backgroundImage from "../../assets/breadcrum.png";
 
 const Gallarybreadcrumb = ({ title = "Gallary", activePage }) => {
   const pageTitle = activePage || title;
@@ -19,7 +19,7 @@ const Gallarybreadcrumb = ({ title = "Gallary", activePage }) => {
             Home
           </Link>
 
-          <span className="Gallary-breadcrumb-divider">|</span>
+          <span className="Gallary-breadcrumb-divider">//</span>
 
           <span className="Gallary-breadcrumb-active">{pageTitle}</span>
         </div>

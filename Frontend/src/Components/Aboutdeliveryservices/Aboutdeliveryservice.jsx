@@ -8,7 +8,7 @@ import {
   FiPhone,
   FiArrowRight,
 } from "react-icons/fi";
-import Boylend from "../../assets/boylendwater.jpeg";
+import Boylend from "../../assets/boylendwater.png";
 import Ladywater from "../../assets/Drinking_water.jpeg";
 
 import "./Aboutservicedelivery.css";

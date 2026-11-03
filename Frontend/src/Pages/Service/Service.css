@@ -1,0 +1,21 @@
+/* Service Page Styles */
+
+.service-page {
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.service-page img {
+  max-width: 100%;
+  height: auto;
+}
+
+.service-page button {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.service-page button:hover {
+  transform: translateY(-2px);
+}

@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./NewsBlogStandard.css";
 
-import heroImage from "../../assets/news-hero-children.jpg";
-import articleImage from "../../assets/news-delivery-article.jpg";
-import recentChildren from "../../assets/news-recent-children.jpg";
-import recentDelivery from "../../assets/news-recent-delivery.jpg";
-import recentWater from "../../assets/news-recent-water.jpg";
-import contactImage from "../../assets/news-contact-delivery.jpg";
+import heroImage from "../../assets/news-hero-children.png";
+import articleImage from "../../assets/news-delivery-article.png";
+import recentChildren from "../../assets/news-recent-children.png";
+import recentDelivery from "../../assets/news-recent-delivery.png";
+import recentWater from "../../assets/news-recent-water.png";
+import contactImage from "../../assets/news-contact-delivery.png";
 
 /* ---------------------------------------------------------
    Edit the content below (dates, contact details, posts)

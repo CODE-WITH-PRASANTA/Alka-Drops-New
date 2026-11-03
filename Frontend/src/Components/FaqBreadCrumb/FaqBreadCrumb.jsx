@@ -1,6 +1,6 @@
 import React from 'react';
 import './FaqBreadCrumb.css';
-import backgroundImage from '../../assets/breadcrum.jpeg'; 
+import backgroundImage from '../../assets/breadcrum.png'; 
 
 const FaqBreadCrumb = ({ title, activePage }) => {
   return (

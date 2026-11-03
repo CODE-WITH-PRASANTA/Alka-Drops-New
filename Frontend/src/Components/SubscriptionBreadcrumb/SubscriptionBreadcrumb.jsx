@@ -1,6 +1,6 @@
 import React from 'react';
 import './SubscriptionBreadcrumb.css';
-import backgroundImage from '../../assets/breadcrum.jpeg'; 
+import backgroundImage from '../../assets/breadcrum.png'; 
 
 const SubscriptionBreadcrumb = ({ title, activePage }) => {
   return (

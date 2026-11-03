@@ -1,6 +1,6 @@
 import React from 'react';
 import './ShopDBreadCrumb.css';
-import backgroundImage from '../../assets/breadcrum.jpeg'; 
+import backgroundImage from '../../assets/breadcrum.png'; 
 
 const ShopDBreadCrumb = ({ title, activePage }) => {
   return (

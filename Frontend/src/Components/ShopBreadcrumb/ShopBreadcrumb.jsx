@@ -1,6 +1,6 @@
 import React from 'react';
 import './ShopBreadcrumb.css';
-import backgroundImage from '../../assets/breadcrum.jpeg'; 
+import backgroundImage from '../../assets/breadcrum.png'; 
 
 const ShopBreadcrumb = ({ title, activePage }) => {
   return (

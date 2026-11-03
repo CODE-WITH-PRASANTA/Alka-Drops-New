@@ -1,7 +1,7 @@
 /* Using Poppins font for the clean, geometric look */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-.Blogbreadcrumb-wrapper {
+.Blog-Breadcrumb-wrapper {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -11,8 +11,8 @@
   font-family: 'Poppins', sans-serif;
 }
 
-.Blogbreadcrumb-overlay {
-  background: rgba(0, 0, 0, 0.6); /* Slightly darker overlay for better text contrast */
+.Blog-Breadcrumb-overlay {
+  background: rgba(0, 0, 0, 0.6); /* Darker overlay for better text contrast */
   height: 100%;
   width: 100%;
   display: flex;
@@ -22,14 +22,14 @@
   color: #ffffff;
 }
 
-.Blogbreadcrumb-title {
-  font-size: 2.3rem; /* Larger font size to match the bold header in your screenshot */
+.Blog-Breadcrumb-title {
+  font-size: 2.3rem;
   font-weight: 600;
   margin: 0;
   line-height: 1;
 }
 
-.Blogbreadcrumb-nav {
+.Blog-Breadcrumb-nav {
   font-size: 1.1rem;
   font-weight: 400;
   display: flex;
@@ -38,28 +38,33 @@
   text-transform: capitalize;
 }
 
-.Blogbreadcrumb-divider {
-  color: #4d97ff; /* Red divider */
+.Blog-Breadcrumb-divider {
+  color: #4d97ff;
   font-weight: 700;
+}
+
+.Blog-Breadcrumb-home {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.Blog-Breadcrumb-home:hover,
+.Blog-Breadcrumb-home:focus {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.Blog-Breadcrumb-active {
+  color: #ffffff;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .Blogbreadcrumb-wrapper {
+  .Blog-Breadcrumb-wrapper {
     height: 250px;
   }
-  
-  .Blogbreadcrumb-title {
+
+  .Blog-Breadcrumb-title {
     font-size: 3rem;
   }
-}
-.Blogbreadcrumb-home {
-  color: #ffffff;
-  text-decoration: none;
-}
-
-.Blogbreadcrumb-home:hover,
-.Blogbreadcrumb-home:focus {
-  color: #ffffff;
-  text-decoration: none;
 }

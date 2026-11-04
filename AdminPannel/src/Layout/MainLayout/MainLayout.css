@@ -1,63 +1,159 @@
-.MainLayout {
-  display: flex;
-  min-height: 100vh;
-  background-color: #f8fafc;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --alka-layout-sidebar-width: 330px;
+  --alka-layout-bg: #ffffff;
+  --alka-layout-text: #193b38;
+
+  /* Must match the .alka-topbar height in Topbar.css */
+  --alka-topbar-h: 60px;
 }
+
+/* Main layout */
+
+.MainLayout {
+  min-height: 100vh;
+  width: 100%;
+  background: var(--alka-layout-bg);
+  color: var(--alka-layout-text);
+  font-family: "Inter", sans-serif;
+}
+
+/* Desktop sidebar visible */
+
+.MainLayout.sidebar-visible {
+  --alka-layout-sidebar-width: 330px;
+}
+
+/* Desktop sidebar collapsed: icon rail stays visible,
+   so content must start after the rail (not at 0) */
+
+.MainLayout.sidebar-hidden {
+  --alka-layout-sidebar-width: var(--alka-sidebar-collapsed-width, 78px);
+}
+
+/* Main content wrapper */
 
 .MainLayout-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin-left: 260px; /* Width of expanded sidebar */
-  transition: margin-left 0.3s ease;
-  min-width: 0; /* Prevents flex items from breaking layout boundaries */
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: var(--alka-layout-sidebar-width);
+  transition: margin-left 0.28s ease;
 }
 
-/* Shift container when sidebar is collapsed */
-.MainLayout.sidebar-collapsed .MainLayout-container {
-  margin-left: 70px;
+/* Topbar */
+
+.MainLayout-container > .alka-topbar {
+  width: 100%;
 }
+
+/* Page content */
 
 .MainLayout-content {
-  padding: 24px;
-  flex: 1;
+  min-width: 0;
+  padding: 27px;
+  box-sizing: border-box;
 }
 
-.MainLayout-placeholder {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 40px;
-  text-align: center;
-  color: #64748b;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+/* Page title */
+
+.MainLayout-content .page-title {
+  margin: 0 0 24px;
+  color: #193b38;
+  font-family: "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
-.MainLayout-placeholder h2 {
-  color: #0066cc;
-  margin-bottom: 10px;
+/* Ensure page content uses same font */
+
+.MainLayout-content > * {
+  font-family: "Inter", sans-serif;
 }
 
-/* Mobile Responsive Adjustments */
-@media (max-width: 768px) {
-  .MainLayout-container, 
-  .MainLayout.sidebar-collapsed .MainLayout-container {
-    margin-left: 0;
+/* =========================================
+   DESKTOP + TABLET: COLLAPSED SIDEBAR
+   Toggle button takes the place of the logo
+========================================= */
+
+@media (min-width: 769px) {
+  /* Topbar height must match on tablet */
+  @media (max-width: 1024px) {
+    :root {
+      --alka-topbar-h: 72px;
+    }
   }
-  
-  .MainLayout-overlay {
+
+  /* Sidebar header (empty, logo hidden) lines up with the topbar */
+  .MainLayout.sidebar-hidden .alka-sidebar.alka-sidebar-hidden .alka-sidebar-header {
+    min-height: var(--alka-topbar-h);
+    height: var(--alka-topbar-h);
+  }
+
+  /* Topbar has its own stacking context (sticky), so it must sit
+     above the sidebar (z-index 1100) for the toggle to be visible */
+  .MainLayout.sidebar-hidden .alka-topbar {
+    z-index: 1200;
+  }
+
+  /* Toggle moves into the rail, exactly where the logo was */
+  .MainLayout.sidebar-hidden .alka-topbar-toggle {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
-    z-index: 98;
+
+    width: var(--alka-sidebar-collapsed-width, 78px);
+    height: var(--alka-topbar-h);
+
+    border-right: 1px solid #e5efeb;
+    border-bottom: 1px solid #e5f0ed;
+
+    background: #f5fbfa;
   }
-  
+
+  .MainLayout.sidebar-hidden .alka-topbar-toggle:hover {
+    background: #e3f8f2;
+  }
+
+  /* Toggle is out of the flow now, so give the breadcrumb its space */
+  .MainLayout.sidebar-hidden .alka-topbar-left {
+    padding-left: 24px;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+  .MainLayout {
+    --alka-layout-sidebar-width: 0px !important;
+  }
+
+  .MainLayout-container {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
   .MainLayout-content {
-    padding: 16px;
+    padding: 20px 16px;
+  }
+
+  .MainLayout-content .page-title {
+    margin-bottom: 20px;
+    font-size: 21px;
+  }
+}
+
+/* Motion accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .MainLayout-container {
+    transition: none;
+  }
+}
+@media (min-width: 769px) {
+  .MainLayout.sidebar-visible .alka-sidebar,
+  .MainLayout.sidebar-hidden .alka-sidebar {
+    width: var(--alka-layout-sidebar-width);
   }
 }

@@ -1,501 +1,852 @@
-/* Sidebar.css — Alka Drops premium 3D blue theme */
+/* =========================================
+   ALKA DROPS SIDEBAR
+   Full Sidebar + Icon Rail
+   JSX unchanged
+========================================= */
 
-.Sidebar {
-  width: 270px;
-  height: 100vh;
-  background: linear-gradient(165deg, #4fa9f5 0%, #2679dd 26%, #1454ad 55%, #0a316f 82%, #071f4a 100%);
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --alka-primary: #08bfae;
+  --alka-primary-dark: #079b8e;
+
+  --alka-sidebar-bg: #f5fbfa;
+  --alka-sidebar-border: #e5f0ed;
+
+  --alka-text: #193b38;
+  --alka-muted: #78918c;
+
+  --alka-sidebar-width: 290px;
+  --alka-sidebar-collapsed-width: 78px;
+}
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+.alka-sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 100;
-  box-shadow: 12px 0 38px rgba(4, 26, 63, 0.4), inset -1px 0 0 rgba(255, 255, 255, 0.08);
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-}
+  bottom: 0;
 
-.Sidebar.collapsed {
-  width: 76px;
-}
+  width: var(--alka-sidebar-width);
+  height: 100vh;
 
-/* Glossy top-left light sheen */
-.Sidebar-sheen {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.22), transparent 45%),
-    radial-gradient(circle at 100% 100%, rgba(0, 0, 0, 0.18), transparent 55%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.Sidebar-logo,
-.Sidebar-nav,
-.Sidebar-brandFooter {
-  position: relative;
-  z-index: 1;
-}
-
-/* ============================
-   LOGO / BRAND HEADER
-============================ */
-
-.Sidebar-logo {
-  height: 78px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  gap: 12px;
-  overflow: hidden;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  flex-shrink: 0;
-}
-
-.Sidebar.collapsed .Sidebar-logo {
-  padding: 0;
-  justify-content: center;
-}
-
-/* Wrapper for Dark Logo Mark */
-.Sidebar-logo-iconWrap {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.Sidebar-logo-iconWrap::before {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  border-radius: 14px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.35), transparent 70%);
-  animation: darkLogoGlow 3.4s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes darkLogoGlow {
-  0%, 100% {
-    opacity: 0.5;
-    transform: scale(0.95);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-}
-
-.Sidebar-logo-icon {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  display: block;
-  filter: drop-shadow(0 8px 18px rgba(2, 10, 25, 0.6));
-  flex-shrink: 0;
-}
-
-.Sidebar-logo-text-group {
   display: flex;
   flex-direction: column;
-  line-height: 1.2;
+
   overflow: hidden;
+  box-sizing: border-box;
+
+  background: var(--alka-sidebar-bg);
+
+  border: 0;
+  border-right: 1px solid var(--alka-sidebar-border);
+
+  border-radius: 0;
+
+  box-shadow: 0 10px 35px rgba(21, 77, 68, 0.07);
+
+  z-index: 1100;
+
+  font-family: "Inter", sans-serif;
+
+  transition:
+    width 0.28s ease,
+    transform 0.28s ease;
 }
 
-.Sidebar-logo-text {
-  font-size: 18px;
+/* =========================================
+   COLLAPSED SIDEBAR
+   Only icons visible
+========================================= */
+
+.alka-sidebar.alka-sidebar-hidden {
+  width: var(--alka-sidebar-collapsed-width);
+
+  transform: translateX(0);
+
+  pointer-events: auto;
+}
+
+/* =========================================
+   SIDEBAR HEADER
+========================================= */
+
+.alka-sidebar-header {
+  min-height: 104px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px 22px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid var(--alka-sidebar-border);
+
+  flex-shrink: 0;
+
+  transition:
+    padding 0.28s ease,
+    min-height 0.28s ease;
+}
+
+/* Brand */
+
+.alka-brand {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  min-width: 0;
+}
+
+/* Brand icon */
+
+.alka-brand-icon {
+  width: 51px;
+  height: 51px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 16px;
+
+  background: linear-gradient(135deg, #13cbb7, #08a99c);
+
+  color: white;
+
+  box-shadow: 0 6px 14px rgba(8, 191, 174, 0.2);
+
+  transition:
+    width 0.28s ease,
+    height 0.28s ease,
+    border-radius 0.28s ease;
+}
+
+/* Brand text */
+
+.alka-brand-info,
+.alka-footer-content {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.alka-brand-name {
+  color: var(--alka-text);
+
+  font-size: 16px;
   font-weight: 800;
-  color: #ffffff;
+
   white-space: nowrap;
-  letter-spacing: -0.3px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
-.Sidebar-logo-tagline {
-  font-size: 10px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.72);
+.alka-brand-subtitle {
+  color: var(--alka-muted);
+
+  font-size: 11px;
+
   white-space: nowrap;
-  letter-spacing: 0.03em;
 }
 
-/* ============================
-   NAV
-============================ */
+/* =========================================
+   COLLAPSED HEADER
+   Logo hidden, space kept for the toggle button
+========================================= */
 
-.Sidebar-nav {
-  padding: 18px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.alka-sidebar.alka-sidebar-hidden .alka-sidebar-header {
+  min-height: 88px;
+  height: 88px;
+
+  padding: 0;
+
+  justify-content: center;
+
+  border-bottom: 1px solid var(--alka-sidebar-border);
+}
+
+/* Hide the logo and brand text completely */
+
+.alka-sidebar.alka-sidebar-hidden .alka-brand,
+.alka-sidebar.alka-sidebar-hidden .alka-brand-icon,
+.alka-sidebar.alka-sidebar-hidden .alka-brand-info {
+  display: none;
+}
+
+/* =========================================
+   SIDEBAR CONTENT
+========================================= */
+
+.alka-sidebar-content {
   flex: 1;
+
+  padding: 24px 14px 18px;
+
   overflow-y: auto;
   overflow-x: hidden;
+
+  scrollbar-width: thin;
+  scrollbar-color: #c8e6df transparent;
+
+  transition: padding 0.28s ease;
 }
 
-.Sidebar-nav::-webkit-scrollbar {
-  width: 5px;
-}
-.Sidebar-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-}
+/* Section title */
 
-.Sidebar-link {
-  display: flex;
-  align-items: center;
-  padding: 11px 14px;
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  border-radius: 12px;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-  gap: 14px;
-  white-space: nowrap;
-  width: 100%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  font-size: 14.5px;
-  font-weight: 600;
-}
+.alka-section-label {
+  padding: 0 15px 17px;
 
-.Sidebar-link:hover {
-  background-color: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  transform: translateX(4px);
-  box-shadow: 0 4px 10px rgba(4, 26, 63, 0.2);
-}
+  color: #9aaca7;
 
-.Sidebar-link.active {
-  background: linear-gradient(160deg, #ffffff 0%, #eaf4ff 100%);
-  color: #1c66c4;
-  box-shadow: 0 10px 24px rgba(4, 26, 63, 0.45), 0 2px 5px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  transform: translateX(2px);
-}
-
-.Sidebar-link.active .Sidebar-icon {
-  color: #1c66c4;
-  transform: scale(1.06);
-}
-
-.Sidebar-dropdown-toggle {
-  justify-content: flex-start;
-}
-
-.Sidebar-chevron {
-  margin-left: auto;
-  transition: transform 0.2s ease;
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.Sidebar-dropdown-wrapper.is-open > .Sidebar-link {
-  background-color: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
-}
-
-.Sidebar-chevron.rotated {
-  transform: rotate(180deg);
-  color: #ffffff;
-}
-
-.Sidebar-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.Sidebar-link:hover .Sidebar-icon {
-  transform: scale(1.08);
-}
-
-/* ============================
-   SECTION HEADINGS
-============================ */
-
-.Sidebar-section-wrapper {
-  margin: 16px 0 8px 0;
-  padding: 0 14px;
-}
-
-.Sidebar-animated-divider {
-  height: 1px;
-  width: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.06));
-  border-radius: 2px;
-  margin-bottom: 10px;
-}
-
-.Sidebar-section-title {
-  display: block;
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: rgba(255, 255, 255, 0.55);
-  padding-left: 2px;
+
+  letter-spacing: 1.4px;
+
+  white-space: nowrap;
 }
 
-.Sidebar.collapsed .Sidebar-section-wrapper {
-  padding: 0 8px;
-}
+/* Navigation */
 
-/* ============================
-   SUBMENU
-============================ */
-
-.Sidebar-submenu {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.alka-sidebar-nav {
   display: flex;
   flex-direction: column;
-  padding-left: 20px;
-  margin: 2px 0 0 25px;
-  background-color: rgba(0, 0, 0, 0.16);
-  border-radius: 8px;
-  border-left: 2px dashed rgba(255, 255, 255, 0.28);
+
+  gap: 5px;
 }
 
-.Sidebar-dropdown-wrapper.is-open .Sidebar-submenu {
-  max-height: 300px;
-  padding: 6px 0;
-}
+/* =========================================
+   MENU LINKS
+========================================= */
 
-.Sidebar-submenu-link {
-  padding: 8px 16px;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.78);
-  text-decoration: none;
-  border-radius: 6px;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.Sidebar-submenu-link:hover {
-  background-color: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  padding-left: 20px;
-}
-
-.Sidebar-submenu-link.active {
-  background-color: rgba(255, 255, 255, 0.95);
-  color: #1c66c4;
-}
-
-/* ============================
-   BOTTOM BRAND FOOTER
-============================ */
-
-.Sidebar-brandFooter {
+.alka-menu-link {
   position: relative;
-  height: 180px;
-  flex-shrink: 0;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding-right: 20px;
-}
 
-.Sidebar-brandFooter-waves {
-  position: absolute;
-  inset: 0;
   width: 100%;
-  height: 100%;
-  z-index: 1;
+  min-height: 57px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 0 15px;
+
+  border: 1px solid transparent;
+  border-radius: 13px;
+
+  background: transparent;
+
+  color: #607d76;
+
+  text-decoration: none;
+
+  font-family: "Inter", sans-serif;
+
+  font-size: 12.5px;
+  font-weight: 600;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+
+  flex-shrink: 0;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    padding 0.28s ease;
 }
 
-.wave {
-  transform-box: fill-box;
-  transform-origin: center;
+/* Hover */
+
+.alka-menu-link:hover {
+  background: #eaf7f3;
+
+  color: var(--alka-primary-dark);
 }
 
-.wave-1 {
-  fill: rgba(255, 255, 255, 0.08);
-  animation: waveDrift 7s ease-in-out infinite;
-}
+/* Menu icon */
 
-.wave-2 {
-  fill: rgba(255, 255, 255, 0.12);
-  animation: waveDrift 9s ease-in-out infinite reverse;
-}
+.alka-menu-icon {
+  width: 22px;
+  height: 22px;
 
-.wave-3 {
-  fill: rgba(255, 255, 255, 0.18);
-  animation: waveDrift 11s ease-in-out infinite;
-}
-
-@keyframes waveDrift {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(-3%);
-  }
-}
-
-.droplet {
-  fill: rgba(255, 255, 255, 0.75);
-  animation: dropletFloat 3.6s ease-in-out infinite;
-}
-
-.droplet-1 { animation-delay: 0s; }
-.droplet-2 { animation-delay: 0.5s; }
-.droplet-3 { animation-delay: 1s; }
-.droplet-4 { animation-delay: 1.4s; }
-.droplet-5 { animation-delay: 0.2s; }
-
-@keyframes dropletFloat {
-  0%, 100% {
-    transform: translateY(0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translateY(-4px);
-    opacity: 1;
-  }
-}
-
-/* ============================
-   TRANSPARENT 3D BOTTLE EFFECT
-============================ */
-
-.Sidebar-bottle-wrapper {
-  position: relative;
-  width: 90px;
-  height: 165px;
-  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 4px;
+
+  flex-shrink: 0;
+
+  color: #829b94;
 }
 
-.Sidebar-bottle-img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: 100%;
-  object-fit: contain;
-  position: relative;
-  z-index: 3;
+/* Menu text */
+
+.alka-menu-text {
+  flex: 1;
+
+  min-width: 0;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Active link */
+
+.alka-menu-link.alka-active {
+  background: #e0f7f1;
+
+  border-color: #c9eee5;
+
+  color: #078f83;
+
+  font-weight: 700;
+}
+
+.alka-menu-link.alka-active .alka-menu-icon {
+  color: var(--alka-primary);
+}
+
+/* =========================================
+   DROPDOWN GROUP
+========================================= */
+
+.alka-menu-group {
+  display: flex;
+  flex-direction: column;
+
+  flex-shrink: 0;
+}
+
+.alka-dropdown-trigger {
+  appearance: none;
+}
+
+/* Chevron */
+
+.alka-dropdown-chevron {
+  flex-shrink: 0;
+
+  color: #8ba29b;
+
+  transition:
+    transform 0.25s ease,
+    opacity 0.2s ease;
+}
+
+.alka-chevron-open {
+  transform: rotate(180deg);
+
+  color: var(--alka-primary-dark);
+}
+
+.alka-menu-group-open > .alka-dropdown-trigger {
+  color: #078f83;
+}
+
+/* =========================================
+   SUBMENU
+========================================= */
+
+.alka-submenu {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+
+  max-height: 0;
+
+  overflow: hidden;
+
   opacity: 0;
-  transition: opacity 0.4s ease;
-  filter: drop-shadow(0 14px 18px rgba(2, 12, 32, 0.5)) drop-shadow(0 2px 4px rgba(255, 255, 255, 0.15));
-  animation: bottleFloat 4s ease-in-out infinite, bottleGlint 3.2s ease-in-out infinite;
+
+  transition:
+    max-height 0.3s ease,
+    opacity 0.2s ease;
 }
 
-.Sidebar-bottle-img.is-ready {
+.alka-submenu-open {
+  max-height: 260px;
+
+  margin: 5px 0 7px;
+
   opacity: 1;
 }
 
-.Sidebar-bottle-glow {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 120px;
-  height: 120px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, rgba(127, 205, 251, 0.45) 40%, transparent 75%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
+/* Submenu link */
+
+.alka-submenu-link {
+  min-height: 43px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  margin-left: 20px;
+
+  padding: 0 12px;
+
+  border-radius: 10px;
+
+  color: #78918a;
+
+  font-size: 11.5px;
+  font-weight: 500;
+
+  text-decoration: none;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
-.Sidebar-bottle-ring {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%) rotateX(75deg);
-  width: 60px;
-  height: 60px;
-  border: 2px solid rgba(255, 255, 255, 0.6);
-  border-radius: 50%;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.5);
-  pointer-events: none;
-  z-index: 1;
-  animation: ringPulse 4s ease-in-out infinite;
+/* Hover */
+
+.alka-submenu-link:hover {
+  background: #eaf7f3;
+
+  color: #079b8e;
 }
 
-.Sidebar-bottle-shadow {
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50px;
-  height: 8px;
-  background: radial-gradient(ellipse at center, rgba(3, 18, 48, 0.7) 0%, transparent 80%);
-  border-radius: 50%;
-  z-index: 1;
-  animation: shadowPulse 4s ease-in-out infinite;
+/* Submenu icon */
+
+.alka-submenu-icon {
+  display: flex;
+  align-items: center;
+
+  flex-shrink: 0;
+
+  color: #91aaa1;
 }
 
-@keyframes bottleFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
+/* Active submenu */
+
+.alka-submenu-link.alka-submenu-active {
+  background: #e2f7f1;
+
+  color: #078f83;
+
+  font-weight: 700;
 }
 
-@keyframes bottleGlint {
-  0%, 100% {
-    filter: drop-shadow(0 14px 18px rgba(2, 12, 32, 0.5)) drop-shadow(0 2px 4px rgba(255, 255, 255, 0.15)) brightness(1);
-  }
-  50% {
-    filter: drop-shadow(0 14px 18px rgba(2, 12, 32, 0.5)) drop-shadow(0 2px 6px rgba(255, 255, 255, 0.3)) brightness(1.06);
-  }
+.alka-submenu-link.alka-submenu-active .alka-submenu-icon {
+  color: var(--alka-primary);
 }
 
-@keyframes ringPulse {
-  0%, 100% {
-    transform: translateX(-50%) rotateX(75deg) scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translateX(-50%) rotateX(75deg) scale(1.15);
-    opacity: 0.9;
-  }
+/* =========================================
+   COLLAPSED MENU
+   Icon only
+========================================= */
+
+/* Hide section label */
+
+.alka-sidebar.alka-sidebar-hidden .alka-section-label {
+  display: none;
 }
 
-@keyframes shadowPulse {
-  0%, 100% {
-    transform: translateX(-50%) scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translateX(-50%) scale(0.75);
-    opacity: 0.4;
-  }
+/* Remove extra content padding */
+
+.alka-sidebar.alka-sidebar-hidden .alka-sidebar-content {
+  padding: 18px 8px;
 }
 
-/* ============================
-   MOBILE RESPONSIVE
-============================ */
+/* Reduce nav spacing */
+
+.alka-sidebar.alka-sidebar-hidden .alka-sidebar-nav {
+  gap: 8px;
+}
+
+/* Center all menu icons */
+
+.alka-sidebar.alka-sidebar-hidden .alka-menu-link {
+  min-height: 52px;
+
+  justify-content: center;
+
+  gap: 0;
+
+  padding: 0;
+
+  border-radius: 12px;
+}
+
+/* Icon stays centered */
+
+.alka-sidebar.alka-sidebar-hidden .alka-menu-icon {
+  width: 22px;
+  height: 22px;
+
+  margin: 0;
+}
+
+/* Hide all menu labels */
+
+.alka-sidebar.alka-sidebar-hidden .alka-menu-text {
+  display: none;
+}
+
+/* Hide dropdown chevrons */
+
+.alka-sidebar.alka-sidebar-hidden .alka-dropdown-chevron {
+  display: none;
+}
+
+/* Hide submenu completely */
+
+.alka-sidebar.alka-sidebar-hidden .alka-submenu {
+  display: none;
+
+  max-height: 0;
+
+  margin: 0;
+
+  opacity: 0;
+}
+
+/* Dropdown group */
+
+.alka-sidebar.alka-sidebar-hidden .alka-menu-group {
+  width: 100%;
+}
+
+/* Dropdown button */
+
+.alka-sidebar.alka-sidebar-hidden .alka-dropdown-trigger {
+  justify-content: center;
+}
+
+/* =========================================
+   SIDEBAR FOOTER
+========================================= */
+
+.alka-sidebar-footer {
+  min-height: 92px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin: 0 15px;
+
+  padding: 15px 13px;
+
+  box-sizing: border-box;
+
+  border-top: 1px solid var(--alka-sidebar-border);
+
+  flex-shrink: 0;
+
+  transition:
+    margin 0.28s ease,
+    padding 0.28s ease,
+    min-height 0.28s ease;
+}
+
+/* Footer icon */
+
+.alka-footer-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 13px;
+
+  background: #e2f7f1;
+
+  color: #08aa9c;
+}
+
+/* Footer text */
+
+.alka-footer-title {
+  color: #35554e;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.alka-footer-version {
+  color: #9aaca7;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+}
+
+/* =========================================
+   COLLAPSED FOOTER
+========================================= */
+
+.alka-sidebar.alka-sidebar-hidden .alka-sidebar-footer {
+  min-height: 76px;
+
+  justify-content: center;
+
+  gap: 0;
+
+  margin: 0;
+
+  padding: 12px 0;
+}
+
+/* Center footer icon */
+
+.alka-sidebar.alka-sidebar-hidden .alka-footer-icon {
+  width: 43px;
+  height: 43px;
+
+  border-radius: 13px;
+}
+
+/* Hide footer text */
+
+.alka-sidebar.alka-sidebar-hidden .alka-footer-content {
+  display: none;
+}
+
+/* =========================================
+   MOBILE CLOSE BUTTON
+========================================= */
+
+.alka-mobile-close {
+  display: none;
+
+  width: 35px;
+  height: 35px;
+
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: #e7f6f2;
+
+  color: var(--alka-text);
+
+  cursor: pointer;
+}
+
+/* =========================================
+   MOBILE OVERLAY
+========================================= */
+
+.alka-sidebar-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(15, 42, 37, 0.38);
+
+  backdrop-filter: blur(2px);
+
+  z-index: 1090;
+}
+
+/* =========================================
+   MOBILE SIDEBAR
+========================================= */
 
 @media (max-width: 768px) {
-  .Sidebar {
-    left: -270px;
+
+  .alka-sidebar {
+    width: min(290px, 86vw);
+
+    border-radius: 0;
+
+    transform: translateX(-100%);
+
+    box-shadow: 10px 0 35px rgba(15, 54, 47, 0.14);
+
+    transition: transform 0.28s ease;
   }
-  .Sidebar.mobile-open {
-    left: 0;
-    width: 270px;
-    box-shadow: 12px 0 44px rgba(4, 26, 63, 0.55);
+
+  /* Mobile sidebar open */
+
+  .alka-sidebar-mobile-open {
+    transform: translateX(0);
   }
-  .Sidebar.collapsed {
-    left: -270px;
+
+  /* Mobile closed */
+
+  .alka-sidebar-hidden {
+    transform: translateX(-100%);
   }
-  .Sidebar.collapsed.mobile-open {
-    left: 0;
-    width: 270px;
+
+  /* Mobile open takes priority */
+
+  .alka-sidebar-mobile-open.alka-sidebar-hidden {
+    transform: translateX(0);
+  }
+
+  /* Mobile header */
+
+  .alka-sidebar-header {
+    min-height: 88px;
+
+    padding: 18px;
+  }
+
+  /* Close button */
+
+  .alka-mobile-close {
+    display: flex;
+  }
+
+  /* Mobile content */
+
+  .alka-sidebar-content {
+    padding: 20px 12px;
+  }
+
+  /* Mobile links */
+
+  .alka-menu-link {
+    min-height: 52px;
+  }
+
+  /* Footer */
+
+  .alka-sidebar-footer {
+    min-height: 82px;
+  }
+
+  /* Disable desktop icon rail behavior on mobile */
+
+  .alka-sidebar.alka-sidebar-hidden {
+    width: min(290px, 86vw);
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-sidebar-header {
+    min-height: 88px;
+    height: auto;
+
+    padding: 18px;
+
+    justify-content: space-between;
+  }
+
+  /* Bring the logo back on mobile */
+
+  .alka-sidebar.alka-sidebar-hidden .alka-brand {
+    display: flex;
+
+    justify-content: flex-start;
+
+    width: auto;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-brand-icon {
+    display: flex;
+
+    width: 51px;
+    height: 51px;
+
+    border-radius: 16px;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-brand-info {
+    display: flex;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-section-label {
+    display: block;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-sidebar-content {
+    padding: 20px 12px;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-sidebar-nav {
+    gap: 5px;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-menu-link {
+    min-height: 52px;
+
+    justify-content: flex-start;
+
+    gap: 15px;
+
+    padding: 0 15px;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-menu-text {
+    display: block;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-dropdown-chevron {
+    display: block;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-submenu {
+    display: flex;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-submenu-open {
+    max-height: 260px;
+
+    margin: 5px 0 7px;
+
+    opacity: 1;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-sidebar-footer {
+    min-height: 82px;
+
+    justify-content: flex-start;
+
+    gap: 12px;
+
+    margin: 0 15px;
+
+    padding: 15px 13px;
+  }
+
+  .alka-sidebar.alka-sidebar-hidden .alka-footer-content {
+    display: flex;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .alka-sidebar,
+  .alka-sidebar-header,
+  .alka-sidebar-content,
+  .alka-sidebar-footer,
+  .alka-menu-link,
+  .alka-submenu,
+  .alka-dropdown-chevron {
+    transition: none;
   }
 }

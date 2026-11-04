@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./Layout/MainLayout/MainLayout";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import AddStock from "./Components/AddStock/AddStock";
+import BlogPosting from "./Components/BlogPosting/BlogPosting";
+import BlogManagement from "./Components/BlogManagement/BlogManagement";
 
 const App = () => {
   return (
@@ -19,6 +21,12 @@ const App = () => {
           {/* Dashboard Route */}
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="/admin/shop/add-stock" element={<AddStock/>} />
+          <Route path="/admin/blog-post" element={<BlogPosting />} />
+          <Route path="/admin/blog-management" element={<BlogManagement />} />
+
+
+
+
         </Route>
 
         {/* Fallback Route */}

@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import MainLayout from "./Layout/MainLayout/MainLayout";
 import Dashboard from "./Pages/Dashboard/Dashboard";
+import AddStock from "./Components/AddStock/AddStock";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
 
           {/* Dashboard Route */}
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="/admin/shop/add-stock" element={<AddStock/>} />
         </Route>
 
         {/* Fallback Route */}

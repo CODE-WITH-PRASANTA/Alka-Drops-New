@@ -1,190 +1,105 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import API from "../../services/api";
 import "./NewsBlogStandard.css";
-
-import heroImage from "../../assets/news-hero-children.png";
-import articleImage from "../../assets/news-delivery-article.png";
-import recentChildren from "../../assets/news-recent-children.png";
-import recentDelivery from "../../assets/news-recent-delivery.png";
-import recentWater from "../../assets/news-recent-water.png";
 import contactImage from "../../assets/news-contact-delivery.png";
 
-/* ---------------------------------------------------------
-   Edit the content below (dates, contact details, posts)
---------------------------------------------------------- */
 const ALL = "All Posts";
-
-const categories = [
-  ALL,
-  "Hydration Tips",
-  "Delivery Updates",
-  "Water Quality",
-  "Eco & Refills",
-];
-
-const recentNews = [
-  {
-    id: 1,
-    title: "Easy ways to help kids drink more water every day",
-    date: "21 Oct 2026",
-    category: "Hydration Tips",
-    image: recentChildren,
-  },
-  {
-    id: 2,
-    title: "How to plan your weekly Alka Drops delivery",
-    date: "14 Oct 2026",
-    category: "Delivery Updates",
-    image: recentDelivery,
-  },
-  {
-    id: 3,
-    title: "Why sealed and hygienic packing matters",
-    date: "07 Oct 2026",
-    category: "Water Quality",
-    image: recentWater,
-  },
-  {
-    id: 4,
-    title: "Refill your jar and cut down on plastic waste",
-    date: "30 Sep 2026",
-    category: "Eco & Refills",
-    image: recentDelivery,
-  },
-  {
-    id: 5,
-    title: "Simple hydration habits for the office",
-    date: "22 Sep 2026",
-    category: "Hydration Tips",
-    image: recentChildren,
-  },
-];
-
-const paragraphs = {
-  intro1:
-    "Drinking enough water is one of the simplest habits for everyday wellbeing, yet it is easy to forget when life gets busy. Having clean, good-tasting water always within reach is often the first step, and that is where a reliable doorstep delivery service makes a real difference.",
-  intro2:
-    "Alka Drops delivers pH 8.5+ alkaline drinking water in sealed, hygienic jars and bottles. Many families and offices choose it for its smooth, refreshing taste and for the convenience of never having to carry heavy water home.",
-  intro3:
-    "Our team handles every order with care, from filling and sealing to scheduling and delivery, so the water you open at home is the same fresh water that left our plant.",
-  after1:
-    "A steady supply changes small habits. Keeping a jar or dispenser at home or at the office makes it easy to refill a bottle, offer water to guests, or prepare tea and meals with water you trust.",
-  after2:
-    "Scheduled deliveries also remove the last-minute worry of running out. Choose the pack size that fits your household or workplace, and we will be there on the day you pick.",
-  body1:
-    "Not all water delivery services are the same. Whether you are choosing for your family, your shop or your office, a few simple points can help you decide with confidence.",
-  body2:
-    "At Alka Drops we focus on exactly these points, because dependable service is just as important as the water itself.",
-  more1:
-    "A note on alkaline water: choosing it is a matter of personal taste and preference. Alka Drops is made for everyday drinking, and it is not a substitute for medical advice. If you have a medical condition or special hydration needs, please speak with your doctor.",
-  more2:
-    "Getting started is easy. Browse the shop, pick your jars or bottles, and tell us where to deliver. Our team will take care of the rest and keep your supply fresh and on time.",
-};
-
-const checklist = [
-  "Sealed, hygienic packing from the plant to your door",
-  "Clear scheduling and on-time home delivery",
-  "Consistent quality and a smooth, refreshing taste",
-  "Friendly support whenever you have a question",
-];
-
-const tags = ["Alkaline Water", "Hydration", "Home Delivery"];
-
 const CONTACT_PHONE_LABEL = "+91 98765 43210";
 const CONTACT_PHONE_HREF = "tel:+919876543210";
-const CONTACT_EMAIL = "info@example.com";
+const CONTACT_EMAIL = "info@alkadrops.com";
 
-/* ---------------------------------------------------------
-   Icons
---------------------------------------------------------- */
 function Icon({ name }) {
   const props = {
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.9,
+    strokeWidth: 2,
     strokeLinecap: "round",
     strokeLinejoin: "round",
-    "aria-hidden": true,
+    "aria-hidden": "true",
   };
 
   switch (name) {
     case "user":
       return (
         <svg {...props}>
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
         </svg>
       );
     case "calendar":
       return (
         <svg {...props}>
-          <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
-          <path d="M8 3v4M16 3v4M3.5 10h17" />
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
         </svg>
       );
     case "clock":
       return (
         <svg {...props}>
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 7v5l3 2" />
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
         </svg>
       );
     case "chat":
       return (
         <svg {...props}>
-          <path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.1A8 8 0 1 1 20 12Z" />
-        </svg>
-      );
-    case "search":
-      return (
-        <svg {...props}>
-          <circle cx="10.8" cy="10.8" r="6.3" />
-          <path d="m15.5 15.5 4 4" />
-        </svg>
-      );
-    case "arrow":
-      return (
-        <svg {...props}>
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      );
-    case "check":
-      return (
-        <svg {...props} strokeWidth={2.4}>
-          <path d="m5 12.5 4.5 4.5L19 7.5" />
-        </svg>
-      );
-    case "phone":
-      return (
-        <svg {...props}>
-          <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
-        </svg>
-      );
-    case "mail":
-      return (
-        <svg {...props}>
-          <rect x="3" y="5" width="18" height="14" rx="3" />
-          <path d="m4 7 8 6 8-6" />
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       );
     case "drop":
       return (
         <svg {...props}>
-          <path d="M12 2.5S5.5 10 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 10 12 2.5 12 2.5Z" />
-          <path d="M9 15a3 3 0 0 0 3 3" />
+          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+        </svg>
+      );
+    case "check":
+      return (
+        <svg {...props}>
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      );
+    case "search":
+      return (
+        <svg {...props}>
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      );
+    case "arrow":
+      return (
+        <svg {...props}>
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      );
+    case "phone":
+      return (
+        <svg {...props}>
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+        </svg>
+      );
+    case "mail":
+      return (
+        <svg {...props}>
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
         </svg>
       );
     case "link":
       return (
         <svg {...props}>
-          <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
-          <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
         </svg>
       );
     case "facebook":
       return (
         <svg {...props}>
-          <path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8.5c0-.3.2-.5.5-.5Z" />
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
         </svg>
       );
     case "x":
@@ -205,16 +120,124 @@ function Icon({ name }) {
   }
 }
 
+const formatDate = (dateString) => {
+  if (!dateString) return "Recent";
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return dateString;
+    return d.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  } catch {
+    return "Recent";
+  }
+};
+
 const NewsBlogStandard = () => {
+  const { slug } = useParams();
+
+  const [blog, setBlog] = useState(null);
+  const [allBlogs, setAllBlogs] = useState([]);
+  const [recentNews, setRecentNews] = useState([]);
+  const [categories, setCategories] = useState([ALL]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState(ALL);
-  const [showAll, setShowAll] = useState(false);
   const [progress, setProgress] = useState(0);
   const [copied, setCopied] = useState(false);
 
   const [comments, setComments] = useState([]);
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+
+  /* ---------- Fetch Blog Details and Recent Blogs using Axios ---------- */
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+    setError(null);
+
+    // 1. Fetch all blogs for recent list & categories
+    API.get("/blogs")
+      .then((res) => {
+        if (!isMounted) return;
+        const list = res.data?.blogs || [];
+        const publishedList = list.filter(
+          (b) => !b.status || b.status.toLowerCase() === "published"
+        );
+        setAllBlogs(publishedList);
+        setRecentNews(publishedList.slice(0, 5));
+
+        const cats = [
+          ALL,
+          ...new Set(
+            publishedList
+              .map((b) => b.category?.trim())
+              .filter((c) => Boolean(c))
+          ),
+        ];
+        setCategories(cats);
+
+        // 2. Resolve current blog by slug or id, or pick first published
+        if (slug) {
+          return API.get(`/blogs/${slug}`)
+            .then((detailRes) => {
+              if (!isMounted) return;
+              if (detailRes.data?.blog) {
+                setBlog(detailRes.data.blog);
+                setComments(detailRes.data.blog.comments || []);
+              } else {
+                // Try finding by slug from list
+                const found = publishedList.find(
+                  (b) => b.slug === slug || b._id === slug
+                );
+                if (found) {
+                  setBlog(found);
+                  setComments(found.comments || []);
+                } else {
+                  setError("Blog post not found.");
+                }
+              }
+            })
+            .catch(() => {
+              if (!isMounted) return;
+              const found = publishedList.find(
+                (b) => b.slug === slug || b._id === slug
+              );
+              if (found) {
+                setBlog(found);
+                setComments(found.comments || []);
+              } else {
+                setError("Article could not be loaded.");
+              }
+            });
+        } else {
+          // If no slug specified, show first published blog
+          if (publishedList.length > 0) {
+            setBlog(publishedList[0]);
+            setComments(publishedList[0].comments || []);
+          } else {
+            setError("No blog articles available yet.");
+          }
+        }
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        console.error("Error loading blog details with axios:", err);
+        setError("Failed to connect to database. Please check your backend.");
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [slug]);
 
   /* ---------- reading progress ---------- */
   useEffect(() => {
@@ -235,27 +258,28 @@ const NewsBlogStandard = () => {
     return () => window.clearTimeout(timer);
   }, [copied]);
 
-  /* ---------- filtering ---------- */
+  /* ---------- category count calculation ---------- */
+  const categoryCount = (category) =>
+    category === ALL
+      ? allBlogs.length
+      : allBlogs.filter((news) => news.category?.trim() === category).length;
+
+  /* ---------- filtering sidebar recent news ---------- */
   const filteredNews = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return recentNews.filter((news) => {
-      const matchesSearch = news.title.toLowerCase().includes(query);
-      const matchesCategory =
-        activeCategory === ALL || news.category === activeCategory;
+    return allBlogs.filter((news) => {
+      const titleMatch = (news.title || "").toLowerCase().includes(query);
+      const categoryMatch =
+        activeCategory === ALL || news.category?.trim() === activeCategory;
 
-      return matchesSearch && matchesCategory;
+      return titleMatch && categoryMatch;
     });
-  }, [search, activeCategory]);
-
-  const categoryCount = (category) =>
-    category === ALL
-      ? recentNews.length
-      : recentNews.filter((news) => news.category === category).length;
+  }, [search, activeCategory, allBlogs]);
 
   /* ---------- sharing ---------- */
   const pageUrl = typeof window !== "undefined" ? window.location.href : "";
-  const shareTitle = "Staying hydrated made simple with Alka Drops";
+  const shareTitle = blog?.title || "Alka Drops Alkaline Water Blog";
 
   const shareLinks = [
     {
@@ -279,59 +303,152 @@ const NewsBlogStandard = () => {
     try {
       await navigator.clipboard.writeText(pageUrl);
       setCopied(true);
-    } catch (error) {
+    } catch {
       setCopied(false);
     }
   };
 
-  /* ---------- comments ---------- */
-  const submitComment = (event) => {
+  /* ---------- comments submission with Axios ---------- */
+  const submitComment = async (event) => {
     event.preventDefault();
 
     const name = commentName.trim();
     const text = commentText.trim();
+    if (!name || !text || !blog) return;
 
-    if (!name || !text) return;
+    setIsSubmittingComment(true);
+    try {
+      // Try sending comment to backend if endpoint available
+      const blogId = blog._id || blog.id;
+      if (blogId) {
+        await API.post(`/blogs/${blogId}/comments`, {
+          name,
+          comment: text,
+        }).catch(() => {});
+      }
 
-    setComments((previous) => [
-      { id: Date.now(), name, text, date: "Just now" },
-      ...previous,
-    ]);
-    setCommentName("");
-    setCommentText("");
+      setComments((prev) => [
+        { id: Date.now(), name, comment: text, text, createdAt: new Date() },
+        ...prev,
+      ]);
+      setCommentName("");
+      setCommentText("");
+    } catch (err) {
+      console.warn("Could not save comment to server:", err);
+    } finally {
+      setIsSubmittingComment(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div style={{ textAlign: "center", padding: "120px 20px" }}>
+        <div
+          style={{
+            display: "inline-block",
+            width: "50px",
+            height: "50px",
+            border: "4px solid rgba(10, 63, 184, 0.15)",
+            borderTopColor: "#0a3fb8",
+            borderRadius: "50%",
+            animation: "spin 0.8s linear infinite",
+          }}
+        />
+        <p style={{ marginTop: "18px", color: "#4f6288", fontWeight: 650 }}>
+          Loading article details from database...
+        </p>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (error || !blog) {
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          padding: "100px 20px",
+          maxWidth: "600px",
+          margin: "0 auto",
+        }}
+      >
+        <h2 style={{ color: "#07225f", marginBottom: "12px" }}>
+          Article Not Found
+        </h2>
+        <p style={{ color: "#4f6288", marginBottom: "24px" }}>
+          {error || "The requested blog article does not exist or has been removed."}
+        </p>
+        <Link
+          to="/blog"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "12px 24px",
+            backgroundColor: "#0a3fb8",
+            color: "#ffffff",
+            borderRadius: "10px",
+            textDecoration: "none",
+            fontWeight: 600,
+          }}
+        >
+          &larr; Back to All Blogs
+        </Link>
+      </div>
+    );
+  }
+
+  const imageSrc = blog.coverImage || blog.featuredImage || blog.image;
+  const authorName = blog.author || blog.postedBy || "Alka Drops Team";
+  const dateFormatted = formatDate(blog.createdAt || blog.date);
+  const readTimeStr = blog.readTime || "4 min read";
+  const tagsList = Array.isArray(blog.tags)
+    ? blog.tags
+    : typeof blog.tags === "string" && blog.tags
+    ? blog.tags.split(",").map((t) => t.trim())
+    : [];
 
   return (
     <section className="news-detail-page">
       <div className="news-progress" style={{ width: `${progress}%` }} aria-hidden="true" />
 
-      <span className="news-bg news-bg-left" aria-hidden="true"></span>
-      <span className="news-bg news-bg-right" aria-hidden="true"></span>
+      <span className="news-bg news-bg-left" aria-hidden="true" />
+      <span className="news-bg news-bg-right" aria-hidden="true" />
 
       <div className="news-detail-container">
         {/* ================= ARTICLE ================= */}
         <main className="news-article">
-          <div className="news-hero-image">
-            <img src={heroImage} alt="Children holding drinking water bottles" />
-            <div className="news-hero-overlay" />
-            <span className="news-hero-tag">Hydration Tips</span>
-            <span className="news-hero-ph">
-              <Icon name="drop" /> pH 8.5+ Alkaline
-            </span>
-          </div>
+          {imageSrc && (
+            <div className="news-hero-image">
+              <img
+                src={imageSrc}
+                alt={blog.title}
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+              <div className="news-hero-overlay" />
+              <span className="news-hero-tag">
+                {blog.category || "Alkaline Water"}
+              </span>
+              <span className="news-hero-ph">
+                <Icon name="drop" /> pH 8.5+ Alkaline
+              </span>
+            </div>
+          )}
 
           <div className="news-meta">
             <span>
               <Icon name="user" />
-              Alka Drops Team
+              {authorName}
             </span>
             <span>
               <Icon name="calendar" />
-              28 Oct 2026
+              {dateFormatted}
             </span>
             <span>
               <Icon name="clock" />
-              4 min read
+              {readTimeStr.includes("read") ? readTimeStr : `${readTimeStr} min read`}
             </span>
             <span>
               <Icon name="chat" />
@@ -339,98 +456,56 @@ const NewsBlogStandard = () => {
             </span>
           </div>
 
-          <h1 className="news-main-title">
-            Staying Hydrated Made Simple: Fresh Alkaline Water Delivered to
-            Your Door
-          </h1>
+          <h1 className="news-main-title">{blog.title}</h1>
 
-          <div className="news-article-text">
-            <p className="news-lead">{paragraphs.intro1}</p>
-            <p>{paragraphs.intro2}</p>
-            <p>{paragraphs.intro3}</p>
-          </div>
+          {/* Excerpt if present */}
+          {blog.excerpt && (
+            <div className="news-article-text">
+              <p className="news-lead">{blog.excerpt}</p>
+            </div>
+          )}
 
-          <blockquote className="news-quote">
-            <span className="news-quote-mark" aria-hidden="true">“</span>
-            <p>
-              Good water should be simple: clean, fresh and at your door
-              exactly when you need it.
-            </p>
-            <strong>The Alka Drops Team</strong>
-          </blockquote>
+          {/* Full Rich Article Content from TinyMCE */}
+          <div
+            className="news-article-text"
+            style={{ marginTop: "20px", lineHeight: "1.8", color: "#334155" }}
+            dangerouslySetInnerHTML={{
+              __html: blog.content || blog.description || "<p>No content available.</p>",
+            }}
+          />
 
-          <div className="news-article-text">
-            <p>{paragraphs.after1}</p>
-            <p>{paragraphs.after2}</p>
-          </div>
-
-          <div className="news-second-image">
-            <img
-              src={articleImage}
-              alt="Alka Drops delivery professional handing a water bottle to a customer"
-            />
-            <span className="news-image-chip">
-              <Icon name="check" /> Free home delivery
-            </span>
-          </div>
-
-          <h2 className="news-secondary-title">
-            What to look for in a water delivery service
-          </h2>
-
-          <div className="news-article-text">
-            <p>{paragraphs.body1}</p>
-          </div>
-
-          <ul className="news-check-list">
-            {checklist.map((item) => (
-              <li key={item}>
-                <span>
-                  <Icon name="check" />
-                </span>
-                {item}
-              </li>
-            ))}
-          </ul>
-
-          <div className="news-article-text">
-            <p>{paragraphs.body2}</p>
-
-            {showAll && (
-              <>
-                <p>{paragraphs.more1}</p>
-                <p>{paragraphs.more2}</p>
-              </>
-            )}
-          </div>
-
-          <button
-            type="button"
-            className="news-read-more"
-            onClick={() => setShowAll((previous) => !previous)}
-            aria-expanded={showAll}
-          >
-            {showAll ? "Show Less" : "Read More"}
-            <span className={`news-read-more-icon ${showAll ? "open" : ""}`}>
-              <Icon name="arrow" />
-            </span>
-          </button>
+          {/* Blockquote if present */}
+          {blog.quote && (
+            <blockquote className="news-quote">
+              <span className="news-quote-mark" aria-hidden="true">
+                “
+              </span>
+              <p>{blog.quote}</p>
+              <strong>{authorName}</strong>
+            </blockquote>
+          )}
 
           {/* tags + share */}
           <div className="news-article-footer">
             <div className="news-tags">
-              <strong>Related Tags</strong>
+              <strong>Tags</strong>
               <div>
-                {tags.map((tag) => (
-                  <button
-                    type="button"
-                    key={tag}
-                    onClick={() => setSearch(tag)}
-                    title={`Search news for ${tag}`}
-                  >
-                    {tag}
-                  </button>
-                ))}
+                {tagsList.length > 0 ? (
+                  tagsList.map((tag) => (
+                    <button
+                      type="button"
+                      key={tag}
+                      onClick={() => setSearch(tag)}
+                      title={`Filter by ${tag}`}
+                    >
+                      {tag}
+                    </button>
+                  ))
+                ) : (
+                  <span style={{ fontSize: "13px", color: "#81796f" }}>
+                    {blog.category || "Alkaline Water"}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -477,15 +552,15 @@ const NewsBlogStandard = () => {
               </p>
             ) : (
               <div className="news-comment-list">
-                {comments.map((comment) => (
-                  <div className="news-comment" key={comment.id}>
+                {comments.map((comment, index) => (
+                  <div className="news-comment" key={comment._id || comment.id || index}>
                     <span className="news-comment-avatar">
-                      {comment.name.charAt(0).toUpperCase()}
+                      {(comment.name || "A").charAt(0).toUpperCase()}
                     </span>
                     <div>
                       <strong>{comment.name}</strong>
-                      <small>{comment.date}</small>
-                      <p>{comment.text}</p>
+                      <small>{formatDate(comment.createdAt || comment.date)}</small>
+                      <p>{comment.comment || comment.text}</p>
                     </div>
                   </div>
                 ))}
@@ -509,8 +584,8 @@ const NewsBlogStandard = () => {
                 aria-label="Your comment"
                 required
               />
-              <button type="submit">
-                Post Comment
+              <button type="submit" disabled={isSubmittingComment}>
+                {isSubmittingComment ? "Posting..." : "Post Comment"}
                 <Icon name="arrow" />
               </button>
             </form>
@@ -526,10 +601,10 @@ const NewsBlogStandard = () => {
             <form className="news-search-form" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="search"
-                placeholder="Search news..."
+                placeholder="Search articles..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                aria-label="Search news"
+                aria-label="Search articles"
               />
               <button type="submit" aria-label="Search">
                 <Icon name="search" />
@@ -539,7 +614,7 @@ const NewsBlogStandard = () => {
 
           {/* category */}
           <div className="news-widget">
-            <h3>Category</h3>
+            <h3>Categories</h3>
 
             <div className="news-category-list">
               {categories.map((category) => (
@@ -563,30 +638,59 @@ const NewsBlogStandard = () => {
 
           {/* recent news */}
           <div className="news-widget">
-            <h3>Recent News</h3>
+            <h3>Recent Articles</h3>
 
             <div className="news-recent-list">
               {filteredNews.length > 0 ? (
-                filteredNews.map((news) => (
-                  <a
-                    className="news-recent-card"
-                    href={`#recent-${news.id}`}
-                    key={news.id}
-                  >
-                    <img src={news.image} alt="" />
+                filteredNews.slice(0, 5).map((news) => {
+                  const rImg = news.coverImage || news.featuredImage || news.image;
+                  const rDate = formatDate(news.createdAt || news.date);
+                  const targetSlug = news.slug || news._id;
 
-                    <div className="news-recent-info">
-                      <small>{news.category}</small>
-                      <p>{news.title}</p>
-                      <span>
-                        <Icon name="calendar" /> {news.date}
-                      </span>
-                    </div>
-                  </a>
-                ))
+                  return (
+                    <Link
+                      className="news-recent-card"
+                      to={`/blog/${targetSlug}`}
+                      key={news._id || news.id}
+                    >
+                      {rImg ? (
+                        <img
+                          src={rImg}
+                          alt={news.title}
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: "74px",
+                            height: "74px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            background: "#0a3fb8",
+                            color: "#ffffff",
+                            borderRadius: "12px",
+                          }}
+                        >
+                          💧
+                        </div>
+                      )}
+
+                      <div className="news-recent-info">
+                        <small>{news.category || "Alkaline Water"}</small>
+                        <p>{news.title}</p>
+                        <span>
+                          <Icon name="calendar" /> {rDate}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })
               ) : (
                 <div className="news-no-results">
-                  <p>No news found.</p>
+                  <p>No articles found.</p>
                   <button
                     type="button"
                     onClick={() => {
@@ -642,10 +746,10 @@ const NewsBlogStandard = () => {
                 </a>
               </div>
 
-              <a className="news-contact-cta" href="/shop">
+              <Link className="news-contact-cta" to="/shop">
                 Shop Now
                 <Icon name="arrow" />
-              </a>
+              </Link>
             </div>
           </div>
         </aside>

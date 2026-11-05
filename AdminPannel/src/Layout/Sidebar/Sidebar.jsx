@@ -22,6 +22,7 @@ import {
   Store,
   Boxes,
   PackageCheck,
+  Tag,
 } from "lucide-react";
 
 import { NavLink, useLocation } from "react-router-dom";
@@ -38,6 +39,11 @@ const menuItems = [
         title: "Blog Management",
         path: "/admin/blog-management",
         icon: ClipboardList,
+      },
+      {
+        title: "Add Category",
+        path: "/admin/blog-category",
+        icon: Tag,
       },
     ],
   },

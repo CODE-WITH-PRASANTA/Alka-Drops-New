@@ -1,75 +1,25 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import API from "../../services/api";
 import "./HomeNews.css";
 
-import news1 from "../../assets/homenews-1.png";
-import news2 from "../../assets/homenews-2.png";
-import news3 from "../../assets/homenews-3.png";
-import news4 from "../../assets/homenews-4.png";
-import news5 from "../../assets/homenews-5.png";
-import news6 from "../../assets/homenews-6.png";
-
-const AUTOPLAY_DELAY = 3000; // ms between slides
+const AUTOPLAY_DELAY = 3500; // ms between slides
 const MAX_PER_VIEW = 3; // clones needed for a seamless loop
 
-/* Replace with your real articles. "link" is where Read More goes. */
-const articles = [
-  {
-    id: 1,
-    image: news1,
-    date: "28 October 2026",
-    author: "Admin",
-    category: "Alkaline Water",
-    title: "5 Reasons Families Are Switching to Alkaline Water",
-    link: "/news/alkaline-water-for-families",
-  },
-  {
-    id: 2,
-    image: news2,
-    date: "21 October 2026",
-    author: "Admin",
-    category: "Health Tips",
-    title: "How Much Water Should You Really Drink Every Day?",
-    link: "/news/daily-water-intake",
-  },
-  {
-    id: 3,
-    image: news3,
-    date: "14 October 2026",
-    author: "Admin",
-    category: "Water Care",
-    title: "Storing Drinking Water Safely: Simple Hygiene Tips",
-    link: "/news/storing-drinking-water",
-  },
-  {
-    id: 4,
-    image: news4,
-    date: "07 October 2026",
-    author: "Admin",
-    category: "Lifestyle",
-    title: "Stay Hydrated at Work: Easy Habits That Make a Difference",
-    link: "/news/hydration-at-work",
-  },
-  {
-    id: 5,
-    image: news5,
-    date: "30 September 2026",
-    author: "Admin",
-    category: "Buying Guide",
-    title: "20L Jar, 5L Can or 1L Bottles? Choosing the Right Pack",
-    link: "/news/choosing-the-right-pack",
-  },
-  {
-    id: 6,
-    image: news6,
-    date: "23 September 2026",
-    author: "Admin",
-    category: "Alkaline Water",
-    title: "What Does pH 8.5+ Mean and Why Does It Matter?",
-    link: "/news/what-is-ph-8-5",
-  },
-];
-
-const TOTAL = articles.length;
+const formatDate = (dateString) => {
+  if (!dateString) return "Recent";
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return dateString;
+    return d.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  } catch {
+    return "Recent";
+  }
+};
 
 const getPerView = () => {
   if (typeof window === "undefined") return 3;
@@ -78,66 +28,93 @@ const getPerView = () => {
   return 1;
 };
 
-const NewsCard = ({ item, hidden }) => (
-  <article
-    className="home-news__card"
-    aria-hidden={hidden ? "true" : undefined}
-  >
-    <div className="home-news__media">
-      <div className="home-news__image-wrap">
-        <img
-          src={item.image}
-          alt={hidden ? "" : item.title}
-          className="home-news__image"
-          loading="lazy"
-          decoding="async"
-          draggable="false"
-        />
-        <span className="home-news__media-overlay" aria-hidden="true"></span>
+const NewsCard = ({ item, hidden }) => {
+  const blogLink = `/blog/${item.slug || item._id}`;
+  const imageSrc = item.coverImage || item.featuredImage || item.image;
+  const authorName = item.author || item.postedBy || "Admin";
+  const dateFormatted = formatDate(item.createdAt || item.date);
+
+  return (
+    <article
+      className="home-news__card"
+      aria-hidden={hidden ? "true" : undefined}
+    >
+      <div className="home-news__media">
+        <div className="home-news__image-wrap">
+          {imageSrc ? (
+            <img
+              src={imageSrc}
+              alt={hidden ? "" : item.title}
+              className="home-news__image"
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "linear-gradient(135deg, #0a3fb8, #1aa7e0)",
+                color: "#ffffff",
+                fontSize: "36px",
+              }}
+            >
+              💧
+            </div>
+          )}
+          <span className="home-news__media-overlay" aria-hidden="true" />
+        </div>
+
+        <span className="home-news__date">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" stroke="currentColor" strokeWidth="1.9" />
+            <path d="M3.5 10H20.5M8 3V7M16 3V7" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+          </svg>
+          {dateFormatted}
+        </span>
       </div>
 
-      <span className="home-news__date">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" stroke="currentColor" strokeWidth="1.9" />
-          <path d="M3.5 10H20.5M8 3V7M16 3V7" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-        </svg>
-        {item.date}
-      </span>
-    </div>
+      <div className="home-news__body">
+        <ul className="home-news__meta">
+          <li className="home-news__meta-item">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
+              <path d="M4.5 20C4.5 16 7.9 13.5 12 13.5C16.1 13.5 19.5 16 19.5 20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+            By {authorName}
+          </li>
+          <li className="home-news__meta-item">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 7.5C3 6.4 3.9 5.5 5 5.5H9.5L11.5 8H19C20.1 8 21 8.9 21 10V17.5C21 18.6 20.1 19.5 19 19.5H5C3.9 19.5 3 18.6 3 17.5V7.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+            </svg>
+            {item.category || "Alkaline Water"}
+          </li>
+        </ul>
 
-    <div className="home-news__body">
-      <ul className="home-news__meta">
-        <li className="home-news__meta-item">
+        <h3 className="home-news__card-title">{item.title}</h3>
+
+        <Link
+          className="home-news__read-more"
+          to={blogLink}
+          tabIndex={hidden ? -1 : undefined}
+          aria-label={hidden ? undefined : `Read more: ${item.title}`}
+        >
+          <span>Read More</span>
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
-            <path d="M4.5 20C4.5 16 7.9 13.5 12 13.5C16.1 13.5 19.5 16 19.5 20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M5 12H19M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          By {item.author}
-        </li>
-        <li className="home-news__meta-item">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M3 7.5C3 6.4 3.9 5.5 5 5.5H9.5L11.5 8H19C20.1 8 21 8.9 21 10V17.5C21 18.6 20.1 19.5 19 19.5H5C3.9 19.5 3 18.6 3 17.5V7.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-          </svg>
-          {item.category}
-        </li>
-      </ul>
-
-      <h3 className="home-news__card-title">{item.title}</h3>
-
-      <a
-        className="home-news__read-more"
-        href={item.link}
-        tabIndex={hidden ? -1 : undefined}
-        aria-label={hidden ? undefined : `Read more: ${item.title}`}
-      >
-        <span>Read More</span>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M5 12H19M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </a>
-    </div>
-  </article>
-);
+        </Link>
+      </div>
+    </article>
+  );
+};
 
 const HomeNews = () => {
   const sectionRef = useRef(null);
@@ -146,12 +123,42 @@ const HomeNews = () => {
   const lockTimerRef = useRef(null);
   const touchStartRef = useRef(null);
 
+  const [articles, setArticles] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [isVisible, setIsVisible] = useState(false);
   const [perView, setPerView] = useState(getPerView);
   const [index, setIndex] = useState(0);
   const [animate, setAnimate] = useState(true);
   const [hoverPaused, setHoverPaused] = useState(false);
   const [tabHidden, setTabHidden] = useState(false);
+
+  /* Fetch live articles using Axios */
+  useEffect(() => {
+    let isMounted = true;
+    API.get("/blogs")
+      .then((res) => {
+        if (!isMounted) return;
+        const list = res.data?.blogs || [];
+        const published = list.filter(
+          (b) => !b.status || b.status.toLowerCase() === "published"
+        );
+        setArticles(published);
+      })
+      .catch((err) => {
+        console.error("HomeNews: failed to fetch blogs with axios:", err);
+        setArticles([]);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const TOTAL = articles.length;
 
   const reducedMotion =
     typeof window !== "undefined" &&
@@ -189,7 +196,7 @@ const HomeNews = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  /* Pause while the browser tab is hidden */
+  /* Pause while browser tab is hidden */
   useEffect(() => {
     const handleVisibility = () => setTabHidden(document.hidden);
     document.addEventListener("visibilitychange", handleVisibility);
@@ -198,7 +205,6 @@ const HomeNews = () => {
 
   useEffect(() => () => clearTimeout(lockTimerRef.current), []);
 
-  /* Lock so quick clicks can't break the animation */
   const lock = useCallback(() => {
     lockRef.current = true;
     clearTimeout(lockTimerRef.current);
@@ -213,18 +219,17 @@ const HomeNews = () => {
   }, []);
 
   const next = useCallback(() => {
-    if (lockRef.current) return;
+    if (lockRef.current || TOTAL <= 1) return;
     lock();
     setAnimate(true);
     setIndex((current) => current + 1);
-  }, [lock]);
+  }, [lock, TOTAL]);
 
   const prev = useCallback(() => {
-    if (lockRef.current) return;
+    if (lockRef.current || TOTAL <= 1) return;
     lock();
 
     if (index === 0) {
-      // jump to the cloned end without animation, then slide back one
       setAnimate(false);
       setIndex(TOTAL);
       requestAnimationFrame(() => {
@@ -237,7 +242,7 @@ const HomeNews = () => {
       setAnimate(true);
       setIndex((current) => current - 1);
     }
-  }, [index, lock]);
+  }, [index, lock, TOTAL]);
 
   const goTo = useCallback(
     (target) => {
@@ -246,12 +251,11 @@ const HomeNews = () => {
       setAnimate(true);
       setIndex(target);
     },
-    [index, lock]
+    [index, lock, TOTAL]
   );
 
-  /* After sliding onto the cloned cards, silently jump back to the real ones */
   const handleTransitionEnd = (event) => {
-    if (event.target !== trackRef.current) return;
+    if (event.target !== trackRef.current || TOTAL === 0) return;
 
     if (index >= TOTAL) {
       setAnimate(false);
@@ -267,16 +271,14 @@ const HomeNews = () => {
     }
   };
 
-  /* Automatic scroll, one card at a time */
   const isPaused = hoverPaused || tabHidden || reducedMotion;
 
   useEffect(() => {
-    if (isPaused || !isVisible) return undefined;
+    if (isPaused || !isVisible || TOTAL <= perView) return undefined;
     const timer = setTimeout(next, AUTOPLAY_DELAY);
     return () => clearTimeout(timer);
-  }, [index, isPaused, isVisible, next]);
+  }, [index, isPaused, isVisible, next, TOTAL, perView]);
 
-  /* Swipe on touch screens */
   const handleTouchStart = (event) => {
     touchStartRef.current = event.touches[0].clientX;
     setHoverPaused(true);
@@ -300,6 +302,10 @@ const HomeNews = () => {
     if (event.key === "ArrowLeft") prev();
   };
 
+  if (isLoading || TOTAL === 0) {
+    return null; // Don't show empty or loading section on home if no published blogs
+  }
+
   const activeDot = index % TOTAL;
   const clones = articles.slice(0, MAX_PER_VIEW);
 
@@ -310,111 +316,131 @@ const HomeNews = () => {
       id="news"
       aria-labelledby="home-news-title"
     >
-      {/* Background decoration */}
       <div className="home-news__bg" aria-hidden="true">
         <span className="home-news__orb home-news__orb--one" />
         <span className="home-news__orb home-news__orb--two" />
       </div>
 
       <div className="home-news__container">
-        {/* Heading + arrows */}
-        <div className="home-news__heading">
-          <div className="home-news__heading-text">
+        <div className="home-news__header">
+          <div className="home-news__titles">
             <span className="home-news__eyebrow">
-              <span className="home-news__eyebrow-line"></span>
-              NEWS &amp; ARTICLES
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Latest Articles
             </span>
-
-            <h2 className="home-news__title" id="home-news-title">
-              Latest <span>Articles</span>
+            <h2 id="home-news-title" className="home-news__main-title">
+              Fresh News &amp; Hydration Guides
             </h2>
-
-            <p className="home-news__subtitle">
-              Tips, guides and updates on healthy hydration and pure alkaline
-              water from the Alka Drops team.
-            </p>
           </div>
 
-          <div className="home-news__arrows">
+          <div
+            className="home-news__controls"
+            role="group"
+            aria-label="Slider navigation"
+          >
             <button
               type="button"
-              className="home-news__arrow"
+              className="home-news__arrow-btn"
               onClick={prev}
-              aria-label="Previous articles"
+              aria-label="Previous article"
             >
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M19 12H5M12 19L5 12L12 5"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
-
             <button
               type="button"
-              className="home-news__arrow"
+              className="home-news__arrow-btn"
               onClick={next}
-              aria-label="Next articles"
+              aria-label="Next article"
             >
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5 12H19M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M5 12H19M12 5L19 12L12 19"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>
         </div>
 
-        {/* Slider */}
         <div
           className="home-news__slider"
-          role="region"
-          aria-roledescription="carousel"
-          aria-label="Latest articles"
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
           onMouseEnter={() => setHoverPaused(true)}
           onMouseLeave={() => setHoverPaused(false)}
-          onFocus={() => setHoverPaused(true)}
-          onBlur={() => setHoverPaused(false)}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Latest articles slider"
         >
-          <div className="home-news__viewport">
-            <div
-              ref={trackRef}
-              className="home-news__track"
-              style={{
-                "--home-news-per-view": perView,
-                transform: `translateX(-${index * (100 / perView)}%)`,
-                transition: animate ? undefined : "none",
-              }}
-              onTransitionEnd={handleTransitionEnd}
-              aria-live={isPaused ? "polite" : "off"}
-            >
-              {articles.map((item) => (
-                <div className="home-news__slide" key={item.id}>
-                  <NewsCard item={item} />
-                </div>
-              ))}
+          <div
+            ref={trackRef}
+            className={`home-news__track ${
+              animate ? "home-news__track--animating" : ""
+            }`}
+            style={{
+              transform: `translateX(-${(index * 100) / perView}%)`,
+            }}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {articles.map((item) => (
+              <div
+                className="home-news__slide"
+                key={item._id || item.id}
+                style={{ flex: `0 0 ${100 / perView}%` }}
+              >
+                <NewsCard item={item} />
+              </div>
+            ))}
 
-              {clones.map((item) => (
-                <div className="home-news__slide" key={`clone-${item.id}`}>
-                  <NewsCard item={item} hidden />
-                </div>
-              ))}
-            </div>
+            {clones.map((item, cloneIndex) => (
+              <div
+                className="home-news__slide"
+                key={`clone-${item._id || item.id}-${cloneIndex}`}
+                style={{ flex: `0 0 ${100 / perView}%` }}
+                aria-hidden="true"
+              >
+                <NewsCard item={item} hidden />
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Dots */}
-        <div className="home-news__dots" role="tablist" aria-label="Choose article">
-          {articles.map((item, i) => (
+        <div
+          className="home-news__dots"
+          role="tablist"
+          aria-label="Article slides"
+        >
+          {articles.map((item, dotIndex) => (
             <button
+              key={item._id || item.id}
               type="button"
-              key={item.id}
               role="tab"
-              aria-selected={activeDot === i}
-              aria-label={`Show article ${i + 1}`}
+              aria-selected={activeDot === dotIndex}
+              aria-label={`Go to article ${dotIndex + 1}`}
               className={`home-news__dot ${
-                activeDot === i ? "home-news__dot--active" : ""
+                activeDot === dotIndex ? "home-news__dot--active" : ""
               }`}
-              onClick={() => goTo(i)}
+              onClick={() => goTo(dotIndex)}
             />
           ))}
         </div>

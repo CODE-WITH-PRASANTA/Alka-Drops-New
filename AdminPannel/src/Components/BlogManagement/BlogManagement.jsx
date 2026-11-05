@@ -1,6 +1,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../../services/api";
 
 import {
   FiGrid,
@@ -406,7 +407,7 @@ const getTags = (tags) => {
 };
 
 const getImage = (blog) => {
-  const image = blog.featuredImage || blog.mainImage || blog.image;
+  const image = blog.featuredImage || blog.coverImage || blog.mainImage || blog.image;
 
   if (!image) return "";
 
@@ -476,7 +477,36 @@ const getInitialBlogs = () => {
 const BlogManagement = () => {
   const navigate = useNavigate();
 
-  const [blogs, setBlogs] = useState(getInitialBlogs);
+  const [blogs, setBlogs] = useState([]);
+  const [isLoadingBlogs, setIsLoadingBlogs] = useState(true);
+
+  // Fetch all blogs from MongoDB Backend via Axios
+  const fetchBlogsFromBackend = async () => {
+    try {
+      setIsLoadingBlogs(true);
+      const res = await API.get("/blogs");
+      const data = res.data;
+      if (data.success && Array.isArray(data.blogs)) {
+        setBlogs(data.blogs);
+      } else {
+        // Fallback to local storage if needed
+        const local = localStorage.getItem(STORAGE_KEY);
+        if (local) setBlogs(JSON.parse(local));
+      }
+    } catch (err) {
+      console.warn("Could not load blogs from backend, fallback to local storage:", err);
+      try {
+        const local = localStorage.getItem(STORAGE_KEY);
+        if (local) setBlogs(JSON.parse(local));
+      } catch {}
+    } finally {
+      setIsLoadingBlogs(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBlogsFromBackend();
+  }, []);
 
   const [viewMode, setViewMode] = useState("grid");
 
@@ -484,6 +514,18 @@ const BlogManagement = () => {
 
   const [categoryFilter, setCategoryFilter] =
     useState("All Categories");
+
+  const [dbCategories, setDbCategories] = useState([]);
+
+  useEffect(() => {
+    API.get("/categories?status=active")
+      .then((res) => {
+        if (res.data?.success && Array.isArray(res.data.categories)) {
+          setDbCategories(res.data.categories.map((c) => c.name));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const [statusFilter, setStatusFilter] =
     useState("All Status");
@@ -494,6 +536,16 @@ const BlogManagement = () => {
 
   const [openMenu, setOpenMenu] = useState(null);
 
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (openMenu && !e.target.closest(".BlogManagement-cardMenu")) {
+        setOpenMenu(null);
+      }
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, [openMenu]);
+
   const [selectedBlog, setSelectedBlog] = useState(null);
 
   const [deleteId, setDeleteId] = useState(null);
@@ -503,7 +555,7 @@ const BlogManagement = () => {
   const itemsPerPage = 6;
 
   /* =====================================================
-     SAVE DATA LOCALLY
+     SAVE DATA LOCALLY (BACKUP)
   ===================================================== */
 
   useEffect(() => {
@@ -514,31 +566,27 @@ const BlogManagement = () => {
       );
     } catch (error) {
       console.error("Local storage error:", error);
-      setNotice(
-        "Browser storage is full. Reduce the size of uploaded files."
-      );
     }
   }, [blogs]);
 
   /* =====================================================
-     CREATE BLOG
+     CREATE BLOG -> REDIRECT TO BLOG POST
   ===================================================== */
 
   const handleCreate = () => {
     setOpenMenu(null);
-
-    navigate("/blog/blog-posting");
+    navigate("/admin/blog-post");
   };
 
   /* =====================================================
-     EDIT BLOG
+     EDIT BLOG -> REDIRECT TO BLOG POST WITH DATA FILLED
   ===================================================== */
 
   const handleEdit = (blog) => {
     setOpenMenu(null);
     setSelectedBlog(null);
-
-    navigate("/blog/blog-posting", {
+    const targetId = blog._id || blog.id;
+    navigate(`/admin/blog-post?id=${targetId}`, {
       state: {
         blog,
         isEditing: true,
@@ -553,13 +601,12 @@ const BlogManagement = () => {
   const availableCategories = useMemo(
     () => [
       "All Categories",
-      ...new Set(
-        blogs
-          .map((blog) => blog.category)
-          .filter(Boolean)
-      ),
+      ...new Set([
+        ...dbCategories,
+        ...blogs.map((blog) => blog.category).filter(Boolean),
+      ]),
     ],
-    [blogs]
+    [blogs, dbCategories]
   );
 
   /* =====================================================
@@ -693,57 +740,73 @@ const BlogManagement = () => {
   };
 
   /* =====================================================
-     DELETE BLOG - LOCAL ONLY
+     DELETE BLOG - MONGODB & LOCAL
   ===================================================== */
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteId === null) return;
 
-    setBlogs((previous) =>
-      previous.filter(
-        (blog) => blog.id !== deleteId
-      )
-    );
+    try {
+      if (typeof deleteId === "string" && deleteId.length >= 12) {
+        await API.delete(`/blogs/${deleteId}`);
+      }
 
-    if (selectedBlog?.id === deleteId) {
-      setSelectedBlog(null);
+      setBlogs((previous) =>
+        previous.filter(
+          (blog) => (blog._id || blog.id) !== deleteId
+        )
+      );
+
+      if ((selectedBlog?._id || selectedBlog?.id) === deleteId) {
+        setSelectedBlog(null);
+      }
+
+      setDeleteId(null);
+      showNotice("Blog post deleted successfully.");
+      fetchBlogsFromBackend();
+    } catch (err) {
+      console.error("Delete blog error:", err);
+      showNotice("Error communicating with database.");
     }
-
-    setDeleteId(null);
-
-    showNotice("Blog post deleted successfully.");
   };
 
   /* =====================================================
-     CHANGE STATUS - LOCAL ONLY
+     CHANGE STATUS - MONGODB & LOCAL
   ===================================================== */
 
-  const handleStatusChange = (blog) => {
-    const nextStatus =
-      blog.status === "Published"
-        ? "Draft"
-        : "Published";
+  const handleStatusChange = async (blog) => {
+    const id = blog._id || blog.id;
+    const currentStatus = (blog.status || "published").toLowerCase();
+    const nextStatus = currentStatus === "published" ? "draft" : "published";
 
-    setBlogs((previous) =>
-      previous.map((item) =>
-        item.id === blog.id
-          ? {
-              ...item,
-              status: nextStatus,
-              updatedAt: new Date().toISOString(),
-            }
-          : item
-      )
-    );
+    try {
+      if (typeof id === "string" && id.length >= 12) {
+        await API.put(`/blogs/${id}`, { status: nextStatus });
+      }
 
-    if (selectedBlog?.id === blog.id) {
-      setSelectedBlog((previous) => ({
-        ...previous,
-        status: nextStatus,
-      }));
+      setBlogs((previous) =>
+        previous.map((item) =>
+          (item._id || item.id) === id
+            ? {
+                ...item,
+                status: nextStatus,
+                updatedAt: new Date().toISOString(),
+              }
+            : item
+        )
+      );
+
+      if ((selectedBlog?._id || selectedBlog?.id) === id) {
+        setSelectedBlog((previous) => ({
+          ...previous,
+          status: nextStatus,
+        }));
+      }
+
+      showNotice(`Blog status changed to ${nextStatus}.`);
+    } catch (err) {
+      console.error("Status update error:", err);
     }
-
-    showNotice(`Blog status changed to ${nextStatus}.`);
   };
 
   /* =====================================================
@@ -763,76 +826,83 @@ const BlogManagement = () => {
      ACTION MENU
   ===================================================== */
 
-  const renderActions = (blog) => (
-    <div className="BlogManagement-cardMenu">
+  const renderActions = (blog) => {
+    const blogId = blog._id || blog.id;
+    const isOpen = openMenu === blogId;
 
-      <button
-        type="button"
-        className="BlogManagement-menuTrigger"
-        onClick={() =>
-          setOpenMenu(
-            openMenu === blog.id ? null : blog.id
-          )
-        }
-        aria-label={`Actions for ${blog.title}`}
-        aria-expanded={openMenu === blog.id}
-      >
-        <FiMoreVertical />
-      </button>
+    return (
+      <div className="BlogManagement-cardMenu" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          className="BlogManagement-menuTrigger"
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpenMenu(isOpen ? null : blogId);
+          }}
+          aria-label={`Actions for ${blog.title}`}
+          aria-expanded={isOpen}
+        >
+          <FiMoreVertical />
+        </button>
 
-      {openMenu === blog.id && (
-        <div className="BlogManagement-menuDropdown">
+        {isOpen && (
+          <div className="BlogManagement-menuDropdown" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedBlog(blog);
+                setOpenMenu(null);
+              }}
+            >
+              <FiEye />
+              View details
+            </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedBlog(blog);
-              setOpenMenu(null);
-            }}
-          >
-            <FiEye />
-            View details
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOpenMenu(null);
+                handleEdit(blog);
+              }}
+            >
+              <FiEdit2 />
+              Edit blog
+            </button>
 
-          <button
-            type="button"
-            onClick={() => handleEdit(blog)}
-          >
-            <FiEdit2 />
-            Edit blog
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleStatusChange(blog);
+                setOpenMenu(null);
+              }}
+            >
+              {(blog.status || "published").toLowerCase() === "published" ? (
+                <FiClock />
+              ) : (
+                <FiCheckCircle />
+              )}
 
-          <button
-            type="button"
-            onClick={() => handleStatusChange(blog)}
-          >
-            {blog.status === "Published" ? (
-              <FiClock />
-            ) : (
-              <FiCheckCircle />
-            )}
+              {(blog.status || "published").toLowerCase() === "published"
+                ? "Move to draft"
+                : "Publish post"}
+            </button>
 
-            {blog.status === "Published"
-              ? "Move to draft"
-              : "Publish post"}
-          </button>
-
-          <button
-            type="button"
-            className="BlogManagement-menuDelete"
-            onClick={() => {
-              setDeleteId(blog.id);
-              setOpenMenu(null);
-            }}
-          >
-            <FiTrash2 />
-            Delete blog
-          </button>
-
-        </div>
-      )}
-    </div>
-  );
+            <button
+              type="button"
+              className="BlogManagement-menuDelete"
+              onClick={() => {
+                setDeleteId(blog._id || blog.id);
+                setOpenMenu(null);
+              }}
+            >
+              <FiTrash2 />
+              Delete blog
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   /* =====================================================
      MAIN JSX
@@ -1134,7 +1204,7 @@ const BlogManagement = () => {
             {visibleBlogs.map((blog) => (
               <article
                 className="BlogManagement-card"
-                key={blog.id}
+                key={blog._id || blog.id}
               >
 
                 <div className="BlogManagement-cardImage">
@@ -1155,7 +1225,7 @@ const BlogManagement = () => {
                   )}
 
                   <span className="BlogManagement-blogCode">
-                    {blog.code || `BLOG-${blog.id}`}
+                    {blog.code || `BLOG-${((blog._id || blog.id || "")).toString().slice(-4).toUpperCase()}`}
                   </span>
 
                   {renderActions(blog)}
@@ -1239,7 +1309,7 @@ const BlogManagement = () => {
               <tbody>
 
                 {visibleBlogs.map((blog) => (
-                  <tr key={blog.id}>
+                  <tr key={blog._id || blog.id}>
 
                     <td>
                       <div className="BlogManagement-listPost">
@@ -1260,7 +1330,7 @@ const BlogManagement = () => {
                           <strong>{blog.title}</strong>
 
                           <span>
-                            {blog.code || `BLOG-${blog.id}`}
+                            {blog.code || `BLOG-${((blog._id || blog.id || "")).toString().slice(-4).toUpperCase()}`}
                           </span>
 
                           <small>{getDescription(blog)}</small>
@@ -1320,7 +1390,7 @@ const BlogManagement = () => {
                           className="BlogManagement-listDelete"
                           aria-label={`Delete ${blog.title}`}
                           title="Delete"
-                          onClick={() => setDeleteId(blog.id)}
+                          onClick={() => setDeleteId(blog._id || blog.id)}
                         >
                           <FiTrash2 />
                         </button>

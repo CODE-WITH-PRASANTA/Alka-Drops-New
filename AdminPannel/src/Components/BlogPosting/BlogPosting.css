@@ -2637,3 +2637,511 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* =====================================================
+   SINGLE WEBP FEATURED IMAGE PREVIEW STYLES
+===================================================== */
+
+.BlogPosting-singleImagePreviewWrap {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.BlogPosting-imageCard {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  height: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background-color: #f3f4f6;
+}
+
+.BlogPosting-imagePreviewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.BlogPosting-imageOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px;
+}
+
+.BlogPosting-webpBadge {
+  align-self: flex-start;
+  background-color: #00a896;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.03em;
+}
+
+.BlogPosting-imageOverlayActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.BlogPosting-changeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  color: #1f2937;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.BlogPosting-changeBtn:hover {
+  background-color: #f9fafb;
+}
+
+.BlogPosting-deleteImgBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.BlogPosting-deleteImgBtn:hover {
+  background-color: #dc2626;
+}
+
+.BlogPosting-loadingBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background-color: #eff6ff;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+
+/* =====================================================
+   AUTOMATIC SLUG PREVIEW STYLES
+===================================================== */
+
+.BlogPosting-slugWrapper {
+  display: flex;
+  align-items: center;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.BlogPosting-slugWrapper:focus-within {
+  border-color: #00a896;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.12);
+}
+
+.BlogPosting-slugPrefix {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  background-color: #f1f5f9;
+  border-right: 1px solid #e2e8f0;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.BlogPosting-slugInput {
+  flex: 1;
+  border: none !important;
+  background: transparent !important;
+  padding: 10px 14px !important;
+  font-size: 13px !important;
+  font-family: monospace;
+  color: #0f2d2e !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* =====================================================
+   PUBLICATION STATUS TOGGLE SWITCH
+===================================================== */
+
+.BlogPosting-statusToggleContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.BlogPosting-statusToggleSwitch {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  background-color: #cbd5e1;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  transition: background-color 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.BlogPosting-statusToggleSwitch.is-active {
+  background-color: #00a896;
+}
+
+.BlogPosting-statusToggleSlider {
+  display: block;
+  width: 22px;
+  height: 22px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s ease;
+  transform: translateX(0);
+}
+
+.BlogPosting-statusToggleSwitch.is-active .BlogPosting-statusToggleSlider {
+  transform: translateX(22px);
+}
+
+.BlogPosting-statusToggleText {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.text-published {
+  color: #00a896;
+}
+
+.text-draft {
+  color: #94a3b8;
+}
+
+/* =====================================================
+   ACTION BUTTONS - EXECUTIVE ALKA DROPS DESIGN
+===================================================== */
+
+.BlogPosting-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.BlogPosting-submitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 28px;
+  background: linear-gradient(135deg, #00a896 0%, #028090 100%);
+  color: #ffffff !important;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 168, 150, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.02em;
+}
+
+.BlogPosting-submitButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #028090 0%, #016a78 100%);
+  box-shadow: 0 6px 20px rgba(0, 168, 150, 0.45);
+  transform: translateY(-2px);
+}
+
+.BlogPosting-submitButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 168, 150, 0.3);
+}
+
+.BlogPosting-submitButton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.BlogPosting-resetButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 13px 22px;
+  background-color: #ffffff;
+  color: #4b5563 !important;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.BlogPosting-resetButton:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  color: #111827 !important;
+  border-color: #9ca3af;
+}
+
+.BlogPosting-resetButton:active:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.BlogPosting-resetButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* =====================================================
+   PROPORTIONAL WEBP IMAGE PREVIEW & TAGS (OVERRIDE)
+===================================================== */
+
+.BlogPosting-singleImagePreviewWrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin-top: 10px !important;
+  width: fit-content !important;
+}
+
+.BlogPosting-imageCard {
+  position: relative !important;
+  width: 280px !important;
+  max-width: 280px !important;
+  height: 165px !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  background: #f8fafc !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.BlogPosting-imagePreviewImg {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  background-color: #f8fafc !important;
+  display: block !important;
+}
+
+.BlogPosting-webpBadge {
+  position: absolute !important;
+  top: 8px !important;
+  left: 8px !important;
+  background-color: #00a896 !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  padding: 3px 8px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25) !important;
+  letter-spacing: 0.03em !important;
+  z-index: 2 !important;
+}
+
+.BlogPosting-imageControls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 280px !important;
+}
+
+.BlogPosting-changeBtn {
+  flex: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 7px !important;
+  padding: 7px 12px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.BlogPosting-changeBtn:hover {
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+
+.BlogPosting-deleteImgBtn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fca5a5 !important;
+  border-radius: 7px !important;
+  padding: 7px 12px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.BlogPosting-deleteImgBtn:hover {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+}
+
+/* TAGS INPUT ROW & CHIPS */
+.BlogPosting-tagInputRow {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.BlogPosting-addTagBtn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 10px 18px !important;
+  background: linear-gradient(135deg, #00a896 0%, #028090 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 6px rgba(0, 168, 150, 0.25) !important;
+  transition: all 0.2s ease !important;
+}
+
+.BlogPosting-addTagBtn:hover {
+  background: linear-gradient(135deg, #028090 0%, #016a78 100%) !important;
+  transform: translateY(-1px) !important;
+}
+
+.BlogPosting-tagsContainer {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+  min-height: 28px !important;
+}
+
+.BlogPosting-tagChip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background-color: #e6f7f5 !important;
+  color: #00a896 !important;
+  border: 1px solid #bbf2ea !important;
+  padding: 4px 10px !important;
+  border-radius: 16px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  animation: fadeIn 0.2s ease !important;
+}
+
+.BlogPosting-tagChipRemove {
+  background: none !important;
+  border: none !important;
+  color: #00a896 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: color 0.15s ease !important;
+}
+
+.BlogPosting-tagChipRemove:hover {
+  color: #ef4444 !important;
+}
+
+
+/* =====================================================
+   VIEW ALL / BACK BUTTON
+===================================================== */
+.BlogPosting-viewAllButton {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: #ffffff;
+  color: #166e65;
+  border: 1.5px solid #d0e7e3;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(16, 75, 68, 0.05);
+  transition: all 0.22s ease;
+}
+
+.BlogPosting-viewAllButton:hover {
+  background: #f0f9f8;
+  color: #0b4e47;
+  border-color: #166e65;
+  box-shadow: 0 4px 14px rgba(22, 110, 101, 0.15);
+  transform: translateX(-3px);
+}
+
+.BlogPosting-viewAllButton svg {
+  font-size: 16px;
+  transition: transform 0.22s ease;
+}
+
+.BlogPosting-viewAllButton:hover svg {
+  transform: translateX(-3px);
+}

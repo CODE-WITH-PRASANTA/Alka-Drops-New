@@ -6,43 +6,12 @@ import Topbar from "../Topbar/Topbar";
 
 import "./MainLayout.css";
 
-const pageTitles = {
-  "/admin/dashboard": "Dashboard",
-  "/admin/blog-post": "Blog Post",
-  "/admin/blog-management": "Blog Management",
-  "/admin/product-management": "Product Management",
-  "/admin/team-management": "Team Management",
-  "/admin/gallery-management": "Gallery Management",
-  "/admin/subscription-management": "Subscription Management",
-  "/admin/order-management": "Order Management",
-  "/admin/subscription-orders": "Subscription Orders Management",
-  "/admin/user-management": "User Management",
-  "/admin/delivery-boy-id": "Delivery Boy ID Generation",
-  "/admin/assigning-bottle": "Assigning Bottle",
-  "/admin/settings": "Settings",
-  "/admin/report-management": "Report Management",
-  "/admin/enquiry-management": "Enquiry Management",
-  "/admin/review-management": "Review Management",
-};
-
-// Fallback title for routes that are not listed above.
-const prettify = (pathname) =>
-  pathname
-    .split("/")
-    .filter(Boolean)
-    .pop()
-    ?.replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase()) || "Dashboard";
-
 const MainLayout = () => {
   const location = useLocation();
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-  const currentTitle =
-    pageTitles[location.pathname] || prettify(location.pathname);
 
   useEffect(() => {
     const checkScreen = () => {
@@ -95,7 +64,6 @@ const MainLayout = () => {
         <Topbar toggleSidebar={toggleSidebar} />
 
         <main className="MainLayout-content">
-          <h1 className="page-title">{currentTitle}</h1>
           <Outlet />
         </main>
       </div>

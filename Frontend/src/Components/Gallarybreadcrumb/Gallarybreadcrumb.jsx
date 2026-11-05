@@ -1,15 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Gallarybreadcrumb.css";
-import backgroundImage from "../../assets/breadcrum.png";
-
+import Background from "../../assets/AlkaDropsBreadCrumb.png";
 const Gallarybreadcrumb = ({ title = "Gallary", activePage }) => {
   const pageTitle = activePage || title;
 
   return (
     <section
       className="Gallary-breadcrumb-wrapper"
-      style={{ backgroundImage: `url(${backgroundImage})` }}
+      style={{ backgroundImage: `url(${Background})` }}
     >
       <div className="Gallary-breadcrumb-overlay">
         <h1 className="Gallary-breadcrumb-title">{pageTitle}</h1>

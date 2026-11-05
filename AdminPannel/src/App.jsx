@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 
 import MainLayout from "./Layout/MainLayout/MainLayout";
-import Dashboard from "./Pages/Dashboard/Dashboard";
+import DashboardMain   from "./Pages/Dashboard/DashboardMain";
 
 const App = () => {
   return (
@@ -16,7 +16,7 @@ const App = () => {
           <Route index element={<Navigate to="/dashboard" replace />} />
 
           {/* Dashboard Route */}
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="dashboard" element={<DashboardMain  />} />
         </Route>
 
         {/* Fallback Route */}

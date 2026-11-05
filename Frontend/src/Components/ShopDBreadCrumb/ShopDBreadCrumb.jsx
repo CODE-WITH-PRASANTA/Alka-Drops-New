@@ -1,12 +1,12 @@
 import React from 'react';
 import './ShopDBreadCrumb.css';
-import backgroundImage from '../../assets/breadcrum.png'; 
+import Background from "../../assets/AlkaDropsBreadCrumb.png";
 
 const ShopDBreadCrumb = ({ title, activePage }) => {
   return (
     <section 
       className="ShopD-BreadCrumb-wrapper" 
-      style={{ backgroundImage: `url(${backgroundImage})` }}
+      style={{ backgroundImage: `url(${Background})` }}
     >
       <div className="ShopD-BreadCrumb-overlay">
         <h1 className="ShopD-BreadCrumb-title">Shop Details</h1>

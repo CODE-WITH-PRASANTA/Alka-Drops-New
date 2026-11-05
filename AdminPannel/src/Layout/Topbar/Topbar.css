@@ -1,423 +1,886 @@
-/* Custom Variable Palette */
-:root {
-  --topbar-bg: rgba(255, 255, 255, 0.88);
-  --topbar-border: #e2e8f0;
-  --primary-blue: #0284c7;
-  --primary-blue-hover: #0369a1;
-  --primary-light-bg: #f0f9ff;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 10px 25px -5px rgba(2, 132, 199, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-}
 
-.Topbar {
-  height: 64px;
-  background: var(--topbar-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--topbar-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+/* =========================================
+   ALKA DROPS TOPBAR
+   Compact • Responsive • Clean
+========================================= */
+
+.alka-topbar {
   position: sticky;
   top: 0;
-  z-index: 90;
-  transition: all 0.25s ease;
-}
+  width: 100%;
 
-.Topbar-left, .Topbar-right {
+  height: 60px;
+  min-height: 60px;
+
   display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-/* Sidebar Toggle */
-.Topbar-toggle-btn {
-  background: #ffffff;
-  border: 1px solid var(--topbar-border);
-  color: var(--text-muted);
-  cursor: pointer;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-sm);
-}
-
-.Topbar-toggle-btn:hover {
-  background-color: var(--primary-light-bg);
-  color: var(--primary-blue);
-  border-color: #bae6fd;
-  transform: translateY(-1px);
-}
-
-/* Breadcrumbs */
-.Topbar-path {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-}
-
-.Topbar-path-parent {
-  color: var(--text-muted);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  font-size: 11px;
-  background: #f1f5f9;
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.Topbar-path-separator {
-  color: #cbd5e1;
-}
-
-.Topbar-path-current {
-  color: var(--primary-blue);
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-/* Search Bar */
-.Topbar-search-box {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.Topbar-search-icon {
-  position: absolute;
-  left: 14px;
-  color: #94a3b8;
-  pointer-events: none;
-  transition: color 0.2s;
-}
-
-.Topbar-search-input {
-  background-color: #f8fafc;
-  border: 1px solid var(--topbar-border);
-  padding: 8px 42px 8px 38px;
-  border-radius: 20px;
-  outline: none;
-  width: 220px;
-  font-size: 13px;
-  color: var(--text-main);
-  transition: all 0.25s ease;
-}
-
-.Topbar-search-input::placeholder {
-  color: #94a3b8;
-}
-
-.Topbar-search-input:focus {
-  width: 260px;
-  border-color: var(--primary-blue);
-  background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
-}
-
-.Topbar-search-input:focus + .Topbar-search-icon {
-  color: var(--primary-blue);
-}
-
-.Topbar-search-shortcut {
-  position: absolute;
-  right: 12px;
-  font-size: 10px;
-  font-family: inherit;
-  font-weight: 600;
-  color: #94a3b8;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  padding: 1px 5px;
-  border-radius: 4px;
-  pointer-events: none;
-}
-
-/* Actions Wrapper */
-.Topbar-action-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  position: relative;
-}
-
-/* Action Button */
-.Topbar-action-btn {
-  background: #ffffff;
-  border: 1px solid var(--topbar-border);
-  color: var(--text-muted);
-  cursor: pointer;
-  position: relative;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
-}
-
-.Topbar-action-btn:hover, .Topbar-action-btn.active {
-  color: var(--primary-blue);
-  background-color: var(--primary-light-bg);
-  border-color: #bae6fd;
-}
-
-.Topbar-badge {
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  background-color: #ef4444;
-  color: white;
-  font-size: 10px;
-  font-weight: 700;
-  height: 18px;
-  min-width: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-}
-
-/* User Card Button */
-.Topbar-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  padding: 4px 10px 4px 5px;
-  border-radius: 30px;
-  position: relative;
-  user-select: none;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-}
-
-.Topbar-user:hover, .Topbar-user.active {
-  background-color: #ffffff;
-  border-color: var(--topbar-border);
-  box-shadow: var(--shadow-sm);
-}
-
-.Topbar-avatar-wrapper {
-  position: relative;
-  display: flex;
-}
-
-.Topbar-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #e0f2fe;
-}
-
-.Topbar-status-indicator {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 9px;
-  height: 9px;
-  background-color: #10b981;
-  border: 2px solid #ffffff;
-  border-radius: 50%;
-}
-
-.Topbar-user-info {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.25;
-}
-
-.Topbar-username {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.Topbar-role {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 400;
-}
-
-.Topbar-chevron {
-  color: var(--text-muted);
-  transition: transform 0.25s ease;
-}
-
-.Topbar-chevron.open {
-  transform: rotate(180deg);
-}
-
-/* Universal Dropdown Styling */
-.Topbar-dropdown {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  box-shadow: var(--shadow-md);
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-  animation: topbarDropdownSlide 0.2s ease-out;
-}
-
-@keyframes topbarDropdownSlide {
-  from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.Topbar-user-dropdown {
-  width: 210px;
-}
-
-.Topbar-user-card {
-  padding: 8px 10px;
-}
-
-.Topbar-card-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-main);
-  margin: 0;
-}
-
-.Topbar-card-email {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin: 2px 0 0 0;
-  word-break: break-all;
-}
-
-.Topbar-dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-main);
-  text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.15s ease;
-}
-
-.Topbar-dropdown-item:hover {
-  background-color: var(--primary-light-bg);
-  color: var(--primary-blue);
-}
-
-.Topbar-dropdown-item.logout {
-  color: #ef4444;
-}
-
-.Topbar-dropdown-item.logout:hover {
-  background-color: #fef2f2;
-  color: #dc2626;
-}
-
-.Topbar-dropdown-divider {
-  height: 1px;
-  background-color: #f1f5f9;
-  margin: 4px 0;
-}
-
-/* Notification Dropdown Specifics */
-.Topbar-notifications-dropdown {
-  width: 280px;
-  padding: 12px;
-}
-
-.Topbar-dropdown-header {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f1f5f9;
-  margin-bottom: 8px;
+
+  gap: 20px;
+
+  padding: 0 24px 0 0;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border-bottom: 1px solid #e8f0ed;
+
+  z-index: 500;
+
+  font-family: "Inter", sans-serif;
 }
 
-.Topbar-dropdown-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-main);
-}
+/* =========================================
+   LEFT AND RIGHT
+========================================= */
 
-.Topbar-dropdown-badge {
-  font-size: 10px;
-  background: var(--primary-light-bg);
-  color: var(--primary-blue);
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 10px;
-}
-
-.Topbar-notification-item {
+.alka-topbar-left,
+.alka-topbar-right {
   display: flex;
-  gap: 10px;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background-color 0.15s;
+  align-items: center;
 }
 
-.Topbar-notification-item:hover {
-  background-color: #f8fafc;
+.alka-topbar-left {
+  gap: 24px;
+  min-width: 0;
+  align-self: stretch;
 }
 
-.Topbar-notification-dot {
-  width: 6px;
-  height: 6px;
-  background-color: var(--primary-blue);
-  border-radius: 50%;
-  margin-top: 6px;
+.alka-topbar-right {
+  gap: 14px;
   flex-shrink: 0;
 }
 
-.Topbar-notification-text {
-  font-size: 12px;
-  color: var(--text-main);
+/* =========================================
+   SIDEBAR TOGGLE
+========================================= */
+
+.alka-topbar-toggle {
+  width: 64px;
+  height: 100%;
+
+  align-self: stretch;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
   margin: 0;
-  line-height: 1.4;
+
+  border: 0;
+  border-right: 1px solid #e5efeb;
+
+  border-radius: 0;
+
+  background: #f7fbfa;
+  color: #58746d;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
-.Topbar-notification-time {
+.alka-topbar-toggle:hover {
+  background: #e3f8f2;
+  color: #079b8e;
+}
+
+/* =========================================
+   BREADCRUMB
+========================================= */
+
+.alka-breadcrumb {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  min-width: 0;
+
+  color: #82958f;
+  font-size: 12px;
+}
+
+.alka-breadcrumb-home,
+.alka-breadcrumb-parent {
+  color: #82958f;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.alka-breadcrumb-home:hover {
+  color: #079b8e;
+}
+
+.alka-breadcrumb-separator {
+  color: #c1d0ca;
+  font-size: 18px;
+}
+
+.alka-breadcrumb-current {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  min-width: 0;
+
+  color: #294b44;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.alka-breadcrumb-current svg {
+  flex-shrink: 0;
+  color: #08a99c;
+}
+
+.alka-breadcrumb-current span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================
+   SEARCH
+========================================= */
+
+.alka-search-wrapper {
+  position: relative;
+  width: 278px;
+  flex-shrink: 0;
+}
+
+.alka-search-box {
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 14px;
+
+  border: 1px solid #e7efec;
+  border-radius: 15px;
+
+  background: #f8fbfa;
+
+  box-sizing: border-box;
+}
+
+.alka-search-box:focus-within {
+  background: white;
+  border-color: #a8e5d8;
+
+  box-shadow: 0 0 0 3px rgba(8, 191, 174, 0.08);
+}
+
+.alka-search-icon {
+  flex-shrink: 0;
+  color: #91a69e;
+}
+
+.alka-search-box input {
+  width: 100%;
+  min-width: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #294b44;
+
+  font: 500 11.5px "Inter", sans-serif;
+}
+
+.alka-search-box input::placeholder {
+  color: #a0b0aa;
+}
+
+.alka-search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  background: transparent;
+
+  color: #6c8a80;
+
+  cursor: pointer;
+}
+
+/* =========================================
+   DROPDOWN WRAPPERS
+========================================= */
+
+.alka-topbar-dropdown-wrapper {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+}
+
+/* =========================================
+   NOTIFICATION BUTTON
+========================================= */
+
+.alka-topbar-icon-button {
+  position: relative;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #e7efec;
+  border-radius: 15px;
+
+  background: #f8fbfa;
+  color: #718b82;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.alka-topbar-icon-button:hover,
+.alka-topbar-button-active {
+  background: #e5f8f2;
+  border-color: #c9eee4;
+  color: #079b8e;
+}
+
+.alka-notification-badge {
+  position: absolute;
+
+  top: -5px;
+  right: -5px;
+
+  min-width: 17px;
+  height: 17px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 3px;
+
+  box-sizing: border-box;
+
+  border: 2px solid white;
+  border-radius: 20px;
+
+  background: #10bba9;
+  color: white;
+
+  font-size: 8px;
+  font-weight: 800;
+}
+
+/* =========================================
+   PROFILE
+========================================= */
+
+.alka-profile-button {
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 3px 8px 3px 5px;
+
+  border: 1px solid transparent;
+  border-radius: 15px;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.alka-profile-button:hover,
+.alka-profile-active {
+  background: #f4faf7;
+  border-color: #e7f2ed;
+}
+
+.alka-profile-avatar,
+.alka-profile-avatar-large {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 14px;
+
+  background: #e0f7ef;
+  color: #08a99c;
+}
+
+.alka-profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: 5px;
+}
+
+.alka-profile-name {
+  color: #294b44;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.alka-profile-role {
+  color: #91a39c;
+  font-size: 9px;
+}
+
+.alka-profile-chevron {
+  color: #9aaca5;
+
+  transition: transform 0.2s;
+}
+
+.alka-profile-chevron-open {
+  transform: rotate(180deg);
+}
+
+/* =========================================
+   DROPDOWNS
+========================================= */
+
+.alka-search-dropdown,
+.alka-notification-dropdown,
+.alka-profile-dropdown {
+  position: absolute;
+
+  top: calc(100% + 12px);
+  right: 0;
+
+  background: white;
+
+  border: 1px solid #e7efec;
+  border-radius: 16px;
+
+  box-shadow: 0 15px 45px rgba(27, 73, 63, 0.12);
+
+  z-index: 1500;
+
+  animation: alkaTopbarDrop 0.18s ease;
+}
+
+/* =========================================
+   SEARCH DROPDOWN
+========================================= */
+
+.alka-search-dropdown {
+  width: 290px;
+  max-height: 350px;
+
+  padding: 10px;
+
+  box-sizing: border-box;
+
+  overflow-y: auto;
+}
+
+.alka-dropdown-heading {
+  padding: 10px;
+
+  color: #a0b0aa;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 1.2px;
+}
+
+.alka-search-result {
+  width: 100%;
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 11px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: transparent;
+  color: #506d65;
+
+  font: 600 11px "Inter", sans-serif;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.alka-search-result:hover {
+  background: #eaf8f3;
+  color: #078f83;
+}
+
+.alka-search-empty {
+  padding: 20px;
+
+  color: #94a69f;
+
+  font-size: 11px;
+  text-align: center;
+}
+
+/* =========================================
+   NOTIFICATION DROPDOWN
+========================================= */
+
+.alka-notification-dropdown {
+  width: 340px;
+  overflow: hidden;
+}
+
+.alka-notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 18px;
+
+  border-bottom: 1px solid #edf3f0;
+}
+
+.alka-notification-header h3 {
+  margin: 0 0 5px;
+
+  color: #23443d;
+  font-size: 13px;
+}
+
+.alka-notification-header span {
+  color: #91a39c;
   font-size: 10px;
-  color: var(--text-muted);
-  display: block;
-  margin-top: 2px;
 }
 
-/* Responsive Styles */
+.alka-mark-read {
+  border: none;
+  background: transparent;
+
+  color: #08a99c;
+
+  font: 700 10px "Inter", sans-serif;
+
+  cursor: pointer;
+}
+
+.alka-notification-list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.alka-notification-item {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 12px;
+
+  padding: 15px 17px;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-bottom: 1px solid #f0f5f2;
+
+  background: white;
+
+  font-family: "Inter", sans-serif;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.alka-notification-item:hover {
+  background: #f8fbfa;
+}
+
+.alka-notification-unread {
+  background: #f1fbf7;
+}
+
+.alka-notification-icon {
+  width: 35px;
+  height: 35px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: #e0f7ef;
+  color: #08a99b;
+}
+
+.alka-notification-content {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.alka-notification-content strong {
+  color: #35554e;
+  font-size: 11px;
+}
+
+.alka-notification-content span {
+  color: #81958d;
+
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.alka-notification-content small {
+  color: #a0b0aa;
+  font-size: 9px;
+}
+
+.alka-unread-dot {
+  width: 7px;
+  height: 7px;
+
+  margin-top: 5px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #08bfae;
+}
+
+.alka-notification-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 25px;
+
+  color: #94a69f;
+
+  font-size: 11px;
+  text-align: center;
+}
+
+.alka-notification-footer {
+  padding: 12px 18px;
+
+  border-top: 1px solid #edf3f0;
+
+  color: #a0b0aa;
+
+  font-size: 10px;
+  text-align: center;
+}
+
+/* =========================================
+   PROFILE DROPDOWN
+========================================= */
+
+.alka-profile-dropdown {
+  width: 225px;
+
+  padding: 10px;
+
+  box-sizing: border-box;
+}
+
+.alka-profile-dropdown-header {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 11px 9px 14px;
+}
+
+.alka-profile-dropdown-text {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.alka-profile-dropdown-header strong {
+  color: #294b44;
+  font-size: 11px;
+}
+
+.alka-profile-dropdown-header small {
+  color: #91a39c;
+  font-size: 9px;
+}
+
+.alka-profile-dropdown-divider {
+  height: 1px;
+
+  margin: 0 3px 8px;
+
+  background: #edf3f0;
+}
+
+.alka-profile-dropdown-item {
+  width: 100%;
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 11px;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 10px;
+
+  background: transparent;
+  color: #607d73;
+
+  font: 600 11px "Inter", sans-serif;
+
+  text-align: left;
+  text-decoration: none;
+
+  cursor: pointer;
+}
+
+.alka-profile-dropdown-item:hover {
+  background: #eaf8f3;
+  color: #079b8e;
+}
+
+.alka-logout-item {
+  color: #c76c6c;
+}
+
+.alka-logout-item:hover {
+  background: #fff1f0;
+  color: #d24f4f;
+}
+
+/* =========================================
+   DROPDOWN ANIMATION
+========================================= */
+
+@keyframes alkaTopbarDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1024px) {
+  .alka-topbar {
+    height: 72px;
+    min-height: 72px;
+
+    padding: 0 18px 0 0;
+
+    gap: 12px;
+  }
+
+  .alka-topbar-left {
+    gap: 14px;
+  }
+
+  .alka-search-wrapper {
+    width: 210px;
+  }
+
+  .alka-topbar-right {
+    gap: 9px;
+  }
+
+  .alka-topbar-toggle {
+    width: 56px;
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
 @media (max-width: 768px) {
-  .Topbar-search-box, 
-  .Topbar-user-info,
-  .Topbar-path {
+  .alka-topbar {
+    height: 65px;
+    min-height: 65px;
+
+    padding: 0 14px 0 0;
+
+    gap: 8px;
+  }
+
+  .alka-topbar-left {
+    flex: 1;
+    gap: 10px;
+  }
+
+  .alka-topbar-right {
+    gap: 7px;
+  }
+
+  .alka-topbar-toggle {
+    width: 48px;
+    height: 100%;
+  }
+
+  .alka-topbar-icon-button {
+    width: 37px;
+    height: 37px;
+  }
+
+  .alka-breadcrumb {
+    gap: 6px;
+    font-size: 10px;
+  }
+
+  .alka-breadcrumb-home,
+  .alka-breadcrumb-parent,
+  .alka-breadcrumb-separator {
     display: none;
   }
 
-  .Topbar {
-    padding: 0 16px;
+  .alka-breadcrumb-current {
+    max-width: 145px;
+    font-size: 10px;
+  }
+
+  .alka-search-wrapper {
+    width: auto;
+  }
+
+  .alka-search-box {
+    width: 37px;
+    height: 37px;
+
+    justify-content: center;
+
+    padding: 0;
+  }
+
+  .alka-search-box input {
+    display: none;
+  }
+
+  .alka-search-wrapper:focus-within .alka-search-box {
+    position: absolute;
+
+    right: 0;
+
+    width: min(260px, 75vw);
+
+    justify-content: flex-start;
+
+    padding: 0 12px;
+
+    z-index: 10;
+  }
+
+  .alka-search-wrapper:focus-within .alka-search-box input {
+    display: block;
+  }
+
+  .alka-profile-info,
+  .alka-profile-chevron {
+    display: none;
+  }
+
+  .alka-profile-avatar {
+    width: 37px;
+    height: 37px;
+  }
+
+  .alka-notification-dropdown {
+    right: -45px;
+
+    width: min(330px, 88vw);
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 420px) {
+  .alka-topbar {
+    height: 60px;
+    min-height: 60px;
+
+    padding: 0 9px 0 0;
+  }
+
+  .alka-topbar-right {
+    gap: 5px;
+  }
+
+  .alka-topbar-toggle {
+    width: 44px;
+  }
+
+  .alka-topbar-icon-button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .alka-search-box {
+    width: 34px;
+    height: 34px;
+  }
+
+  .alka-breadcrumb-current {
+    max-width: 120px;
   }
 }

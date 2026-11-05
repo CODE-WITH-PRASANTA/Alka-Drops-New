@@ -1,12 +1,12 @@
 import React from 'react';
 import './SubscriptionBreadcrumb.css';
-import backgroundImage from '../../assets/breadcrum.png'; 
+import Background from "../../assets/AlkaDropsBreadCrumb.png";
 
 const SubscriptionBreadcrumb = ({ title, activePage }) => {
   return (
     <section 
       className="Subscription-Breadcrumb-wrapper" 
-      style={{ backgroundImage: `url(${backgroundImage})` }}
+      style={{ backgroundImage: `url(${Background})` }}
     >
       <div className="Subscription-Breadcrumb-overlay">
         <h1 className="Subscription-Breadcrumb-title">Subscription</h1>

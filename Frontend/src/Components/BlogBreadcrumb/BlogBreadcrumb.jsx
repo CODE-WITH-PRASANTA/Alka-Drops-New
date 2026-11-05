@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./BlogBreadcrumb.css";
-import backgroundImage from "../../assets/breadcrum.png";
+import Background from "../../assets/AlkaDropsBreadCrumb.png";
 
 const BlogBreadcrumb = ({ title = "Blog", activePage }) => {
   const pageTitle = activePage || title;
@@ -9,7 +9,7 @@ const BlogBreadcrumb = ({ title = "Blog", activePage }) => {
   return (
     <section
       className="Blog-Breadcrumb-wrapper"
-      style={{ backgroundImage: `url(${backgroundImage})` }}
+      style={{ backgroundImage: `url(${Background})` }}
     >
       <div className="Blog-Breadcrumb-overlay">
         <h1 className="Blog-Breadcrumb-title">{pageTitle}</h1>

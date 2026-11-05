@@ -1,148 +1,486 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { Menu, ChevronDown, Bell, Search, User, LogOut, Shield } from 'lucide-react';
-import './Topbar.css';
+import React, { useState, useEffect, useRef } from "react";
+
+import {
+  Menu,
+  Search,
+  Bell,
+  ChevronDown,
+  UserRound,
+  Settings,
+  LogOut,
+  X,
+  LayoutDashboard,
+  Newspaper,
+  Package,
+  Users,
+  Images,
+  Crown,
+  ShoppingCart,
+  CalendarDays,
+  Truck,
+  ChartNoAxesColumn,
+  Mail,
+  Star,
+  FileText,
+  ClipboardList,
+} from "lucide-react";
+
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
+import "./Topbar.css";
+
+const routeTitles = {
+  "/admin/dashboard": "Dashboard",
+
+  "/admin/blog-post": "Blog Post",
+  "/admin/blog-management": "Blog Management",
+
+  "/admin/product-management": "Product Management",
+  "/admin/team-management": "Team Management",
+  "/admin/gallery-management": "Gallery Management",
+
+  "/admin/subscription-management": "Subscription Management",
+  "/admin/order-management": "Order Management",
+  "/admin/subscription-orders": "Subscription Orders Management",
+
+  "/admin/user-management": "User Management",
+
+  "/admin/delivery-boy-id": "Delivery Boy ID Generation",
+  "/admin/assigning-bottle": "Assigning Bottle",
+
+  "/admin/settings": "Settings",
+  "/admin/report-management": "Report Management",
+  "/admin/enquiry-management": "Enquiry Management",
+  "/admin/review-management": "Review Management",
+};
+
+const routeIcons = {
+  "/admin/dashboard": LayoutDashboard,
+
+  "/admin/blog-post": FileText,
+  "/admin/blog-management": Newspaper,
+
+  "/admin/product-management": Package,
+  "/admin/team-management": Users,
+  "/admin/gallery-management": Images,
+
+  "/admin/subscription-management": Crown,
+  "/admin/order-management": ShoppingCart,
+  "/admin/subscription-orders": CalendarDays,
+
+  "/admin/user-management": UserRound,
+
+  "/admin/delivery-boy-id": Truck,
+  "/admin/assigning-bottle": ClipboardList,
+
+  "/admin/settings": Settings,
+  "/admin/report-management": ChartNoAxesColumn,
+  "/admin/enquiry-management": Mail,
+  "/admin/review-management": Star,
+};
+
+// Parent group shown in the breadcrumb for dropdown children.
+const routeParents = {
+  "/admin/blog-post": "Blog Management",
+  "/admin/blog-management": "Blog Management",
+  "/admin/delivery-boy-id": "Delivery Boy Management",
+  "/admin/assigning-bottle": "Delivery Boy Management",
+};
+
+// Fallback title for routes that are not listed above.
+const prettify = (pathname) =>
+  pathname
+    .split("/")
+    .filter(Boolean)
+    .pop()
+    ?.replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase()) || "Dashboard";
 
 const Topbar = ({ toggleSidebar }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const dropdownRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  // Close dropdowns when clicking outside
+  const [searchValue, setSearchValue] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: "Welcome to Alka Drops",
+      message: "Your admin dashboard is ready.",
+      time: "Recently",
+      unread: true,
+    },
+    {
+      id: 2,
+      title: "Dashboard updated",
+      message: "Your dashboard is running successfully.",
+      time: "Recently",
+      unread: true,
+    },
+  ]);
+
+  const notificationRef = useRef(null);
+  const profileRef = useRef(null);
+  const searchRef = useRef(null);
+
+  const currentTitle =
+    routeTitles[location.pathname] || prettify(location.pathname);
+
+  const parentTitle = routeParents[location.pathname];
+
+  const CurrentIcon = routeIcons[location.pathname] || LayoutDashboard;
+
+  const unreadCount = notifications.filter(
+    (notification) => notification.unread
+  ).length;
+
+  // Close dropdowns when clicking outside.
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-        setNotificationsOpen(false);
+    const handleOutsideClick = (event) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
+        setNotificationOpen(false);
+      }
+
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
   }, []);
 
-  // Format path breadcrumb dynamically
-  const pathSegments = location.pathname.split('/').filter(Boolean);
-  const currentPath = pathSegments.length > 0 
-    ? pathSegments[pathSegments.length - 1].replace(/-/g, ' ') 
-    : 'Dashboard';
-  const parentPath = pathSegments.length > 1 
-    ? pathSegments[0].toUpperCase() 
-    : 'ADMIN';
+  // Close dropdowns when changing pages.
+  useEffect(() => {
+    setNotificationOpen(false);
+    setProfileOpen(false);
+    setSearchOpen(false);
+  }, [location.pathname]);
+
+  // Search current admin pages.
+  const searchablePages = Object.entries(routeTitles).map(([path, title]) => ({
+    path,
+    title,
+  }));
+
+  const filteredPages = searchablePages.filter((page) =>
+    page.title.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
+  const handleSearchChange = (value) => {
+    setSearchValue(value);
+    setSearchOpen(value.trim().length > 0);
+  };
+
+  const handleSearchNavigate = (path) => {
+    navigate(path);
+
+    setSearchValue("");
+    setSearchOpen(false);
+  };
+
+  const markAllRead = () => {
+    setNotifications((previous) =>
+      previous.map((notification) => ({
+        ...notification,
+        unread: false,
+      }))
+    );
+  };
+
+  const handleNotificationClick = (id) => {
+    setNotifications((previous) =>
+      previous.map((notification) =>
+        notification.id === id ? { ...notification, unread: false } : notification
+      )
+    );
+  };
+
+  const handleLogout = () => {
+    setProfileOpen(false);
+
+    // Connect your actual logout logic here.
+    // Example:
+    // localStorage.removeItem("token");
+
+    navigate("/login");
+  };
 
   return (
-    <header className="Topbar">
-      <div className="Topbar-left">
-        <button 
-          className="Topbar-toggle-btn" 
-          onClick={toggleSidebar} 
-          aria-label="Toggle Sidebar"
+    <header className="alka-topbar">
+      {/* LEFT SECTION */}
+      <div className="alka-topbar-left">
+        {/* Sidebar toggle (flush with the sidebar edge) */}
+        <button
+          type="button"
+          className="alka-topbar-toggle"
+          onClick={toggleSidebar}
+          aria-label="Toggle sidebar"
+          title="Toggle sidebar"
         >
-          <Menu size={20} />
+          <Menu size={21} strokeWidth={2} />
         </button>
 
-        <div className="Topbar-path">
-          <span className="Topbar-path-parent">{parentPath}</span>
-          <span className="Topbar-path-separator">/</span>
-          <span className="Topbar-path-current">{currentPath}</span>
+        {/* Breadcrumb: Home / Parent / Current page */}
+        <div className="alka-breadcrumb">
+          <Link to="/admin/dashboard" className="alka-breadcrumb-home">
+            Home
+          </Link>
+
+          <span className="alka-breadcrumb-separator">/</span>
+
+          {parentTitle && (
+            <>
+              <span className="alka-breadcrumb-parent">{parentTitle}</span>
+              <span className="alka-breadcrumb-separator">/</span>
+            </>
+          )}
+
+          <div className="alka-breadcrumb-current">
+            <span className="alka-breadcrumb-icon">
+              <CurrentIcon size={16} />
+            </span>
+
+            <span>{currentTitle}</span>
+          </div>
         </div>
       </div>
 
-      <div className="Topbar-right">
-        {/* Search Bar */}
-        <div className="Topbar-search-box">
-          <Search size={16} className="Topbar-search-icon" />
-          <input 
-            type="text" 
-            placeholder="Search resources, orders..." 
-            className="Topbar-search-input" 
-          />
-          <kbd className="Topbar-search-shortcut">⌘K</kbd>
+      {/* RIGHT SECTION */}
+      <div className="alka-topbar-right">
+        {/* Search */}
+        <div
+          className={`alka-search-wrapper ${
+            searchOpen ? "alka-search-active" : ""
+          }`}
+          ref={searchRef}
+        >
+          <div className="alka-search-box">
+            <Search size={18} className="alka-search-icon" />
+
+            <input
+              type="text"
+              value={searchValue}
+              onChange={(event) => handleSearchChange(event.target.value)}
+              onFocus={() => {
+                if (searchValue.trim()) {
+                  setSearchOpen(true);
+                }
+              }}
+              placeholder="Search pages..."
+              aria-label="Search admin pages"
+            />
+
+            {searchValue && (
+              <button
+                type="button"
+                className="alka-search-clear"
+                onClick={() => {
+                  setSearchValue("");
+                  setSearchOpen(false);
+                }}
+                aria-label="Clear search"
+              >
+                <X size={15} />
+              </button>
+            )}
+          </div>
+
+          {searchOpen && (
+            <div className="alka-search-dropdown">
+              <div className="alka-dropdown-heading">SEARCH RESULTS</div>
+
+              {filteredPages.length > 0 ? (
+                filteredPages.map((page) => {
+                  const PageIcon = routeIcons[page.path] || LayoutDashboard;
+
+                  return (
+                    <button
+                      key={page.path}
+                      type="button"
+                      className="alka-search-result"
+                      onClick={() => handleSearchNavigate(page.path)}
+                    >
+                      <span className="alka-search-result-icon">
+                        <PageIcon size={17} />
+                      </span>
+
+                      <span>{page.title}</span>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="alka-search-empty">No pages found</div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Notifications */}
-        <div className="Topbar-action-wrapper" ref={dropdownRef}>
-          <button 
-            className={`Topbar-action-btn ${notificationsOpen ? 'active' : ''}`}
-            onClick={() => {
-              setNotificationsOpen(!notificationsOpen);
-              setDropdownOpen(false);
-            }}
+        <div className="alka-topbar-dropdown-wrapper" ref={notificationRef}>
+          <button
+            type="button"
+            className={`alka-topbar-icon-button ${
+              notificationOpen ? "alka-topbar-button-active" : ""
+            }`}
+            onClick={() => setNotificationOpen((previous) => !previous)}
             aria-label="Notifications"
+            aria-expanded={notificationOpen}
           >
-            <Bell size={19} />
-            <span className="Topbar-badge">3</span>
+            <Bell size={19} strokeWidth={1.9} />
+
+            {unreadCount > 0 && (
+              <span className="alka-notification-badge">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </button>
 
-          {notificationsOpen && (
-            <div className="Topbar-dropdown Topbar-notifications-dropdown">
-              <div className="Topbar-dropdown-header">
-                <span className="Topbar-dropdown-title">Notifications</span>
-                <span className="Topbar-dropdown-badge">3 New</span>
+          {notificationOpen && (
+            <div className="alka-notification-dropdown">
+              <div className="alka-notification-header">
+                <div>
+                  <h3>Notifications</h3>
+
+                  <span>
+                    {unreadCount > 0
+                      ? `${unreadCount} unread notifications`
+                      : "You're all caught up"}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  className="alka-mark-read"
+                  onClick={markAllRead}
+                >
+                  Mark all read
+                </button>
               </div>
-              <div className="Topbar-notification-list">
-                <div className="Topbar-notification-item unread">
-                  <div className="Topbar-notification-dot" />
-                  <div>
-                    <p className="Topbar-notification-text">New order <strong>#WDMS-9402</strong> placed.</p>
-                    <span className="Topbar-notification-time">5 mins ago</span>
+
+              <div className="alka-notification-list">
+                {notifications.length > 0 ? (
+                  notifications.map((notification) => (
+                    <button
+                      key={notification.id}
+                      type="button"
+                      className={`alka-notification-item ${
+                        notification.unread ? "alka-notification-unread" : ""
+                      }`}
+                      onClick={() => handleNotificationClick(notification.id)}
+                    >
+                      <span className="alka-notification-icon">
+                        <Bell size={17} />
+                      </span>
+
+                      <span className="alka-notification-content">
+                        <strong>{notification.title}</strong>
+
+                        <span>{notification.message}</span>
+
+                        <small>{notification.time}</small>
+                      </span>
+
+                      {notification.unread && (
+                        <span className="alka-unread-dot" />
+                      )}
+                    </button>
+                  ))
+                ) : (
+                  <div className="alka-notification-empty">
+                    <Bell size={24} />
+
+                    <span>No notifications</span>
                   </div>
-                </div>
-                <div className="Topbar-notification-item unread">
-                  <div className="Topbar-notification-dot" />
-                  <div>
-                    <p className="Topbar-notification-text">Stock alert: Alka Bottle 1L low.</p>
-                    <span className="Topbar-notification-time">20 mins ago</span>
-                  </div>
-                </div>
+                )}
+              </div>
+
+              <div className="alka-notification-footer">
+                <span>Alka Drops Admin</span>
               </div>
             </div>
           )}
+        </div>
 
-          {/* User Profile Menu */}
-          <div 
-            className={`Topbar-user ${dropdownOpen ? 'active' : ''}`} 
-            onClick={() => {
-              setDropdownOpen(!dropdownOpen);
-              setNotificationsOpen(false);
-            }}
+        {/* Profile */}
+        <div className="alka-topbar-dropdown-wrapper" ref={profileRef}>
+          <button
+            type="button"
+            className={`alka-profile-button ${
+              profileOpen ? "alka-profile-active" : ""
+            }`}
+            onClick={() => setProfileOpen((previous) => !previous)}
+            aria-expanded={profileOpen}
           >
-            <div className="Topbar-avatar-wrapper">
-              <img 
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" 
-                alt="User Avatar" 
-                className="Topbar-avatar" 
-              />
-              <span className="Topbar-status-indicator" />
+            <div className="alka-profile-avatar">
+              <UserRound size={19} />
             </div>
 
-            <div className="Topbar-user-info">
-              <span className="Topbar-username">Jane Doe</span>
-              <span className="Topbar-role">Administrator</span>
+            <div className="alka-profile-info">
+              <span className="alka-profile-name">Admin</span>
+
+              <span className="alka-profile-role">Administrator</span>
             </div>
 
-            <ChevronDown size={15} className={`Topbar-chevron ${dropdownOpen ? 'open' : ''}`} />
+            <ChevronDown
+              size={16}
+              className={`alka-profile-chevron ${
+                profileOpen ? "alka-profile-chevron-open" : ""
+              }`}
+            />
+          </button>
 
-            {dropdownOpen && (
-              <div className="Topbar-dropdown Topbar-user-dropdown">
-                <div className="Topbar-user-card">
-                  <p className="Topbar-card-name">Jane Doe</p>
-                  <p className="Topbar-card-email">jane.doe@alkadrops.com</p>
+          {profileOpen && (
+            <div className="alka-profile-dropdown">
+              <div className="alka-profile-dropdown-header">
+                <div className="alka-profile-avatar-large">
+                  <UserRound size={23} />
                 </div>
-                <div className="Topbar-dropdown-divider" />
-                <Link to="/profile" className="Topbar-dropdown-item">
-                  <User size={16} /> My Profile
-                </Link>
-                <Link to="/wdms/settings" className="Topbar-dropdown-item">
-                  <Shield size={16} /> Security & Settings
-                </Link>
-                <div className="Topbar-dropdown-divider" />
-                <Link to="/logout" className="Topbar-dropdown-item logout">
-                  <LogOut size={16} /> Log Out
-                </Link>
+
+                <div className="alka-profile-dropdown-text">
+                  <strong>Admin</strong>
+
+                  <small>Administrator</small>
+                </div>
               </div>
-            )}
-          </div>
+
+              <div className="alka-profile-dropdown-divider" />
+
+              <Link
+                to="/admin/settings"
+                className="alka-profile-dropdown-item"
+                onClick={() => setProfileOpen(false)}
+              >
+                <Settings size={17} />
+
+                <span>Settings</span>
+              </Link>
+
+              <button
+                type="button"
+                className="alka-profile-dropdown-item alka-logout-item"
+                onClick={handleLogout}
+              >
+                <LogOut size={17} />
+
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

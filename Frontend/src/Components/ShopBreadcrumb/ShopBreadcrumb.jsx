@@ -1,12 +1,12 @@
 import React from 'react';
 import './ShopBreadcrumb.css';
-import backgroundImage from '../../assets/breadcrum.png'; 
+import Background from "../../assets/AlkaDropsBreadCrumb.png"; 
 
 const ShopBreadcrumb = ({ title, activePage }) => {
   return (
     <section 
       className="Shop-Breadcrumb-wrapper" 
-      style={{ backgroundImage: `url(${backgroundImage})` }}
+      style={{ backgroundImage: `url(${Background})` }}
     >
       <div className="Shop-Breadcrumb-overlay">
         <h1 className="Shop-Breadcrumb-title">Shop</h1>

@@ -1,12 +1,12 @@
 import React from 'react';
 import './FaqBreadCrumb.css';
-import backgroundImage from '../../assets/breadcrum.png'; 
+import Background from "../../assets/AlkaDropsBreadCrumb.png"; 
 
 const FaqBreadCrumb = ({ title, activePage }) => {
   return (
     <section 
       className="Faq-BreadCrumb-wrapper" 
-      style={{ backgroundImage: `url(${backgroundImage})` }}
+      style={{ backgroundImage: `url(${Background})` }}
     >
       <div className="Faq-BreadCrumb-overlay">
         <h1 className="Faq-BreadCrumb-title">Faq</h1>

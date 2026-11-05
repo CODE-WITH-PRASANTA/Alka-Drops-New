@@ -125,7 +125,7 @@
   clip-path: polygon(0 0, 100% 0, 100% 100%, var(--topbar-slant) 100%);
 }
 
-/* moving light sweep */
+/* Moving light sweep */
 .Topbar-shine {
   position: absolute;
   top: 0;
@@ -178,7 +178,7 @@
   padding-right: 0;
 }
 
-/* thin dividers between items */
+/* Thin dividers between items */
 .Topbar-item + .Topbar-item::before {
   position: absolute;
   top: 50%;
@@ -248,7 +248,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
-  font-size: 14px;
+  font-size: 13px;
   text-decoration: none;
   transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -271,7 +271,7 @@
   .Topbar-social { padding-left: 18px; gap: 8px; }
 }
 
-/* laptop */
+/* Laptop */
 @media (max-width: 1200px) {
   .Topbar-accent { width: 72%; }
   .Topbar-right { width: calc(72% - 8px); gap: 16px; padding: 0 20px 0 48px; }
@@ -279,10 +279,10 @@
   .Topbar-item { padding: 0 13px; gap: 8px; font-size: 12.5px; }
   .Topbar-icon-wrap { width: 26px; height: 26px; }
   .Topbar-social { padding-left: 14px; }
-  .Topbar-social-link { width: 28px; height: 28px; font-size: 13px; }
+  .Topbar-social-link { width: 28px; height: 28px; font-size: 12px; }
 }
 
-/* tablet: full-width blue bar, no diagonal */
+/* Tablet */
 @media (max-width: 900px) {
   .Topbar {
     height: auto;
@@ -318,7 +318,7 @@
   .Topbar-item:last-child { padding-right: 0; }
 }
 
-/* mobile */
+/* Mobile */
 @media (max-width: 600px) {
   .Topbar-right {
     gap: 10px;
@@ -356,7 +356,7 @@
   }
 }
 
-/* small mobile */
+/* Small mobile */
 @media (max-width: 360px) {
   .Topbar-contact {
     flex-direction: column;

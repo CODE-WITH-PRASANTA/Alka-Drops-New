@@ -1,0 +1,429 @@
+.wdms-second-wrapper {
+  background-color: #f7f9fc;
+ 
+  padding: 30px 20px;
+  background-color: transparent;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #1e293b;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.wdms-second-container {
+    width: 100%;
+  margin: 0 auto;
+  margin-top: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Common Card Base Style */
+.wdms-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wdms-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+}
+
+/* 1. Top Metrics Cards Row */
+.wdms-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.metric-card {
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.metric-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.metric-number {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.metric-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.metric-trend.positive { color: #10b981; }
+.metric-trend.negative { color: #ef4444; }
+
+.trend-subtext {
+  color: #94a3b8;
+  font-weight: 400;
+  margin-left: 2px;
+}
+
+/* Icon Box Background Colors */
+.metric-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bg-light-blue { background-color: #eef2ff; }
+.bg-light-orange { background-color: #fff7ed; }
+.bg-light-purple { background-color: #f5f3ff; }
+.bg-light-teal { background-color: #f0fdf4; }
+
+.metric-icon { font-size: 18px; }
+.icon-blue { color: #3b82f6; }
+.icon-orange { color: #f97316; }
+.icon-purple { color: #a855f7; }
+.icon-teal { color: #10b981; }
+.icon-green { color: #22c55e; }
+
+/* 2. Main Panels Grid */
+.wdms-panels-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1.2fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.panel-card {
+  padding: 18px;
+  min-width: 0;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.panel-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.view-all-btn {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.view-all-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.panel-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+
+/* Panel 1: Recent Orders Table */
+.orders-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.orders-table th {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  padding: 8px 6px;
+  background-color: #f8fafc;
+}
+
+.orders-table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+.orders-table th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+
+.orders-table td {
+  padding: 10px 6px;
+  font-size: 11px;
+  border-bottom: 1px solid #f1f5f9;
+  white-space: nowrap;
+}
+
+.orders-table tr:last-child td {
+  border-bottom: none;
+}
+
+.order-id { font-weight: 600; color: #3b82f6; }
+.customer-name { font-weight: 600; color: #1e293b; }
+.order-amount { font-weight: 700; color: #0f172a; }
+.order-date { color: #64748b; font-size: 11px; }
+
+/* Status Pills */
+.status-pill {
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-delivered { background-color: #dcfce7; color: #15803d; }
+.status-transit { background-color: #dbeafe; color: #1e40af; }
+.status-pending { background-color: #fef3c7; color: #b45309; }
+
+/* Panel 2: Top Selling Products */
+.top-products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.product-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.product-rank-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rank-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.rank-bg-blue { background-color: #dbeafe; color: #2563eb; }
+.rank-bg-green { background-color: #dcfce7; color: #16a34a; }
+.rank-bg-orange { background-color: #ffedd5; color: #ea580c; }
+.rank-bg-purple { background-color: #f3e8ff; color: #9333ea; }
+.rank-bg-pink { background-color: #ffe4e6; color: #e11d48; }
+
+.product-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.product-progress-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-bar-container {
+  width: 60px;
+  height: 5px;
+  background-color: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 10px;
+}
+
+.bar-blue { background-color: #3b82f6; }
+.bar-green { background-color: #22c55e; }
+.bar-orange { background-color: #f97316; }
+.bar-purple { background-color: #a855f7; }
+.bar-pink { background-color: #f43f5e; }
+
+.product-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0f172a;
+  min-width: 24px;
+  text-align: right;
+}
+
+/* Panel 3: Quick Actions Grid */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.action-button {
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 12px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.action-icon-wrapper {
+  font-size: 18px;
+}
+
+.action-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #334155;
+  text-align: center;
+}
+
+/* Modal Overlay Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background-color: #ffffff;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 360px;
+  padding: 20px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+
+.modal-header h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.modal-body p {
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 16px;
+}
+
+.confirm-btn {
+  width: 100%;
+  background-color: #3b82f6;
+  color: #ffffff;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.confirm-btn:hover {
+  background-color: #2563eb;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1200px) {
+  .wdms-panels-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .wdms-metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .wdms-panels-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 550px) {
+  .wdms-metrics-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .progress-bar-container {
+    width: 40px;
+  }
+}

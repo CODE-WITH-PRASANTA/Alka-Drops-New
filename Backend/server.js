@@ -67,6 +67,7 @@ app.use("/api/categories", require("./routes/categoryRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/contact", require("./routes/contactRoutes"));
 app.use("/api/upload", require("./routes/uploadRoutes"));
+app.use("/api/team", require("./routes/teamRoutes"));
 
 // Error handling middlewares
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");

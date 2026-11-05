@@ -4,6 +4,7 @@ const User = require("../models/User");
 const Product = require("../models/Product");
 const Blog = require("../models/Blog");
 const Category = require("../models/Category");
+const Team = require("../models/Team");
 
 dotenv.config();
 
@@ -141,6 +142,133 @@ const seedData = async () => {
       console.log(`[Seeder] Seeded ${initialCategories.length} initial categories.`);
     } else {
       console.log(`[Seeder] Categories already exist (${categoryCount} found).`);
+    }
+
+    const teamCount = await Team.countDocuments();
+    if (teamCount === 0) {
+      const initialTeam = [
+        {
+          name: "Doris Jordan",
+          role: "Founder & CEO",
+          department: "Executive",
+          image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80",
+          bio: "Pioneering accessible, mineral-rich alkaline hydration systems with over 15 years in sustainable beverage technologies.",
+          experience: "15+ Years",
+          order: 1,
+          status: "active",
+          socialLinks: {
+            linkedin: "https://www.linkedin.com/",
+            twitter: "https://twitter.com/",
+            facebook: "https://facebook.com/",
+            instagram: "https://instagram.com/",
+          },
+        },
+        {
+          name: "Johnny Ramirez",
+          role: "Operations Manager",
+          department: "Operations",
+          image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop&q=80",
+          bio: "Oversees daily bottling, automated hygienic filling cycles, and cross-city supply chain optimization.",
+          experience: "10+ Years",
+          order: 2,
+          status: "active",
+          socialLinks: {
+            linkedin: "https://www.linkedin.com/",
+            instagram: "https://instagram.com/",
+            facebook: "https://facebook.com/",
+          },
+        },
+        {
+          name: "Diana Wagner",
+          role: "Customer Support Lead",
+          department: "Customer Care",
+          image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=800&auto=format&fit=crop&q=80",
+          bio: "Passionate about seamless user experiences, subscription scheduling, and responsive doorstep service.",
+          experience: "6+ Years",
+          order: 3,
+          status: "active",
+          socialLinks: {
+            linkedin: "https://www.linkedin.com/",
+            twitter: "https://twitter.com/",
+            facebook: "https://facebook.com/",
+          },
+        },
+        {
+          name: "Harry Garrett",
+          role: "Delivery Head",
+          department: "Logistics",
+          image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&auto=format&fit=crop&q=80",
+          bio: "Directs our on-time doorstep delivery fleet, vehicle routing, and tamper-proof jar delivery protocols.",
+          experience: "8+ Years",
+          order: 4,
+          status: "active",
+          socialLinks: {
+            linkedin: "https://www.linkedin.com/",
+            facebook: "https://facebook.com/",
+          },
+        },
+        {
+          name: "Dr. Aarti Sharma",
+          role: "Quality Control Expert",
+          department: "Quality Assurance",
+          image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80",
+          bio: "Leads multi-stage filtration testing, TDS calibration, and daily laboratory water purity verification.",
+          experience: "12+ Years",
+          order: 5,
+          status: "active",
+          socialLinks: {
+            linkedin: "https://www.linkedin.com/",
+            twitter: "https://twitter.com/",
+          },
+        },
+        {
+          name: "Rahul Verma",
+          role: "Sales Executive",
+          department: "Sales & Partnerships",
+          image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&auto=format&fit=crop&q=80",
+          bio: "Connects residential communities, fitness studios, and corporate offices with customized hydration plans.",
+          experience: "5+ Years",
+          order: 6,
+          status: "active",
+          socialLinks: {
+            linkedin: "https://www.linkedin.com/",
+            instagram: "https://instagram.com/",
+          },
+        },
+        {
+          name: "Sneha Patel",
+          role: "Marketing Manager",
+          department: "Marketing",
+          image: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=800&auto=format&fit=crop&q=80",
+          bio: "Drives brand outreach, hydration awareness campaigns, and customer community engagement.",
+          experience: "7+ Years",
+          order: 7,
+          status: "active",
+          socialLinks: {
+            linkedin: "https://www.linkedin.com/",
+            twitter: "https://twitter.com/",
+            instagram: "https://instagram.com/",
+          },
+        },
+        {
+          name: "Arjun Mehta",
+          role: "Logistics Coordinator",
+          department: "Logistics",
+          image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&auto=format&fit=crop&q=80",
+          bio: "Coordinates dispatch scheduling, bottle sanitization tracking, and instant delivery re-orders.",
+          experience: "4+ Years",
+          order: 8,
+          status: "active",
+          socialLinks: {
+            linkedin: "https://www.linkedin.com/",
+            facebook: "https://facebook.com/",
+          },
+        },
+      ];
+      await Team.insertMany(initialTeam);
+      console.log(`[Seeder] Seeded ${initialTeam.length} initial team members.`);
+    } else {
+      console.log(`[Seeder] Team members already exist (${teamCount} found).`);
     }
 
     // Create Admin User if doesn't exist

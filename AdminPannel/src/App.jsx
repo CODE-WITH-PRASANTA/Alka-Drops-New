@@ -19,6 +19,7 @@ import AddStock from "./Components/AddStock/AddStock";
 import BlogPosting from "./Components/BlogPosting/BlogPosting";
 import BlogManagement from "./Components/BlogManagement/BlogManagement";
 import BlogCategory from "./Components/BlogCategory/BlogCategory";
+import TeamManagement from "./Components/TeamManagement/TeamManagement";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 
 const App = () => {
@@ -63,6 +64,12 @@ const App = () => {
           <Route
             path="admin/blog-category"
             element={<BlogCategory />}
+          />
+
+          {/* TEAM MANAGEMENT */}
+          <Route
+            path="admin/team-management"
+            element={<TeamManagement />}
           />
 
         </Route>

@@ -4,8 +4,8 @@ import {
   FaClock,
   FaEnvelope,
   FaFacebookF,
-  FaTwitter,
-  FaGooglePlusG,
+  FaXTwitter,
+  FaWhatsapp,
   FaInstagram,
   FaDroplet,
 } from "react-icons/fa6";
@@ -18,14 +18,14 @@ const CONTACT_ITEMS = [
 
 const SOCIAL_LINKS = [
   { icon: FaFacebookF, label: "Facebook", href: "https://www.facebook.com/" },
-  { icon: FaTwitter, label: "Twitter", href: "https://twitter.com/" },
-  { icon: FaGooglePlusG, label: "Google", href: "https://www.google.com/" },
+  { icon: FaXTwitter, label: "X (Twitter)", href: "https://x.com/" },
+  { icon: FaWhatsapp, label: "WhatsApp", href: "https://wa.me/yourphonenumber" },
   { icon: FaInstagram, label: "Instagram", href: "https://www.instagram.com/" },
 ];
 
 const Topbar = () => {
   return (
-    <div className="Topbar">
+    <header className="Topbar">
       <div className="Topbar-container">
         {/* Left White Section */}
         <div className="Topbar-left">
@@ -67,7 +67,7 @@ const Topbar = () => {
             </a>
           </div>
 
-          <div className="Topbar-social">
+          <div className="Topbar-social" aria-label="Social media links">
             {SOCIAL_LINKS.map(({ icon: Icon, label, href }) => (
               <a
                 key={label}
@@ -83,7 +83,7 @@ const Topbar = () => {
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

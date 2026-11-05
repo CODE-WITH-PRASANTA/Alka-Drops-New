@@ -1,210 +1,378 @@
-/* Topbar main */
+/* =========================================
+   TOPBAR - ALKA DROPS (PREMIUM)
+   Navy / royal blue gradient · yellow accent
+========================================= */
+
 .Topbar {
-  width: 100%;
-  height: 48px;
-  background: #ffffff;
-  font-family: Arial, Helvetica, sans-serif;
+  --topbar-blue: #0b4db5;
+  --topbar-blue-2: #0a3fa0;
+  --topbar-navy: #06215f;
+  --topbar-sky: #1d8fe8;
+  --topbar-yellow: #ffc61a;
+  --topbar-amber: #ffa800;
+  --topbar-ink: #07204f;
+  --topbar-slant: 4.7%;
+
   position: relative;
   z-index: 1000;
+  width: 100%;
+  height: 50px;
   overflow: hidden;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(11, 77, 181, 0.12);
+  font-family: "Outfit", "Poppins", "Segoe UI", Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.Topbar *,
+.Topbar *::before,
+.Topbar *::after {
+  box-sizing: border-box;
 }
 
 .Topbar-container {
+  position: relative;
   width: 100%;
   height: 100%;
-  position: relative;
 }
 
-/* White background */
+/* =========================================
+   LEFT WHITE SECTION
+========================================= */
+
 .Topbar-left {
   position: absolute;
   inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
   width: 100%;
   height: 100%;
-  background: #ffffff;
-  z-index: 1;
+  padding: 0 0 0 clamp(24px, 4vw, 64px);
+  background: linear-gradient(90deg, #ffffff 0%, #f3f8ff 100%);
 }
 
-/* Diagonal white cutout */
-.Topbar-decoration {
+.Topbar-tagline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 16px 5px 6px;
+  border: 1px solid #dbe8fb;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--topbar-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(11, 77, 181, 0.08);
+}
+
+.Topbar-tagline-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #ffe27a, var(--topbar-amber));
+  color: var(--topbar-ink);
+  font-size: 12px;
+  box-shadow: 0 4px 10px rgba(255, 168, 0, 0.4);
+}
+
+.Topbar-tagline-text strong {
+  color: var(--topbar-blue);
+  font-weight: 800;
+}
+
+/* =========================================
+   YELLOW DIAGONAL ACCENT
+========================================= */
+
+.Topbar-accent {
   position: absolute;
   top: 0;
-  left: 40.9%;
-  width: 54px;
+  right: 0;
+  z-index: 2;
+  width: 59.1%;
   height: 100%;
-  background: #ffffff;
-  clip-path: polygon(0 0, 100% 100%, 0 100%);
-  z-index: 3;
+  background: linear-gradient(135deg, var(--topbar-yellow), var(--topbar-amber));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, var(--topbar-slant) 100%);
 }
 
-/* Blue section with / diagonal start */
+/* =========================================
+   RIGHT BLUE SECTION
+========================================= */
+
 .Topbar-right {
   position: absolute;
   top: 0;
   right: 0;
-  width: 59.1%;
-  height: 100%;
-  background: #087fbe;
-  color: #ffffff;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 38px;
-
-  padding: 0 35px 0 65px;
-  box-sizing: border-box;
-
-  /* Creates the diagonal / at the left edge */
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 4.7% 100%);
-  z-index: 2;
-}
-
-/* Contact information */
-.Topbar-contact {
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 34px;
-}
-
-.Topbar-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
+  width: calc(59.1% - 8px);
+  height: 100%;
+  padding: 0 clamp(20px, 2.4vw, 40px) 0 clamp(44px, 4.4vw, 72px);
+  overflow: hidden;
+  background:
+    radial-gradient(420px 120px at 100% 0%, rgba(29, 143, 232, 0.55), transparent 70%),
+    linear-gradient(100deg, var(--topbar-navy) 0%, var(--topbar-blue-2) 45%, var(--topbar-blue) 100%);
   color: #ffffff;
-  text-decoration: none;
-  white-space: nowrap;
-  font-size: 14px;
-  font-weight: 700;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, var(--topbar-slant) 100%);
 }
 
-.Topbar-icon {
-  font-size: 19px;
-  flex-shrink: 0;
+/* moving light sweep */
+.Topbar-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -30%;
+  width: 22%;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+  transform: skewX(-20deg);
+  animation: TopbarShine 7s ease-in-out infinite;
 }
 
-/* Social icons */
-.Topbar-social {
-  display: flex;
-  align-items: center;
-  gap: 18px;
+@keyframes TopbarShine {
+  0%, 55% { left: -30%; }
+  100%    { left: 130%; }
 }
 
-.Topbar-social a {
+/* =========================================
+   CONTACT ITEMS
+========================================= */
+
+.Topbar-contact {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.Topbar-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 22px;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
   text-decoration: none;
-  transition: opacity 0.25s ease;
+  white-space: nowrap;
+  transition: color 0.25s ease;
 }
 
-.Topbar-social a:hover {
-  opacity: 0.7;
+.Topbar-item:first-child {
+  padding-left: 0;
 }
 
-/* Laptop */
+.Topbar-item:last-child {
+  padding-right: 0;
+}
+
+/* thin dividers between items */
+.Topbar-item + .Topbar-item::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 1px;
+  height: 20px;
+  content: "";
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-50%);
+}
+
+.Topbar-icon-wrap {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  color: var(--topbar-yellow);
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.Topbar-icon {
+  font-size: 13px;
+}
+
+.Topbar-item:hover .Topbar-icon-wrap {
+  background: linear-gradient(135deg, var(--topbar-yellow), var(--topbar-amber));
+  color: var(--topbar-ink);
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.Topbar-email:hover {
+  color: var(--topbar-yellow);
+}
+
+.Topbar-email:focus-visible,
+.Topbar-social-link:focus-visible {
+  outline: 2px solid var(--topbar-yellow);
+  outline-offset: 3px;
+}
+
+/* =========================================
+   SOCIAL ICONS
+========================================= */
+
+.Topbar-social {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 26px;
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.Topbar-social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.Topbar-social-link:hover {
+  transform: translateY(-3px);
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--topbar-yellow), var(--topbar-amber));
+  color: var(--topbar-ink);
+  box-shadow: 0 8px 16px rgba(255, 168, 0, 0.45);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1400px) {
+  .Topbar-right { gap: 22px; }
+  .Topbar-item { padding: 0 16px; font-size: 13px; }
+  .Topbar-social { padding-left: 18px; gap: 8px; }
+}
+
+/* laptop */
 @media (max-width: 1200px) {
-  .Topbar-decoration {
-    left: 30%;
-    width: 46px;
-  }
-
-  .Topbar-right {
-    width: 70%;
-    gap: 24px;
-    padding: 0 22px 0 42px;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 3.5% 100%);
-  }
-
-  .Topbar-contact {
-    gap: 20px;
-  }
-
-  .Topbar-item {
-    font-size: 12px;
-  }
-
-  .Topbar-icon {
-    font-size: 16px;
-  }
-
-  .Topbar-social {
-    gap: 13px;
-  }
+  .Topbar-accent { width: 72%; }
+  .Topbar-right { width: calc(72% - 8px); gap: 16px; padding: 0 20px 0 48px; }
+  .Topbar-tagline { display: none; }
+  .Topbar-item { padding: 0 13px; gap: 8px; font-size: 12.5px; }
+  .Topbar-icon-wrap { width: 26px; height: 26px; }
+  .Topbar-social { padding-left: 14px; }
+  .Topbar-social-link { width: 28px; height: 28px; font-size: 13px; }
 }
 
-/* Tablet */
+/* tablet: full-width blue bar, no diagonal */
 @media (max-width: 900px) {
   .Topbar {
     height: auto;
-    min-height: 44px;
+    min-height: 46px;
+    border-bottom: 0;
   }
 
   .Topbar-left,
-  .Topbar-decoration {
+  .Topbar-accent {
     display: none;
   }
 
   .Topbar-right {
     position: relative;
-    width: 100%;
-    height: auto;
-    min-height: 44px;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 12px 22px;
+    gap: 10px 22px;
+    width: 100%;
+    height: auto;
     padding: 10px 16px;
+    border-bottom: 3px solid var(--topbar-yellow);
     clip-path: none;
   }
 
   .Topbar-contact {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 12px 20px;
+    gap: 8px 0;
   }
 
-  .Topbar-social {
-    gap: 16px;
-  }
+  .Topbar-item { padding: 0 16px; font-size: 13px; }
+  .Topbar-item:first-child { padding-left: 0; }
+  .Topbar-item:last-child { padding-right: 0; }
 }
 
-/* Mobile */
+/* mobile */
 @media (max-width: 600px) {
   .Topbar-right {
-    padding: 12px 10px;
+    gap: 10px;
+    padding: 10px 12px;
   }
 
   .Topbar-contact {
     width: 100%;
-    gap: 12px 16px;
+    gap: 8px 14px;
   }
 
   .Topbar-item {
-    font-size: 11px;
-    gap: 6px;
+    padding: 0;
+    gap: 7px;
+    font-size: 12px;
   }
 
-  .Topbar-icon {
-    font-size: 14px;
+  .Topbar-item + .Topbar-item::before {
+    display: none;
   }
 
-  .Topbar-email span {
+  .Topbar-icon-wrap { width: 24px; height: 24px; }
+  .Topbar-icon { font-size: 12px; }
+
+  .Topbar-email .Topbar-text {
     white-space: normal;
     overflow-wrap: anywhere;
   }
 
   .Topbar-social {
-    gap: 20px;
+    justify-content: center;
+    gap: 12px;
+    padding-left: 0;
+    border-left: 0;
   }
 }
 
-/* Small mobile */
+/* small mobile */
 @media (max-width: 360px) {
   .Topbar-contact {
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .Topbar *,
+  .Topbar *::before,
+  .Topbar *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -1,22 +1,21 @@
-.service-page-transition {
+/* Service Page Styles */
+
+.service-page {
   width: 100%;
-  animation: servicePageEnter 0.65s ease-out both;
+  min-height: 100vh;
+  overflow: hidden;
 }
 
-@keyframes servicePageEnter {
-  from {
-    opacity: 0;
-    transform: translateY(22px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.service-page img {
+  max-width: 100%;
+  height: auto;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .service-page-transition {
-    animation: none;
-  }
+.service-page button {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.service-page button:hover {
+  transform: translateY(-2px);
 }

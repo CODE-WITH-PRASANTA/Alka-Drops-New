@@ -1,0 +1,870 @@
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  FiDroplet,
+  FiTruck,
+  FiRefreshCw,
+  FiFeather,
+  FiUser,
+  FiUserPlus,
+  FiMail,
+  FiLock,
+  FiPhone,
+  FiEye,
+  FiEyeOff,
+  FiArrowRight,
+  FiArrowLeft,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiLoader,
+} from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebook } from "react-icons/fa";
+
+/* Put your image at src/assets/login-image.png and adjust this path if needed */
+import loginImage from "../../assets/login-image.png";
+
+import "./Login.css";
+
+/* =========================================
+   CONSTANTS & HELPERS
+========================================= */
+
+const REMEMBER_KEY = "alkaDropsRememberedEmail";
+
+const FEATURES = [
+  { icon: FiDroplet, text: "pH 8.5+ Alkaline Water" },
+  { icon: FiTruck, text: "Home Delivery" },
+  { icon: FiRefreshCw, text: "Easy Subscription" },
+  { icon: FiFeather, text: "Eco-Friendly Refills" },
+];
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_PATTERN = /^[6-9]\d{9}$/;
+
+const getPasswordScore = (password) => {
+  let score = 0;
+  if (password.length >= 8) score += 1;
+  if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score += 1;
+  if (/\d/.test(password)) score += 1;
+  if (/[^A-Za-z0-9]/.test(password)) score += 1;
+  return score;
+};
+
+const STRENGTH_LABELS = ["Too short", "Weak", "Fair", "Good", "Strong"];
+
+/*
+ * Frontend-only placeholder request.
+ * Replace the body of this function with your real API call (fetch / axios).
+ */
+const fakeRequest = () =>
+  new Promise((resolve) => {
+    window.setTimeout(resolve, 1100);
+  });
+
+/* =========================================
+   REUSABLE FIELD
+========================================= */
+
+const LoginField = ({
+  id,
+  label,
+  icon: Icon,
+  error,
+  trailing,
+  ...inputProps
+}) => (
+  <div className="Login-field">
+    <label className="Login-field-label" htmlFor={id}>
+      {label}
+    </label>
+
+    <div className={`Login-field-box ${error ? "Login-field-box--error" : ""}`}>
+      <span className="Login-field-icon" aria-hidden="true">
+        <Icon />
+      </span>
+
+      <input
+        id={id}
+        className="Login-field-input"
+        aria-invalid={error ? "true" : "false"}
+        aria-describedby={error ? `${id}-error` : undefined}
+        {...inputProps}
+      />
+
+      {trailing}
+    </div>
+
+    {error && (
+      <span className="Login-field-error" id={`${id}-error`} role="alert">
+        {error}
+      </span>
+    )}
+  </div>
+);
+
+const LoginStatus = ({ status }) =>
+  status.message ? (
+    <div
+      className={`Login-status Login-status--${status.type}`}
+      role={status.type === "error" ? "alert" : "status"}
+    >
+      {status.type === "success" ? <FiCheckCircle /> : <FiAlertCircle />}
+      <span>{status.message}</span>
+    </div>
+  ) : null;
+
+/* =========================================
+   MAIN COMPONENT
+========================================= */
+
+const Login = () => {
+  const navigate = useNavigate();
+  const mounted = useRef(true);
+
+  // "login" | "register" | "forgot"
+  const [mode, setMode] = useState("login");
+
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [loginData, setLoginData] = useState(() => {
+    let savedEmail = "";
+    try {
+      savedEmail = localStorage.getItem(REMEMBER_KEY) || "";
+    } catch {
+      savedEmail = "";
+    }
+    return { email: savedEmail, password: "", remember: Boolean(savedEmail) };
+  });
+
+  const [registerData, setRegisterData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    terms: false,
+  });
+
+  const [forgotData, setForgotData] = useState({ email: "" });
+
+  const [loginErrors, setLoginErrors] = useState({});
+  const [registerErrors, setRegisterErrors] = useState({});
+  const [forgotErrors, setForgotErrors] = useState({});
+
+  const [loginStatus, setLoginStatus] = useState({ type: "", message: "" });
+  const [registerStatus, setRegisterStatus] = useState({ type: "", message: "" });
+  const [forgotStatus, setForgotStatus] = useState({ type: "", message: "" });
+
+  const isFlipped = mode === "register";
+  const passwordScore = getPasswordScore(registerData.password);
+
+  /* Card height follows the active side, so there is no empty space */
+  const frontRef = useRef(null);
+  const backRef = useRef(null);
+  const [flipHeight, setFlipHeight] = useState(null);
+
+  useLayoutEffect(() => {
+    const face = isFlipped ? backRef.current : frontRef.current;
+    if (!face) return undefined;
+
+    const updateHeight = () => setFlipHeight(face.offsetHeight);
+    updateHeight();
+
+    if (typeof ResizeObserver === "undefined") return undefined;
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(face);
+    return () => observer.disconnect();
+  }, [isFlipped, mode]);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  /* ---------- switching views ---------- */
+
+  const resetMessages = () => {
+    setLoginErrors({});
+    setRegisterErrors({});
+    setForgotErrors({});
+    setLoginStatus({ type: "", message: "" });
+    setRegisterStatus({ type: "", message: "" });
+    setForgotStatus({ type: "", message: "" });
+  };
+
+  const switchMode = (nextMode) => {
+    if (isSubmitting || nextMode === mode) return;
+    resetMessages();
+    setMode(nextMode);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  /* ---------- input handlers ---------- */
+
+  const handleLoginChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    setLoginData((previous) => ({
+      ...previous,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+    setLoginErrors((previous) => ({ ...previous, [name]: "" }));
+    setLoginStatus({ type: "", message: "" });
+  };
+
+  const handleRegisterChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    setRegisterData((previous) => ({
+      ...previous,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+    setRegisterErrors((previous) => ({ ...previous, [name]: "" }));
+    setRegisterStatus({ type: "", message: "" });
+  };
+
+  const handleForgotChange = (event) => {
+    setForgotData({ email: event.target.value });
+    setForgotErrors({});
+    setForgotStatus({ type: "", message: "" });
+  };
+
+  /* ---------- LOGIN ---------- */
+
+  const handleLoginSubmit = async (event) => {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    const errors = {};
+    if (!EMAIL_PATTERN.test(loginData.email.trim())) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!loginData.password) {
+      errors.password = "Please enter your password.";
+    }
+
+    setLoginErrors(errors);
+    if (Object.keys(errors).length) return;
+
+    setIsSubmitting(true);
+    setLoginStatus({ type: "", message: "" });
+
+    try {
+      await fakeRequest(); // TODO: call your login API here
+
+      try {
+        if (loginData.remember) {
+          localStorage.setItem(REMEMBER_KEY, loginData.email.trim());
+        } else {
+          localStorage.removeItem(REMEMBER_KEY);
+        }
+      } catch {
+        /* storage unavailable - ignore */
+      }
+
+      if (!mounted.current) return;
+      setLoginStatus({ type: "success", message: "Login successful! Redirecting..." });
+
+      window.setTimeout(() => {
+        if (mounted.current) navigate("/");
+      }, 900);
+    } catch {
+      if (mounted.current) {
+        setLoginStatus({
+          type: "error",
+          message: "We could not log you in. Please try again.",
+        });
+      }
+    } finally {
+      if (mounted.current) setIsSubmitting(false);
+    }
+  };
+
+  /* ---------- REGISTER ---------- */
+
+  const handleRegisterSubmit = async (event) => {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    const errors = {};
+
+    if (registerData.name.trim().length < 2) {
+      errors.name = "Please enter your full name.";
+    }
+    if (!EMAIL_PATTERN.test(registerData.email.trim())) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!PHONE_PATTERN.test(registerData.phone.trim())) {
+      errors.phone = "Enter a valid 10-digit mobile number.";
+    }
+    if (registerData.password.length < 8) {
+      errors.password = "Password must be at least 8 characters.";
+    } else if (passwordScore < 2) {
+      errors.password = "Use letters, numbers or symbols for a stronger password.";
+    }
+    if (registerData.confirmPassword !== registerData.password) {
+      errors.confirmPassword = "Passwords do not match.";
+    }
+    if (!registerData.terms) {
+      errors.terms = "Please accept the terms to continue.";
+    }
+
+    setRegisterErrors(errors);
+    if (Object.keys(errors).length) return;
+
+    setIsSubmitting(true);
+    setRegisterStatus({ type: "", message: "" });
+
+    try {
+      await fakeRequest(); // TODO: call your register API here
+
+      if (!mounted.current) return;
+
+      const registeredEmail = registerData.email.trim();
+
+      setRegisterStatus({
+        type: "success",
+        message: "Account created successfully! Taking you to login...",
+      });
+
+      window.setTimeout(() => {
+        if (!mounted.current) return;
+        setLoginData((previous) => ({
+          ...previous,
+          email: registeredEmail,
+          password: "",
+        }));
+        setRegisterData({
+          name: "",
+          email: "",
+          phone: "",
+          password: "",
+          confirmPassword: "",
+          terms: false,
+        });
+        resetMessages();
+        setLoginStatus({
+          type: "success",
+          message: "Account created! Please log in to continue.",
+        });
+        setMode("login");
+      }, 1400);
+    } catch {
+      if (mounted.current) {
+        setRegisterStatus({
+          type: "error",
+          message: "We could not create your account. Please try again.",
+        });
+      }
+    } finally {
+      if (mounted.current) setIsSubmitting(false);
+    }
+  };
+
+  /* ---------- FORGOT PASSWORD ---------- */
+
+  const handleForgotSubmit = async (event) => {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    if (!EMAIL_PATTERN.test(forgotData.email.trim())) {
+      setForgotErrors({ email: "Please enter a valid email address." });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setForgotStatus({ type: "", message: "" });
+
+    try {
+      await fakeRequest(); // TODO: call your forgot-password API here
+
+      if (mounted.current) {
+        setForgotStatus({
+          type: "success",
+          message: `If an account exists for ${forgotData.email.trim()}, a password reset link has been sent.`,
+        });
+      }
+    } catch {
+      if (mounted.current) {
+        setForgotStatus({
+          type: "error",
+          message: "Something went wrong. Please try again.",
+        });
+      }
+    } finally {
+      if (mounted.current) setIsSubmitting(false);
+    }
+  };
+
+  /* ---------- SOCIAL LOGIN (placeholder) ---------- */
+
+  const handleSocialLogin = (provider) => {
+    const setStatus = isFlipped ? setRegisterStatus : setLoginStatus;
+    setStatus({
+      type: "error",
+      message: `${provider} sign-in is not connected yet. Please use email for now.`,
+    });
+  };
+
+  /* =========================================
+     SHARED UI PIECES
+  ========================================= */
+
+  const renderTabs = () => (
+    <div
+      className={`Login-tabs ${isFlipped ? "Login-tabs--register" : ""}`}
+      role="tablist"
+      aria-label="Login or Register"
+    >
+      <span className="Login-tabs-indicator" aria-hidden="true" />
+
+      <button
+        type="button"
+        role="tab"
+        aria-selected={!isFlipped}
+        className={`Login-tab ${!isFlipped ? "Login-tab--active" : ""}`}
+        onClick={() => switchMode("login")}
+      >
+        <FiUser />
+        Login
+      </button>
+
+      <button
+        type="button"
+        role="tab"
+        aria-selected={isFlipped}
+        className={`Login-tab ${isFlipped ? "Login-tab--active" : ""}`}
+        onClick={() => switchMode("register")}
+      >
+        <FiUserPlus />
+        Register
+      </button>
+    </div>
+  );
+
+  const renderSocial = () => (
+    <>
+      <div className="Login-divider">
+        <span>Or continue with</span>
+      </div>
+
+      <div className="Login-social">
+        <button
+          type="button"
+          className="Login-social-button"
+          onClick={() => handleSocialLogin("Google")}
+        >
+          <FcGoogle />
+          <span>Continue with Google</span>
+        </button>
+
+        <button
+          type="button"
+          className="Login-social-button"
+          onClick={() => handleSocialLogin("Facebook")}
+        >
+          <FaFacebook className="Login-facebook" />
+          <span>Continue with Facebook</span>
+        </button>
+      </div>
+    </>
+  );
+
+  const passwordToggle = (visible, setVisible, label) => (
+    <button
+      type="button"
+      className="Login-eye"
+      onClick={() => setVisible((previous) => !previous)}
+      aria-label={visible ? `Hide ${label}` : `Show ${label}`}
+    >
+      {visible ? <FiEyeOff /> : <FiEye />}
+    </button>
+  );
+
+  const submitContent = (idleText, busyText) =>
+    isSubmitting ? (
+      <>
+        <FiLoader className="Login-spinner" />
+        <span>{busyText}</span>
+      </>
+    ) : (
+      <>
+        <span>{idleText}</span>
+        <FiArrowRight />
+      </>
+    );
+
+  /* =========================================
+     RENDER
+  ========================================= */
+
+  return (
+    <main
+      className="Login"
+      style={{ "--login-bg-image": `url(${loginImage})` }}
+    >
+      <div className="Login-overlay" aria-hidden="true" />
+
+      <div className="Login-container">
+        {/* ============ LEFT CONTENT ============ */}
+        <section className="Login-hero" aria-label="Alka Drops welcome">
+          <span className="Login-badge">
+            <FiDroplet />
+            {isFlipped ? "Join Alka Drops" : "Welcome Back"}
+          </span>
+
+          <h1 className="Login-title">
+            Stay Hydrated
+            <br />
+            with <span>Alka Drops</span>
+          </h1>
+
+          <p className="Login-subtitle">
+            Pure, alkaline water for a healthier,
+            <br className="Login-break" />
+            more active life.
+          </p>
+
+          <ul className="Login-features">
+            {FEATURES.map(({ icon: Icon, text }) => (
+              <li className="Login-feature" key={text}>
+                <span className="Login-feature-icon" aria-hidden="true">
+                  <Icon />
+                </span>
+                <span className="Login-feature-text">{text}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* ============ RIGHT FORM CARD ============ */}
+        <section className="Login-card-wrap" aria-label="Account access">
+          <div
+            className={`Login-flip ${isFlipped ? "Login-flip--flipped" : ""}`}
+            style={flipHeight ? { height: flipHeight } : undefined}
+          >
+            {/* ---------- FRONT: LOGIN / FORGOT ---------- */}
+            <div
+              ref={frontRef}
+              className={`Login-face Login-face--front ${
+                isFlipped ? "Login-face--hidden" : ""
+              }`}
+              aria-hidden={isFlipped}
+            >
+              {renderTabs()}
+
+              {mode !== "forgot" ? (
+                <div className="Login-panel" key="login-panel">
+                  <div className="Login-heading">
+                    <h2>Login to Your Account</h2>
+                    <p>Access your orders, subscriptions, and more.</p>
+                  </div>
+
+                  <form className="Login-form" onSubmit={handleLoginSubmit} noValidate>
+                    <LoginField
+                      id="login-email"
+                      label="Email Address"
+                      icon={FiMail}
+                      type="email"
+                      name="email"
+                      placeholder="Email Address"
+                      autoComplete="email"
+                      value={loginData.email}
+                      onChange={handleLoginChange}
+                      error={loginErrors.email}
+                    />
+
+                    <LoginField
+                      id="login-password"
+                      label="Password"
+                      icon={FiLock}
+                      type={showLoginPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="Password"
+                      autoComplete="current-password"
+                      value={loginData.password}
+                      onChange={handleLoginChange}
+                      error={loginErrors.password}
+                      trailing={passwordToggle(
+                        showLoginPassword,
+                        setShowLoginPassword,
+                        "password"
+                      )}
+                    />
+
+                    <div className="Login-options">
+                      <label className="Login-check">
+                        <input
+                          type="checkbox"
+                          name="remember"
+                          checked={loginData.remember}
+                          onChange={handleLoginChange}
+                        />
+                        <span className="Login-check-box" aria-hidden="true" />
+                        <span className="Login-check-text">Remember me</span>
+                      </label>
+
+                      <button
+                        type="button"
+                        className="Login-link"
+                        onClick={() => switchMode("forgot")}
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+
+                    <LoginStatus status={loginStatus} />
+
+                    <button
+                      type="submit"
+                      className="Login-submit"
+                      disabled={isSubmitting}
+                    >
+                      {submitContent("Login Now", "Logging in...")}
+                    </button>
+                  </form>
+
+                  {renderSocial()}
+
+                  <p className="Login-switch">
+                    Don&apos;t have an account?{" "}
+                    <button
+                      type="button"
+                      className="Login-link Login-link--strong"
+                      onClick={() => switchMode("register")}
+                    >
+                      Register Now
+                    </button>
+                  </p>
+                </div>
+              ) : (
+                <div className="Login-panel" key="forgot-panel">
+                  <div className="Login-heading">
+                    <h2>Forgot Password?</h2>
+                    <p>
+                      Enter your registered email and we will send you a link to
+                      reset your password.
+                    </p>
+                  </div>
+
+                  <form className="Login-form" onSubmit={handleForgotSubmit} noValidate>
+                    <LoginField
+                      id="forgot-email"
+                      label="Email Address"
+                      icon={FiMail}
+                      type="email"
+                      name="email"
+                      placeholder="Registered Email Address"
+                      autoComplete="email"
+                      value={forgotData.email}
+                      onChange={handleForgotChange}
+                      error={forgotErrors.email}
+                    />
+
+                    <LoginStatus status={forgotStatus} />
+
+                    <button
+                      type="submit"
+                      className="Login-submit"
+                      disabled={isSubmitting}
+                    >
+                      {submitContent("Send Reset Link", "Sending...")}
+                    </button>
+                  </form>
+
+                  <button
+                    type="button"
+                    className="Login-back"
+                    onClick={() => switchMode("login")}
+                  >
+                    <FiArrowLeft />
+                    Back to Login
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* ---------- BACK: REGISTER ---------- */}
+            <div
+              ref={backRef}
+              className={`Login-face Login-face--back ${
+                !isFlipped ? "Login-face--hidden" : ""
+              }`}
+              aria-hidden={!isFlipped}
+            >
+              {renderTabs()}
+
+              <div className="Login-panel">
+                <div className="Login-heading">
+                  <h2>Create Your Account</h2>
+                  <p>Join Alka Drops for fresh alkaline water at your door.</p>
+                </div>
+
+                <form
+                  className="Login-form"
+                  onSubmit={handleRegisterSubmit}
+                  noValidate
+                >
+                  <LoginField
+                    id="register-name"
+                    label="Full Name"
+                    icon={FiUser}
+                    type="text"
+                    name="name"
+                    placeholder="Full Name"
+                    autoComplete="name"
+                    maxLength={100}
+                    value={registerData.name}
+                    onChange={handleRegisterChange}
+                    error={registerErrors.name}
+                  />
+
+                  <LoginField
+                    id="register-email"
+                    label="Email Address"
+                    icon={FiMail}
+                    type="email"
+                    name="email"
+                    placeholder="Email Address"
+                    autoComplete="email"
+                    value={registerData.email}
+                    onChange={handleRegisterChange}
+                    error={registerErrors.email}
+                  />
+
+                  <LoginField
+                    id="register-phone"
+                    label="Mobile Number"
+                    icon={FiPhone}
+                    type="tel"
+                    name="phone"
+                    placeholder="10-digit Mobile Number"
+                    autoComplete="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={registerData.phone}
+                    onChange={(event) => {
+                      event.target.value = event.target.value.replace(/\D/g, "");
+                      handleRegisterChange(event);
+                    }}
+                    error={registerErrors.phone}
+                  />
+
+                  <div className="Login-field-group">
+                    <LoginField
+                      id="register-password"
+                      label="Password"
+                      icon={FiLock}
+                      type={showRegisterPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="Create Password"
+                      autoComplete="new-password"
+                      value={registerData.password}
+                      onChange={handleRegisterChange}
+                      error={registerErrors.password}
+                      trailing={passwordToggle(
+                        showRegisterPassword,
+                        setShowRegisterPassword,
+                        "password"
+                      )}
+                    />
+
+                    {registerData.password && (
+                      <div className="Login-strength" aria-live="polite">
+                        <div className="Login-strength-bars">
+                          {[1, 2, 3, 4].map((level) => (
+                            <span
+                              key={level}
+                              className={
+                                passwordScore >= level
+                                  ? `Login-strength-bar Login-strength-bar--on Login-strength-bar--level${passwordScore}`
+                                  : "Login-strength-bar"
+                              }
+                            />
+                          ))}
+                        </div>
+                        <span className="Login-strength-label">
+                          {STRENGTH_LABELS[passwordScore]}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <LoginField
+                    id="register-confirm"
+                    label="Confirm Password"
+                    icon={FiLock}
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                    autoComplete="new-password"
+                    value={registerData.confirmPassword}
+                    onChange={handleRegisterChange}
+                    error={registerErrors.confirmPassword}
+                    trailing={passwordToggle(
+                      showConfirmPassword,
+                      setShowConfirmPassword,
+                      "confirm password"
+                    )}
+                  />
+
+                  <div className="Login-terms">
+                    <label className="Login-check">
+                      <input
+                        type="checkbox"
+                        name="terms"
+                        checked={registerData.terms}
+                        onChange={handleRegisterChange}
+                      />
+                      <span className="Login-check-box" aria-hidden="true" />
+                      <span className="Login-check-text">
+                        I agree to the Terms &amp; Privacy Policy
+                      </span>
+                    </label>
+
+                    {registerErrors.terms && (
+                      <span className="Login-field-error" role="alert">
+                        {registerErrors.terms}
+                      </span>
+                    )}
+                  </div>
+
+                  <LoginStatus status={registerStatus} />
+
+                  <button
+                    type="submit"
+                    className="Login-submit"
+                    disabled={isSubmitting}
+                  >
+                    {submitContent("Create Account", "Creating account...")}
+                  </button>
+                </form>
+
+                {renderSocial()}
+
+                <p className="Login-switch">
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    className="Login-link Login-link--strong"
+                    onClick={() => switchMode("login")}
+                  >
+                    Login Now
+                  </button>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+};
+
+export default Login;

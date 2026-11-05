@@ -1,0 +1,771 @@
+
+/* =========================================
+   SUBSCRIPTION ONE - MAIN SECTION
+========================================= */
+
+.SubscriptionOne-section {
+  position: relative;
+  width: 100%;
+  padding: 80px 20px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+.SubscriptionOne-section * {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.SubscriptionOne-header {
+  width: 100%;
+  max-width: 920px;
+  text-align: center;
+  margin-bottom: 65px;
+}
+
+.SubscriptionOne-tagline {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #004ea8;
+  background: #e0f2fe;
+  padding: 9px 20px;
+  border-radius: 30px;
+  margin-bottom: 20px;
+}
+
+.SubscriptionOne-main-title {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+
+.SubscriptionOne-title-primary {
+  font-size: clamp(28px, 4.5vw, 42px);
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+  letter-spacing: -0.8px;
+}
+
+.SubscriptionOne-title-secondary {
+  font-size: clamp(17px, 2.5vw, 24px);
+  font-weight: 650;
+  color: #004ea8;
+  line-height: 1.4;
+}
+
+.SubscriptionOne-lead-text {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.9;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+/* =========================================
+   PRICING CARD GRID
+========================================= */
+
+.SubscriptionOne-container {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 25px;
+  width: 100%;
+  max-width: 1200px;
+  align-items: stretch;
+  perspective: 1500px;
+}
+
+/* =========================================
+   CARD BASE
+========================================= */
+
+.SubscriptionOne-card {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  border-radius: 14px;
+  box-sizing: border-box;
+}
+
+.SubscriptionOne-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.SubscriptionOne-standard-card:hover .SubscriptionOne-card-inner,
+.SubscriptionOne-standard-card.is-flipped .SubscriptionOne-card-inner {
+  transform: rotateY(180deg);
+}
+
+.SubscriptionOne-card-front,
+.SubscriptionOne-card-back {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 14px;
+  padding: 38px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+/* =========================================
+   STANDARD CARD
+========================================= */
+
+.SubscriptionOne-standard-card .SubscriptionOne-card-front {
+  background: #ffffff;
+  border: 1px solid #e9eef5;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.045);
+}
+
+.SubscriptionOne-card-back {
+  background: #004ea8;
+  transform: rotateY(180deg);
+  box-shadow: 0 20px 40px rgba(0, 78, 168, 0.2);
+}
+
+/* =========================================
+   FEATURED CARD
+========================================= */
+
+.SubscriptionOne-featured-card {
+  height: 550px;
+  margin-top: -15px;
+  background: linear-gradient(145deg, #004ea8, #003b82);
+  border-radius: 14px;
+  box-shadow: 0 20px 45px rgba(0, 78, 168, 0.2);
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-card-front {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+/* =========================================
+   PRICE RING
+========================================= */
+
+.SubscriptionOne-price-ring-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.SubscriptionOne-price-outer-ring {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 1px solid #dbe5ef;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-price-outer-ring,
+.SubscriptionOne-price-outer-ring.variant-blue {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.SubscriptionOne-price-bubble {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    inset 0 4px 10px rgba(0, 0, 0, 0.04),
+    0 8px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-price-bubble,
+.SubscriptionOne-price-bubble.variant-blue {
+  background: #59c6f9;
+  box-shadow: 0 10px 25px rgba(89, 198, 249, 0.35);
+}
+
+/* Currency */
+
+.SubscriptionOne-currency-symbol {
+  font-size: 17px;
+  font-weight: 750;
+  color: #1e293b;
+  margin-right: 2px;
+  margin-top: -9px;
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-currency-symbol,
+.SubscriptionOne-price-bubble.variant-blue .SubscriptionOne-currency-symbol {
+  color: #ffffff;
+}
+
+/* Price */
+
+.SubscriptionOne-price-amount {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -1px;
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-price-amount,
+.SubscriptionOne-price-bubble.variant-blue .SubscriptionOne-price-amount {
+  color: #ffffff;
+}
+
+/* Period */
+
+.SubscriptionOne-period-badge {
+  position: absolute;
+  top: -2px;
+  right: -7px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #004ea8;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 78, 168, 0.3);
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-period-badge,
+.SubscriptionOne-price-bubble.variant-blue .SubscriptionOne-period-badge {
+  background: #ffffff;
+  color: #087fc4;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================
+   CARD HEADING
+========================================= */
+
+.SubscriptionOne-card-heading {
+  width: 100%;
+  text-align: center;
+}
+
+.SubscriptionOne-card-title {
+  font-size: 23px;
+  font-weight: 750;
+  color: #0f172a;
+  margin: 8px 0 8px;
+  text-align: center;
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-card-title {
+  color: #ffffff;
+}
+
+.SubscriptionOne-card-subtitle {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-card-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.SubscriptionOne-card-middle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  padding: 10px 0;
+}
+
+.SubscriptionOne-card-description {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.8;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.SubscriptionOne-flip-hint {
+  color: #94a3b8;
+  font-size: 10px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* =========================================
+   TEXT COLORS
+========================================= */
+
+.SubscriptionOne-card-title.text-white {
+  color: #ffffff;
+}
+
+.SubscriptionOne-card-subtitle.text-lightblue {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* =========================================
+   FEATURE LIST
+========================================= */
+
+.SubscriptionOne-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.SubscriptionOne-feature-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 550;
+  color: rgba(255, 255, 255, 0.96);
+  text-align: center;
+}
+
+.SubscriptionOne-feat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #59c6f9;
+  flex-shrink: 0;
+}
+
+.SubscriptionOne-feat-icon.text-white {
+  color: #ffffff;
+}
+
+/* =========================================
+   ORDER BUTTON
+========================================= */
+
+.SubscriptionOne-order-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #004ea8;
+  padding: 13px 43px 13px 25px;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 1px;
+  color: #ffffff;
+  text-decoration: none;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  width: 170px;
+  min-height: 45px;
+  flex-shrink: 0;
+}
+
+.SubscriptionOne-order-btn:hover {
+  background: #003777;
+  transform: translateY(-3px);
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-order-btn,
+.SubscriptionOne-order-btn.variant-light {
+  background: #59c6f9;
+  color: #ffffff;
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-order-btn:hover,
+.SubscriptionOne-order-btn.variant-light:hover {
+  background: #38b4f4;
+}
+
+.SubscriptionOne-order-btn-accent {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 38px;
+  background: #3a89e9;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.SubscriptionOne-featured-card .SubscriptionOne-order-btn-accent,
+.SubscriptionOne-order-btn.variant-light .SubscriptionOne-order-btn-accent {
+  background: #79d5ff;
+}
+
+/* =========================================
+   INFORMATION SECTION
+========================================= */
+
+.SubscriptionOne-info-block {
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 85px;
+}
+
+.SubscriptionOne-info-heading {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.SubscriptionOne-info-heading > span {
+  color: #087fc4;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.SubscriptionOne-info-heading h2 {
+  font-size: 30px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 12px 0;
+}
+
+.SubscriptionOne-info-heading > p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* =========================================
+   INFORMATION GRID
+========================================= */
+
+.SubscriptionOne-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 35px;
+}
+
+.SubscriptionOne-info-box {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.025);
+  transition: 0.3s ease;
+}
+
+.SubscriptionOne-info-box:hover {
+  transform: translateY(-5px);
+  border-color: #b9dff5;
+  box-shadow: 0 12px 30px rgba(0, 78, 168, 0.07);
+}
+
+.SubscriptionOne-info-icon {
+  font-size: 28px;
+  color: #087fc4;
+  margin-bottom: 16px;
+}
+
+.SubscriptionOne-info-heading-box {
+  font-size: 17px;
+  color: #0f172a;
+  margin: 0 0 12px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.SubscriptionOne-info-box p {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* =========================================
+   BUSINESS CONTACT
+========================================= */
+
+.SubscriptionOne-nap-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  justify-content: space-between;
+  align-items: center;
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 25px 28px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.SubscriptionOne-nap-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.7;
+}
+
+.SubscriptionOne-nap-item svg {
+  color: #59c6f9;
+  flex-shrink: 0;
+}
+
+.SubscriptionOne-nap-label {
+  font-weight: 750;
+}
+
+.SubscriptionOne-nap-item a {
+  color: #59c6f9;
+  text-decoration: none;
+  font-weight: 750;
+}
+
+.SubscriptionOne-nap-item a:hover {
+  text-decoration: underline;
+}
+
+/* =========================================
+   TABLET RESPONSIVE
+========================================= */
+
+@media (max-width: 991px) {
+  .SubscriptionOne-section {
+    padding: 65px 20px;
+  }
+
+  .SubscriptionOne-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 25px;
+    max-width: 750px;
+  }
+
+  .SubscriptionOne-card {
+    height: 520px;
+  }
+
+  .SubscriptionOne-featured-card {
+    height: 520px;
+    margin-top: 0;
+    grid-column: 1 / -1;
+    width: calc(50% - 12px);
+    justify-self: center;
+  }
+
+  .SubscriptionOne-info-block {
+    margin-top: 65px;
+  }
+
+  .SubscriptionOne-nap-container {
+    justify-content: flex-start;
+  }
+}
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 650px) {
+  .SubscriptionOne-section {
+    padding: 50px 15px;
+  }
+
+  .SubscriptionOne-header {
+    margin-bottom: 40px;
+  }
+
+  .SubscriptionOne-tagline {
+    font-size: 9px;
+    padding: 8px 13px;
+    letter-spacing: 1px;
+  }
+
+  .SubscriptionOne-main-title {
+    gap: 10px;
+  }
+
+  .SubscriptionOne-title-primary {
+    font-size: 29px;
+  }
+
+  .SubscriptionOne-title-secondary {
+    font-size: 17px;
+  }
+
+  .SubscriptionOne-lead-text {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .SubscriptionOne-container {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+    max-width: 400px;
+  }
+
+  .SubscriptionOne-card {
+    height: 510px;
+    width: 100%;
+  }
+
+  .SubscriptionOne-featured-card {
+    width: 100%;
+    grid-column: auto;
+    height: 510px;
+  }
+
+  .SubscriptionOne-card-front,
+  .SubscriptionOne-card-back {
+    padding: 35px 24px;
+  }
+
+  .SubscriptionOne-price-outer-ring {
+    width: 130px;
+    height: 130px;
+  }
+
+  .SubscriptionOne-price-bubble {
+    width: 102px;
+    height: 102px;
+  }
+
+  .SubscriptionOne-price-amount {
+    font-size: 29px;
+  }
+
+  .SubscriptionOne-card-title {
+    font-size: 22px;
+  }
+
+  .SubscriptionOne-feature-item {
+    font-size: 12px;
+  }
+
+  .SubscriptionOne-info-block {
+    margin-top: 60px;
+  }
+
+  .SubscriptionOne-info-heading h2 {
+    font-size: 25px;
+  }
+
+  .SubscriptionOne-info-heading > p {
+    font-size: 12px;
+  }
+
+  .SubscriptionOne-info-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .SubscriptionOne-info-box {
+    padding: 24px;
+  }
+
+  .SubscriptionOne-nap-container {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 22px;
+    gap: 16px;
+  }
+
+  .SubscriptionOne-nap-item {
+    font-size: 11px;
+    align-items: flex-start;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 380px) {
+  .SubscriptionOne-title-primary {
+    font-size: 25px;
+  }
+
+  .SubscriptionOne-title-secondary {
+    font-size: 15px;
+  }
+
+  .SubscriptionOne-card {
+    height: 500px;
+  }
+
+  .SubscriptionOne-featured-card {
+    height: 500px;
+  }
+
+  .SubscriptionOne-card-front,
+  .SubscriptionOne-card-back {
+    padding: 30px 17px;
+  }
+
+  .SubscriptionOne-feature-item {
+    font-size: 11px;
+    gap: 8px;
+  }
+
+  .SubscriptionOne-order-btn {
+    width: 155px;
+  }
+
+  .SubscriptionOne-info-heading h2 {
+    font-size: 22px;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .SubscriptionOne-card-inner,
+  .SubscriptionOne-info-box,
+  .SubscriptionOne-order-btn {
+    transition: none;
+  }
+}

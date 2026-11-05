@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./ContactBreadcrumb.css";
-import backgroundImage from "../../assets/breadcrum.jpeg";
+import backgroundImage from "../../assets/breadcrum.png";
 
 const ContactBreadcrumb = ({ title = "Contact", activePage }) => {
   const pageTitle = activePage || title;

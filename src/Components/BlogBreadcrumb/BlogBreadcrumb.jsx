@@ -1,31 +1,31 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "./BlogBreadCrumb.css";
-import backgroundImage from "../../assets/breadcrum.jpeg";
+import "./BlogBreadcrumb.css";
+import Background from "../../assets/AlkaDropsBreadCrumb.png";
 
-const BlogbreadCrumb = ({ title = "Blog", activePage }) => {
+const BlogBreadcrumb = ({ title = "Blog", activePage }) => {
   const pageTitle = activePage || title;
 
   return (
     <section
-      className="Blogbreadcrumb-wrapper"
-      style={{ backgroundImage: `url(${backgroundImage})` }}
+      className="Blog-Breadcrumb-wrapper"
+      style={{ backgroundImage: `url(${Background})` }}
     >
-      <div className="Blogbreadcrumb-overlay">
-        <h1 className="Blogbreadcrumb-title">{pageTitle}</h1>
+      <div className="Blog-Breadcrumb-overlay">
+        <h1 className="Blog-Breadcrumb-title">{pageTitle}</h1>
 
-        <div className="Blogbreadcrumb-nav">
-          <Link to="/" className="Blogbreadcrumb-home">
+        <div className="Blog-Breadcrumb-nav">
+          <Link to="/" className="Blog-Breadcrumb-home">
             Home
           </Link>
 
-          <span className="Blogbreadcrumb-divider">|</span>
+          <span className="Blog-Breadcrumb-divider">//</span>
 
-          <span className="Blogbreadcrumb-active">{pageTitle}</span>
+          <span className="Blog-Breadcrumb-active">{pageTitle}</span>
         </div>
       </div>
     </section>
   );
 };
 
-export default BlogbreadCrumb;
+export default BlogBreadcrumb;

@@ -1,0 +1,345 @@
+/* =========================================
+   FLOATING ICONS — ALKA DROPS EDITION
+========================================= */
+
+.FloatingIcons {
+  --size: 54px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ---------- Item wrapper ---------- */
+
+.FloatingIcons__item {
+  position: relative;
+  isolation: isolate;
+  width: var(--size);
+  height: var(--size);
+  animation: FloatingIcons-enter 700ms var(--ease-out) backwards;
+  animation-delay: calc(var(--enter, 0) * 140ms + 400ms);
+}
+
+/* Rotating, blurred halo */
+.FloatingIcons__item::before {
+  position: absolute;
+  inset: -7px;
+  z-index: -2;
+  content: "";
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    var(--glow) 18%,
+    transparent 40%,
+    var(--glow-2) 62%,
+    transparent 82%,
+    var(--glow) 100%
+  );
+  filter: blur(9px);
+  opacity: 0.85;
+  animation: FloatingIcons-spin 4.5s linear infinite;
+  pointer-events: none;
+}
+
+/* Soft expanding pulse ring */
+.FloatingIcons__item::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  border-radius: 50%;
+  border: 2px solid var(--glow);
+  opacity: 0;
+  animation: FloatingIcons-ripple 2.8s ease-out infinite;
+  pointer-events: none;
+}
+
+.FloatingIcons__item--whatsapp::after {
+  animation-delay: 1.1s;
+}
+
+/* Alka Drops Royal Blue brand color */
+.FloatingIcons__item--call {
+  --bg: linear-gradient(145deg, #1d4ed8 0%, #0c369e 60%, #061c58 100%);
+  --glow: #2563eb;
+  --glow-2: #60a5fa;
+}
+
+/* WhatsApp Emerald */
+.FloatingIcons__item--whatsapp {
+  --bg: linear-gradient(145deg, #5df59a 0%, #20c05f 55%, #0c8c43 100%);
+  --glow: #25d366;
+  --glow-2: #bfffd6;
+}
+
+/* Alkaline Gold Accent (matches pH 8.5+ badge) */
+.FloatingIcons__item--scroll {
+  --bg: linear-gradient(145deg, #ffe175 0%, #f4bc1c 60%, #b8860b 100%);
+  --glow: #f4bc1c;
+  --glow-2: #fff3c4;
+}
+
+/* ---------- Button ---------- */
+
+.FloatingIcons__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 50%;
+  background: var(--bg);
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -8px 12px rgba(0, 0, 0, 0.25),
+    0 10px 22px -6px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 320ms var(--ease-out),
+    box-shadow 320ms ease;
+}
+
+/* Glass highlight */
+.FloatingIcons__btn::before {
+  position: absolute;
+  top: 3px;
+  left: 20%;
+  width: 60%;
+  height: 42%;
+  content: "";
+  border-radius: 50%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0)
+  );
+  pointer-events: none;
+}
+
+.FloatingIcons__btn:hover {
+  transform: translateY(-4px) scale(1.07);
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.6),
+    inset 0 -8px 12px rgba(0, 0, 0, 0.2),
+    0 16px 28px -8px rgba(0, 0, 0, 0.55);
+}
+
+.FloatingIcons__btn:active {
+  transform: translateY(0) scale(0.94);
+}
+
+.FloatingIcons__btn:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 4px;
+}
+
+.FloatingIcons__svg {
+  position: relative;
+  width: 23px;
+  height: 23px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+.FloatingIcons__svg--wa {
+  width: 27px;
+  height: 27px;
+}
+
+/* Gentle animation pulses */
+.FloatingIcons__btn--call .FloatingIcons__svg {
+  transform-origin: 50% 50%;
+  animation: FloatingIcons-ring 4.2s ease-in-out 2s infinite;
+}
+
+.FloatingIcons__btn--whatsapp .FloatingIcons__svg {
+  animation: FloatingIcons-breathe 3.2s ease-in-out infinite;
+}
+
+/* ---------- Scroll-to-top ---------- */
+
+.FloatingIcons__item--scroll {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate3d(0, 14px, 0) scale(0.85);
+  transition:
+    opacity 380ms ease,
+    transform 480ms var(--ease-out),
+    visibility 0s linear 480ms;
+  animation: none;
+}
+
+.FloatingIcons__item--scroll.FloatingIcons__item--visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition-delay: 0s;
+}
+
+.FloatingIcons__item--scroll::before {
+  opacity: 0.7;
+}
+
+.FloatingIcons__btn--scroll {
+  border-color: rgba(255, 244, 214, 0.85);
+  color: #1a1202;
+}
+
+.FloatingIcons__btn--scroll .FloatingIcons__svg {
+  filter: none;
+}
+
+.FloatingIcons__btn--scroll::before {
+  opacity: 0.65;
+}
+
+.FloatingIcons__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.FloatingIcons__ring circle {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.FloatingIcons__ring-track {
+  stroke: rgba(26, 18, 2, 0.18);
+}
+
+.FloatingIcons__ring-bar {
+  stroke: #1a1202;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 120ms linear;
+}
+
+/* =========================================
+   KEYFRAMES
+========================================= */
+
+@keyframes FloatingIcons-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes FloatingIcons-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes FloatingIcons-ripple {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.75);
+  }
+}
+
+@keyframes FloatingIcons-ring {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0deg);
+  }
+  66% {
+    transform: rotate(-14deg);
+  }
+  72% {
+    transform: rotate(12deg);
+  }
+  78% {
+    transform: rotate(-9deg);
+  }
+  84% {
+    transform: rotate(6deg);
+  }
+  90% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes FloatingIcons-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.09);
+  }
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+  .FloatingIcons {
+    --size: 48px;
+    right: 18px;
+    bottom: 18px;
+    gap: 14px;
+  }
+
+  .FloatingIcons__svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .FloatingIcons__svg--wa {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .FloatingIcons__item,
+  .FloatingIcons__item::before,
+  .FloatingIcons__item::after,
+  .FloatingIcons__svg {
+    animation: none !important;
+  }
+
+  .FloatingIcons__item::after {
+    display: none;
+  }
+
+  .FloatingIcons__btn,
+  .FloatingIcons__item--scroll {
+    transition-duration: 0.01ms !important;
+  }
+}

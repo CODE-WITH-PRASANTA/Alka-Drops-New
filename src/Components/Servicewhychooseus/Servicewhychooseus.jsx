@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import Card1 from'../../assets/card1.jpg';
-import Card2 from'../../assets/card2.jpg';
-import Card3 from'../../assets/card3.jpg';
-import Card4 from'../../assets/card4.jpg';
-import Card5 from'../../assets/card5.jpg';
-import Card6 from'../../assets/card6.jpg';
+import Card1 from "../../assets/card1.jpg";
+import Card2 from "../../assets/card2.jpg";
+import Card3 from "../../assets/card3.jpg";
+import Card4 from "../../assets/card4.jpg";
+import Card5 from "../../assets/card5.jpg";
+import Card6 from "../../assets/card6.jpg";
 
 import "./Servicewhychooseus.css";
 
@@ -12,57 +12,63 @@ const services = [
   {
     id: 1,
     title: "Bottled Water Delivery",
+    tag: "Most popular",
     description:
-      "Enjoy fresh, purified drinking water delivered directly to your doorstep. Our reliable service makes staying hydrated simple and convenient.",
-    image:
-      Card1,
+      "Fresh pH 8.5+ alkaline drinking water delivered to your doorstep in sealed, hygienic jars and bottles. Simple, reliable and always on time.",
+    image: Card1,
     icon: "drop",
   },
   {
     id: 2,
     title: "Water Dispenser Solutions",
+    tag: "Home & office",
     description:
-      "Discover convenient water dispenser solutions for homes and offices, designed to make accessing clean drinking water easier every day.",
-    image:
-      Card2,
+      "Convenient dispenser solutions for homes and offices, designed to make clean drinking water easy to reach every single day.",
+    image: Card2,
     icon: "drop",
   },
   {
     id: 3,
     title: "Fast Home Delivery",
+    tag: "Free delivery",
     description:
-      "Get your drinking water when you need it. Our delivery team focuses on dependable service, convenient scheduling, and timely arrivals.",
-    image:
-      Card3,
+      "Get your water exactly when you need it. Our delivery team focuses on dependable service, flexible scheduling and timely arrivals.",
+    image: Card3,
     icon: "truck",
   },
   {
     id: 4,
     title: "Water Quality Testing",
+    tag: "Safe & tested",
     description:
-      "Water quality matters. Explore our water quality testing service to learn more about water safety and the importance of regular checks.",
-    image:
-      Card4,
+      "Water quality matters. Learn about our testing service and why regular checks are important for safe, healthy drinking water.",
+    image: Card4,
     icon: "shield",
   },
   {
     id: 5,
     title: "Water Purification",
+    tag: "Cleaner taste",
     description:
-      "Discover purification solutions designed to help improve drinking water quality and support cleaner, better-tasting water for everyday use.",
-    image:
-      Card5,
+      "Purification solutions that help improve drinking water quality and support cleaner, better-tasting water for everyday use.",
+    image: Card5,
     icon: "check",
   },
   {
     id: 6,
     title: "Bottle Refill Service",
+    tag: "Eco friendly",
     description:
-      "Choose a convenient bottle refill service that helps reduce single-use plastic waste while keeping your drinking water supply replenished.",
-    image:
-      Card6,
+      "A convenient refill service that reduces single-use plastic waste while keeping your Alka Drops supply topped up.",
+    image: Card6,
     icon: "refresh",
   },
+];
+
+const highlights = [
+  { id: 1, icon: "drop", label: "pH 8.5+ alkaline" },
+  { id: 2, icon: "shield", label: "Sealed & hygienic" },
+  { id: 3, icon: "truck", label: "Free home delivery" },
 ];
 
 function ServiceIcon({ type, className = "" }) {
@@ -131,7 +137,7 @@ export default function Servicewhychooseus() {
   useEffect(() => {
     const section = sectionRef.current;
 
-    if (!section) return;
+    if (!section) return undefined;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -153,29 +159,40 @@ export default function Servicewhychooseus() {
       className={`service-why-section ${visible ? "service-why-visible" : ""}`}
       ref={sectionRef}
     >
+      <span className="service-why-bg service-why-bg-left" aria-hidden="true"></span>
+      <span className="service-why-bg service-why-bg-right" aria-hidden="true"></span>
+
+      {/* ================= HEADER ================= */}
       <div className="service-why-header">
         <div className="service-why-eyebrow">
           <ServiceIcon type="drop" />
-          <span>OUR WATER SERVICES</span>
+          <span>Alka Drops Services</span>
         </div>
 
         <h2 className="service-why-heading">
-          Pure Water, <span>Better Living</span>
+          Pure Alkaline Water,
+          <span> Better Living</span>
         </h2>
 
         <p className="service-why-subtitle">
-          Discover reliable water solutions designed to bring freshness,
+          From doorstep delivery to dispensers and refills, Alka Drops brings
           <br className="service-why-desktop-break" />
-          convenience, and quality to your everyday life.
+          freshness, convenience and quality to your everyday life.
         </p>
 
-        <div className="service-why-divider">
-          <span></span>
-          <ServiceIcon type="drop" />
-          <span></span>
-        </div>
+        <ul className="service-why-highlights">
+          {highlights.map((item) => (
+            <li key={item.id}>
+              <span>
+                <ServiceIcon type={item.icon} />
+              </span>
+              {item.label}
+            </li>
+          ))}
+        </ul>
       </div>
 
+      {/* ================= CARDS ================= */}
       <div className="service-why-grid">
         {services.map((service, index) => (
           <article
@@ -191,29 +208,25 @@ export default function Servicewhychooseus() {
                 loading="lazy"
               />
 
+              <span className="service-why-tag">{service.tag}</span>
+
               <div className="service-why-image-icon">
                 <ServiceIcon type={service.icon} />
               </div>
             </div>
 
             <div className="service-why-card-content">
-              <div className="service-why-card-heading">
-                <div className="service-why-small-icon">
-                  <ServiceIcon type={service.icon} />
-                </div>
+              <h3>{service.title}</h3>
 
-                <h3>{service.title}</h3>
-              </div>
-
-              <p className="service-why-description">
-                {service.description}
-              </p>
+              <p className="service-why-description">{service.description}</p>
 
               <a className="service-why-read-more" href="/about">
-                Read More
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
+                <span>Read More</span>
+                <i>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </i>
               </a>
 
               <div className="service-why-watermark" aria-hidden="true">
@@ -224,7 +237,34 @@ export default function Servicewhychooseus() {
         ))}
       </div>
 
+      {/* ================= CTA BAND ================= */}
+      <div className="service-why-cta">
+        <span className="service-why-cta-glow" aria-hidden="true"></span>
 
+        <div className="service-why-cta-badge" aria-hidden="true">
+          <small>pH</small>
+          <strong>8.5+</strong>
+        </div>
+
+        <div className="service-why-cta-text">
+          <h3>Ready for fresh Alka Drops at your door?</h3>
+          <p>
+            Order today and enjoy pure alkaline water with free home delivery.
+          </p>
+        </div>
+
+        <div className="service-why-cta-actions">
+          <a className="service-why-cta-primary" href="/shop">
+            Shop Now
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
+          <a className="service-why-cta-secondary" href="/contact">
+            Contact Us
+          </a>
+        </div>
+      </div>
     </section>
   );
 }

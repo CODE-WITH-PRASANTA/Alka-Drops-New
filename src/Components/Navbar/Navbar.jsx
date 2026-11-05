@@ -21,7 +21,6 @@ const NAV_LINKS = [
   { to: "/faq", label: "FAQs" },
   { to: "/team", label: "Our Team" },
   { to: "/gallery", label: "Gallery" },
-  { to: "/testimonials", label: "Testimonials" },
   { to: "/contact", label: "Contact" },
 ];
 

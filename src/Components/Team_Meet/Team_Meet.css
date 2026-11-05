@@ -1,252 +1,815 @@
-/* =====================================
-   TEAM MEET SECTION
-===================================== */
+
 
 .team-meet-section {
+  --team-navy: #0a1a6b;
+  --team-blue: #0b5fc4;
+  --team-blue-light: #1e88e5;
+  --team-blue-dark: #07409a;
+  --team-yellow: #f9b800;
+  --team-yellow-dark: #f59e0b;
+  --team-text: #4a5a78;
+  --team-muted: #71809a;
+  --team-border: #e3ecf8;
+  --team-white: #ffffff;
+
+  position: relative;
+  isolation: isolate;
   width: 100%;
-  padding: 55px 25px 60px;
-  background: #ffffff;
+  padding: 90px 25px 75px;
+  overflow: hidden;
   box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
+
+  background:
+    radial-gradient(
+      circle at 90% 8%,
+      rgba(30, 136, 229, 0.09),
+      transparent 28%
+    ),
+    linear-gradient(
+      180deg,
+      #f3f8ff 0%,
+      #ffffff 55%,
+      #f6faff 100%
+    );
+
+  font-family: "Poppins", "Segoe UI", Arial, Helvetica, sans-serif;
 }
 
+.team-meet-section *,
+.team-meet-section *::before,
+.team-meet-section *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   BACKGROUND DECORATIONS
+========================================= */
+
+.team-meet-dots {
+  position: absolute;
+  z-index: -1;
+  top: 35px;
+  left: 35px;
+  width: 230px;
+  height: 150px;
+
+  background-image: radial-gradient(
+    var(--team-blue-light) 1.5px,
+    transparent 1.5px
+  );
+
+  background-size: 22px 22px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.team-meet-glow {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(75px);
+  pointer-events: none;
+}
+
+.team-meet-glow-1 {
+  top: -100px;
+  right: -80px;
+  width: 320px;
+  height: 320px;
+  background: rgba(30, 136, 229, 0.16);
+}
+
+.team-meet-glow-2 {
+  bottom: -100px;
+  left: -70px;
+  width: 300px;
+  height: 300px;
+  background: rgba(249, 184, 0, 0.14);
+}
+
+/* =========================================
+   MAIN CONTAINER
+========================================= */
+
 .team-meet-container {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 1170px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
-/* =====================================
-   HEADING
-===================================== */
+/* =========================================
+   SECTION HEADING
+========================================= */
 
 .team-meet-heading {
+  max-width: 760px;
+  margin: 0 auto 58px;
   text-align: center;
-  margin-bottom: 27px;
+  animation: teamMeetFadeUp 0.7s ease both;
 }
 
-.team-meet-heading span {
-  display: block;
-  color: #087dc1;
-  font-size: 9px;
-  font-weight: 700;
-  margin-bottom: 13px;
+.team-meet-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+
+  margin-bottom: 23px;
+  padding: 10px 20px;
+
+  color: var(--team-blue);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--team-border);
+  border-radius: 50px;
+
+  box-shadow: 0 6px 22px rgba(11, 95, 196, 0.08);
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+}
+
+.team-meet-badge-dot {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+
+  background: linear-gradient(
+    135deg,
+    #ffd75e,
+    var(--team-yellow-dark)
+  );
+
+  border-radius: 50%;
+
+  box-shadow: 0 0 0 4px rgba(249, 184, 0, 0.18);
 }
 
 .team-meet-heading h2 {
-  font-size: 23px;
-  line-height: 1.3;
-  font-weight: 700;
-  color: #080808;
-  margin: 0;
+  margin: 0 0 20px;
+
+  color: var(--team-navy);
+
+  font-size: clamp(34px, 4.2vw, 52px);
+  font-weight: 800;
+  line-height: 1.16;
+  letter-spacing: -1.7px;
 }
 
-/* =====================================
+.team-meet-heading h2 em {
+  display: inline-block;
+  margin-top: 5px;
+
+  color: var(--team-blue);
+  font-style: normal;
+
+  background: linear-gradient(
+    90deg,
+    var(--team-blue-dark),
+    var(--team-blue-light)
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.team-meet-heading > p {
+  max-width: 690px;
+  margin: 0 auto;
+
+  color: var(--team-text);
+
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.9;
+}
+
+/* =========================================
    TEAM GRID
-===================================== */
+========================================= */
 
 .team-meet-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  column-gap: 15px;
-  row-gap: 30px;
+  gap: 26px;
+
   width: 100%;
 }
 
-/* =====================================
+/* =========================================
    TEAM CARD
-===================================== */
+========================================= */
 
 .team-meet-card {
-  width: 100%;
+  position: relative;
   min-width: 0;
+  padding: 32px 18px 25px;
+  overflow: hidden;
+
   text-align: center;
-  padding: 0 5px 12px;
-  box-sizing: border-box;
+
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--team-border);
+  border-radius: 24px;
+
+  box-shadow: 0 10px 32px rgba(10, 26, 107, 0.055);
+
+  animation: teamMeetFadeUp 0.65s ease both;
+  animation-delay: calc(var(--card-index, 0) * 70ms);
 
   transition:
-    transform 0.35s ease,
-    box-shadow 0.35s ease;
-
-  border-radius: 8px;
+    transform 0.4s ease,
+    box-shadow 0.4s ease,
+    border-color 0.4s ease;
 }
 
-/* Hover popup effect */
+/* Bottom gradient accent */
+
+.team-meet-card::after {
+  content: "";
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  background: linear-gradient(
+    90deg,
+    var(--team-blue-dark),
+    var(--team-blue-light),
+    var(--team-yellow)
+  );
+
+  transform: scaleX(0);
+  transform-origin: left;
+
+  transition: transform 0.4s ease;
+}
 
 .team-meet-card:hover {
-  transform: translateY(-9px) scale(1.025);
+  transform: translateY(-9px);
+
+  border-color: rgba(30, 136, 229, 0.35);
+
+  box-shadow: 0 22px 45px rgba(11, 95, 196, 0.14);
 }
 
-/* =====================================
-   TEAM IMAGE
-===================================== */
+.team-meet-card:hover::after {
+  transform: scaleX(1);
+}
+
+/* =========================================
+   PROFILE IMAGE
+========================================= */
 
 .team-meet-image-wrapper {
+  position: relative;
+
+  width: 145px;
+  height: 145px;
+
+  margin: 0 auto 23px;
+}
+
+.team-meet-image-ring {
   width: 100%;
-  max-width: 135px;
-  aspect-ratio: 1 / 1;
-  margin: 0 auto 18px;
-  overflow: hidden;
+  height: 100%;
+  padding: 5px;
+
   border-radius: 50%;
-  background: #eeeeee;
+
+  background: linear-gradient(
+    135deg,
+    var(--team-blue-dark),
+    var(--team-blue-light) 60%,
+    var(--team-yellow)
+  );
+
+  box-shadow: 0 12px 28px rgba(11, 95, 196, 0.22);
+
+  transition:
+    transform 0.45s ease,
+    box-shadow 0.45s ease;
 }
 
 .team-meet-image {
   display: block;
+
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center;
 
-  transition:
-    transform 0.45s ease,
-    filter 0.45s ease;
+  object-fit: cover;
+  object-position: center top;
+
+  border: 4px solid #ffffff;
+  border-radius: 50%;
+
+  background: #eef4fc;
+
+  transition: transform 0.45s ease;
+}
+
+.team-meet-card:hover .team-meet-image-ring {
+  transform: rotate(5deg);
+  box-shadow: 0 16px 32px rgba(11, 95, 196, 0.3);
 }
 
 .team-meet-card:hover .team-meet-image {
-  transform: scale(1.1);
+  transform: rotate(-5deg) scale(1.04);
 }
 
-/* =====================================
-   TEAM INFORMATION
-===================================== */
+/* =========================================
+   WATER DROP BADGE
+========================================= */
+
+.team-meet-drop {
+  position: absolute;
+  right: 3px;
+  bottom: 5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  color: var(--team-navy);
+
+  background: linear-gradient(
+    135deg,
+    #ffe17c,
+    var(--team-yellow-dark)
+  );
+
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+
+  box-shadow: 0 7px 17px rgba(245, 158, 11, 0.3);
+
+  transition: transform 0.35s ease;
+}
+
+.team-meet-card:hover .team-meet-drop {
+  transform: translateY(-3px) rotate(-8deg);
+}
+
+/* =========================================
+   TEAM MEMBER INFORMATION
+========================================= */
 
 .team-meet-info {
-  text-align: center;
+  min-height: 77px;
 }
 
 .team-meet-info h3 {
-  font-size: 11px;
-  font-weight: 700;
-  color: #080808;
-  margin: 0 0 8px;
+  margin: 0 0 12px;
+
+  color: var(--team-navy);
+
+  font-size: 19px;
+  font-weight: 750;
   line-height: 1.4;
+
+  overflow-wrap: anywhere;
+
+  transition: color 0.3s ease;
+}
+
+.team-meet-card:hover .team-meet-info h3 {
+  color: var(--team-blue);
 }
 
 .team-meet-info p {
-  font-size: 9px;
-  font-weight: 400;
-  color: #40547d;
+  display: inline-block;
+
+  max-width: 100%;
   margin: 0;
+  padding: 7px 13px;
+
+  color: var(--team-blue);
+
+  background: #edf5ff;
+  border: 1px solid #e3efff;
+  border-radius: 50px;
+
+  font-size: 11px;
+  font-weight: 650;
   line-height: 1.5;
+
+  overflow-wrap: anywhere;
 }
 
-/* =====================================
-   LARGE LAPTOP
-===================================== */
+/* =========================================
+   SOCIAL MEDIA ICONS
+========================================= */
+
+.team-meet-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  margin-top: 20px;
+
+  opacity: 0;
+  transform: translateY(10px);
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.team-meet-card:hover .team-meet-social,
+.team-meet-card:focus-within .team-meet-social {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.team-meet-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 37px;
+  height: 37px;
+
+  color: #ffffff;
+
+  background: linear-gradient(
+    135deg,
+    var(--team-blue-dark),
+    var(--team-blue-light)
+  );
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  box-shadow: 0 6px 15px rgba(11, 95, 196, 0.2);
+
+  font-size: 14px;
+  text-decoration: none;
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.team-meet-social a:hover {
+  color: var(--team-navy);
+
+  background: linear-gradient(
+    135deg,
+    #ffe17c,
+    var(--team-yellow-dark)
+  );
+
+  box-shadow: 0 8px 18px rgba(245, 158, 11, 0.25);
+
+  transform: translateY(-4px);
+}
+
+.team-meet-social a:focus-visible {
+  outline: 3px solid var(--team-yellow);
+  outline-offset: 4px;
+}
+
+/* =========================================
+   BOTTOM MESSAGE
+========================================= */
+
+.team-meet-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+
+  max-width: 720px;
+  margin: 48px auto 0;
+  padding: 18px 24px;
+
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--team-border);
+  border-radius: 18px;
+
+  box-shadow: 0 8px 25px rgba(10, 26, 107, 0.045);
+}
+
+.team-meet-footer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 42px;
+  height: 42px;
+
+  color: #ffffff;
+
+  background: linear-gradient(
+    135deg,
+    var(--team-blue-dark),
+    var(--team-blue-light)
+  );
+
+  border-radius: 14px;
+}
+
+.team-meet-footer p {
+  margin: 0;
+
+  color: var(--team-text);
+
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.team-meet-footer strong {
+  color: var(--team-navy);
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes teamMeetFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   LARGE LAPTOPS
+========================================= */
 
 @media (max-width: 1100px) {
-  .team-meet-container {
-    max-width: 950px;
-  }
-
   .team-meet-grid {
-    column-gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
   }
 
-  .team-meet-image-wrapper {
-    max-width: 125px;
+  .team-meet-card {
+    padding-right: 16px;
+    padding-left: 16px;
   }
 }
 
-/* =====================================
-   TABLET
-===================================== */
+/* =========================================
+   TABLETS
+========================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 860px) {
   .team-meet-section {
-    padding: 45px 20px;
-  }
-
-  .team-meet-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 20px;
-    row-gap: 30px;
-  }
-
-  .team-meet-image-wrapper {
-    max-width: 145px;
-  }
-
-  .team-meet-heading h2 {
-    font-size: 22px;
-  }
-
-  .team-meet-info h3 {
-    font-size: 12px;
-  }
-
-  .team-meet-info p {
-    font-size: 10px;
-  }
-}
-
-/* =====================================
-   MOBILE
-===================================== */
-
-@media (max-width: 480px) {
-  .team-meet-section {
-    padding: 40px 12px;
+    padding: 70px 20px 65px;
   }
 
   .team-meet-heading {
-    margin-bottom: 25px;
-  }
-
-  .team-meet-heading h2 {
-    font-size: 21px;
+    margin-bottom: 43px;
   }
 
   .team-meet-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 10px;
-    row-gap: 25px;
+    gap: 20px;
   }
 
   .team-meet-image-wrapper {
-    max-width: 120px;
-    margin-bottom: 13px;
+    width: 130px;
+    height: 130px;
+  }
+
+  .team-meet-social {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .team-meet-footer {
+    margin-top: 38px;
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 560px) {
+  .team-meet-section {
+    padding: 55px 14px 50px;
+  }
+
+  .team-meet-dots {
+    top: 18px;
+    left: 12px;
+
+    width: 120px;
+    height: 90px;
+
+    background-size: 18px 18px;
+  }
+
+  .team-meet-glow-1 {
+    right: -150px;
+    width: 240px;
+    height: 240px;
+  }
+
+  .team-meet-glow-2 {
+    left: -150px;
+    width: 230px;
+    height: 230px;
+  }
+
+  .team-meet-heading {
+    margin-bottom: 34px;
+  }
+
+  .team-meet-badge {
+    gap: 9px;
+
+    margin-bottom: 19px;
+    padding: 9px 15px;
+
+    font-size: 10px;
+    letter-spacing: 1.3px;
+  }
+
+  .team-meet-badge-dot {
+    width: 9px;
+    height: 9px;
+  }
+
+  .team-meet-heading h2 {
+    margin-bottom: 15px;
+
+    font-size: clamp(28px, 7.2vw, 35px);
+    line-height: 1.2;
+    letter-spacing: -0.8px;
+  }
+
+  .team-meet-heading > p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .team-meet-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+  }
+
+  .team-meet-card {
+    padding: 23px 9px 18px;
+    border-radius: 18px;
+  }
+
+  .team-meet-image-wrapper {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 17px;
+  }
+
+  .team-meet-image-ring {
+    padding: 4px;
+  }
+
+  .team-meet-image {
+    border-width: 3px;
+  }
+
+  .team-meet-drop {
+    right: 0;
+    bottom: 0;
+
+    width: 29px;
+    height: 29px;
+
+    border-width: 2px;
+  }
+
+  .team-meet-drop svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .team-meet-info {
+    min-height: 72px;
   }
 
   .team-meet-info h3 {
+    margin-bottom: 9px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .team-meet-info p {
+    padding: 6px 8px;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .team-meet-social {
+    gap: 7px;
+    margin-top: 14px;
+
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .team-meet-social a {
+    width: 31px;
+    height: 31px;
+
+    border-radius: 9px;
+    font-size: 12px;
+  }
+
+  .team-meet-footer {
+    gap: 10px;
+
+    margin-top: 30px;
+    padding: 15px 13px;
+
+    border-radius: 15px;
+  }
+
+  .team-meet-footer-icon {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 11px;
+  }
+
+  .team-meet-footer p {
     font-size: 11px;
+    line-height: 1.7;
+  }
+}
+
+/* =========================================
+   VERY SMALL MOBILE
+========================================= */
+
+@media (max-width: 360px) {
+  .team-meet-section {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .team-meet-grid {
+    gap: 10px;
+  }
+
+  .team-meet-card {
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+
+  .team-meet-image-wrapper {
+    width: 88px;
+    height: 88px;
+  }
+
+  .team-meet-info h3 {
+    font-size: 13px;
   }
 
   .team-meet-info p {
     font-size: 9px;
   }
 
-  .team-meet-card:hover {
-    transform: translateY(-5px) scale(1.015);
+  .team-meet-social {
+    gap: 5px;
+  }
+
+  .team-meet-social a {
+    width: 29px;
+    height: 29px;
   }
 }
 
-/* =====================================
-   SMALL MOBILE
-===================================== */
-
-@media (max-width: 340px) {
-  .team-meet-image-wrapper {
-    max-width: 100px;
-  }
-
-  .team-meet-grid {
-    column-gap: 5px;
-  }
-
-  .team-meet-info h3 {
-    font-size: 10px;
-  }
-}
-
-/* =====================================
-   REDUCED MOTION
-===================================== */
+/* =========================================
+   REDUCED MOTION ACCESSIBILITY
+========================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .team-meet-card,
-  .team-meet-image {
-    transition: none;
+  .team-meet-section *,
+  .team-meet-section *::before,
+  .team-meet-section *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

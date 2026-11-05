@@ -1,15 +1,12 @@
-import React from 'react'
-import Contactform from '../../Components/Contactform/Contactform'
-import BreadCrumb from "../../Components/BreadCrumb/BreadCrumb"
-import ContactBreadcrumb from '../../Components/ContactBreadcrumb/ContactBreadcrumb'
+import React from "react";
+import ContactMain from "../../Components/ContactMain/ContactMain";
 
 const Contact = () => {
   return (
     <div>
-      <ContactBreadcrumb />
-      <Contactform />
+      <ContactMain/>
     </div>
-  )
-}
+  );
+};
 
-export default Contact
+export default Contact;

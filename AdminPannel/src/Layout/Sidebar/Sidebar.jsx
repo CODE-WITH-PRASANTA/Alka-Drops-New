@@ -19,6 +19,10 @@ import {
   FileText,
   ClipboardList,
   Droplets,
+  Store,
+  Boxes,
+  PackageCheck,
+  Tag,
 } from "lucide-react";
 
 import { NavLink, useLocation } from "react-router-dom";
@@ -35,6 +39,27 @@ const menuItems = [
         title: "Blog Management",
         path: "/admin/blog-management",
         icon: ClipboardList,
+      },
+      {
+        title: "Add Category",
+        path: "/admin/blog-category",
+        icon: Tag,
+      },
+    ],
+  },
+  {
+    title: "Shop",
+    icon: Store,
+    children: [
+      {
+        title: "Manage",
+        path: "/admin/shop/manage",
+        icon: PackageCheck,
+      },
+      {
+        title: "Add Stock",
+        path: "/admin/shop/add-stock",
+        icon: Boxes,
       },
     ],
   },
@@ -104,12 +129,16 @@ const Sidebar = ({
   const [openDropdown, setOpenDropdown] = useState(null);
 
   // Open the dropdown whose child matches the current URL.
+  // Automatically keep dropdown open if current path matches any child
   useEffect(() => {
     const activeParent = menuItems.find((item) =>
       item.children?.some((child) => child.path === location.pathname)
     );
 
     setOpenDropdown(activeParent?.title || null);
+    if (activeParent) {
+      setOpenDropdown(activeParent.title);
+    }
   }, [location.pathname]);
 
   const handleDropdown = (title) => {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 
 import {
@@ -29,6 +30,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import "./Topbar.css";
 
+/* =========================================
+   ROUTE TITLES
+========================================= */
+
 const routeTitles = {
   "/admin/dashboard": "Dashboard",
 
@@ -54,6 +59,10 @@ const routeTitles = {
   "/admin/review-management": "Review Management",
 };
 
+/* =========================================
+   ROUTE ICONS
+========================================= */
+
 const routeIcons = {
   "/admin/dashboard": LayoutDashboard,
 
@@ -68,7 +77,7 @@ const routeIcons = {
   "/admin/order-management": ShoppingCart,
   "/admin/subscription-orders": CalendarDays,
 
-  "/admin/user-management": UserRound,
+  "/admin/user-management": Users,
 
   "/admin/delivery-boy-id": Truck,
   "/admin/assigning-bottle": ClipboardList,
@@ -79,32 +88,59 @@ const routeIcons = {
   "/admin/review-management": Star,
 };
 
-// Parent group shown in the breadcrumb for dropdown children.
+/* =========================================
+   BREADCRUMB PARENT ROUTES
+========================================= */
+
 const routeParents = {
   "/admin/blog-post": "Blog Management",
   "/admin/blog-management": "Blog Management",
+
   "/admin/delivery-boy-id": "Delivery Boy Management",
   "/admin/assigning-bottle": "Delivery Boy Management",
 };
 
-// Fallback title for routes that are not listed above.
-const prettify = (pathname) =>
-  pathname
-    .split("/")
-    .filter(Boolean)
-    .pop()
-    ?.replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase()) || "Dashboard";
+/* =========================================
+   FALLBACK ROUTE TITLE
+========================================= */
+
+const prettify = (pathname) => {
+  return (
+    pathname
+      .split("/")
+      .filter(Boolean)
+      .pop()
+      ?.replace(/-/g, " ")
+      .replace(/\b\w/g, (character) => character.toUpperCase()) ||
+    "Dashboard"
+  );
+};
+
+/* =========================================
+   TOPBAR COMPONENT
+========================================= */
 
 const Topbar = ({ toggleSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  /* =========================================
+     SEARCH STATE
+  ========================================= */
+
   const [searchValue, setSearchValue] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
 
+  /* =========================================
+     DROPDOWN STATES
+  ========================================= */
+
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
+  /* =========================================
+     NOTIFICATIONS
+  ========================================= */
 
   const [notifications, setNotifications] = useState([
     {
@@ -114,6 +150,7 @@ const Topbar = ({ toggleSidebar }) => {
       time: "Recently",
       unread: true,
     },
+
     {
       id: 2,
       title: "Dashboard updated",
@@ -123,9 +160,17 @@ const Topbar = ({ toggleSidebar }) => {
     },
   ]);
 
+  /* =========================================
+     REFS
+  ========================================= */
+
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
   const searchRef = useRef(null);
+
+  /* =========================================
+     CURRENT ROUTE INFORMATION
+  ========================================= */
 
   const currentTitle =
     routeTitles[location.pathname] || prettify(location.pathname);
@@ -134,11 +179,33 @@ const Topbar = ({ toggleSidebar }) => {
 
   const CurrentIcon = routeIcons[location.pathname] || LayoutDashboard;
 
+  /* =========================================
+     UNREAD NOTIFICATION COUNT
+  ========================================= */
+
   const unreadCount = notifications.filter(
     (notification) => notification.unread
   ).length;
 
-  // Close dropdowns when clicking outside.
+  /* =========================================
+     SEARCHABLE ADMIN PAGES
+  ========================================= */
+
+  const searchablePages = Object.entries(routeTitles).map(
+    ([path, title]) => ({
+      path,
+      title,
+    })
+  );
+
+  const filteredPages = searchablePages.filter((page) =>
+    page.title.toLowerCase().includes(searchValue.trim().toLowerCase())
+  );
+
+  /* =========================================
+     CLOSE DROPDOWNS WHEN CLICKING OUTSIDE
+  ========================================= */
+
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (
@@ -148,11 +215,17 @@ const Topbar = ({ toggleSidebar }) => {
         setNotificationOpen(false);
       }
 
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target)
+      ) {
         setProfileOpen(false);
       }
 
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target)
+      ) {
         setSearchOpen(false);
       }
     };
@@ -164,27 +237,29 @@ const Topbar = ({ toggleSidebar }) => {
     };
   }, []);
 
-  // Close dropdowns when changing pages.
+  /* =========================================
+     CLOSE DROPDOWNS WHEN ROUTE CHANGES
+  ========================================= */
+
   useEffect(() => {
     setNotificationOpen(false);
     setProfileOpen(false);
     setSearchOpen(false);
   }, [location.pathname]);
 
-  // Search current admin pages.
-  const searchablePages = Object.entries(routeTitles).map(([path, title]) => ({
-    path,
-    title,
-  }));
-
-  const filteredPages = searchablePages.filter((page) =>
-    page.title.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  /* =========================================
+     SEARCH CHANGE
+  ========================================= */
 
   const handleSearchChange = (value) => {
     setSearchValue(value);
+
     setSearchOpen(value.trim().length > 0);
   };
+
+  /* =========================================
+     SEARCH NAVIGATION
+  ========================================= */
 
   const handleSearchNavigate = (path) => {
     navigate(path);
@@ -192,6 +267,19 @@ const Topbar = ({ toggleSidebar }) => {
     setSearchValue("");
     setSearchOpen(false);
   };
+
+  /* =========================================
+     CLEAR SEARCH
+  ========================================= */
+
+  const handleClearSearch = () => {
+    setSearchValue("");
+    setSearchOpen(false);
+  };
+
+  /* =========================================
+     MARK ALL NOTIFICATIONS READ
+  ========================================= */
 
   const markAllRead = () => {
     setNotifications((previous) =>
@@ -202,29 +290,74 @@ const Topbar = ({ toggleSidebar }) => {
     );
   };
 
+  /* =========================================
+     MARK INDIVIDUAL NOTIFICATION READ
+  ========================================= */
+
   const handleNotificationClick = (id) => {
     setNotifications((previous) =>
       previous.map((notification) =>
-        notification.id === id ? { ...notification, unread: false } : notification
+        notification.id === id
+          ? {
+              ...notification,
+              unread: false,
+            }
+          : notification
       )
     );
   };
 
+  /* =========================================
+     LOGOUT
+  ========================================= */
+
   const handleLogout = () => {
     setProfileOpen(false);
 
-    // Connect your actual logout logic here.
+    // Add your actual authentication logout logic here.
     // Example:
     // localStorage.removeItem("token");
 
     navigate("/login");
   };
 
+  /* =========================================
+     TOGGLE NOTIFICATIONS
+  ========================================= */
+
+  const handleNotificationToggle = () => {
+    setNotificationOpen((previous) => !previous);
+
+    setProfileOpen(false);
+    setSearchOpen(false);
+  };
+
+  /* =========================================
+     TOGGLE PROFILE
+  ========================================= */
+
+  const handleProfileToggle = () => {
+    setProfileOpen((previous) => !previous);
+
+    setNotificationOpen(false);
+    setSearchOpen(false);
+  };
+
+  /* =========================================
+     TOPBAR JSX
+  ========================================= */
+
   return (
     <header className="alka-topbar">
-      {/* LEFT SECTION */}
+
+      {/* =====================================
+          LEFT SECTION
+      ===================================== */}
+
       <div className="alka-topbar-left">
-        {/* Sidebar toggle (flush with the sidebar edge) */}
+
+        {/* SIDEBAR TOGGLE */}
+
         <button
           type="button"
           className="alka-topbar-toggle"
@@ -235,47 +368,85 @@ const Topbar = ({ toggleSidebar }) => {
           <Menu size={21} strokeWidth={2} />
         </button>
 
-        {/* Breadcrumb: Home / Parent / Current page */}
+        {/* BREADCRUMB */}
+
         <div className="alka-breadcrumb">
-          <Link to="/admin/dashboard" className="alka-breadcrumb-home">
+
+          {/* HOME */}
+
+          <Link
+            to="/admin/dashboard"
+            className="alka-breadcrumb-home"
+          >
             Home
           </Link>
 
-          <span className="alka-breadcrumb-separator">/</span>
+          <span className="alka-breadcrumb-separator">
+            /
+          </span>
+
+          {/* PARENT */}
 
           {parentTitle && (
             <>
-              <span className="alka-breadcrumb-parent">{parentTitle}</span>
-              <span className="alka-breadcrumb-separator">/</span>
+              <span className="alka-breadcrumb-parent">
+                {parentTitle}
+              </span>
+
+              <span className="alka-breadcrumb-separator">
+                /
+              </span>
             </>
           )}
 
+          {/* CURRENT PAGE */}
+
           <div className="alka-breadcrumb-current">
+
             <span className="alka-breadcrumb-icon">
               <CurrentIcon size={16} />
             </span>
 
             <span>{currentTitle}</span>
+
           </div>
+
         </div>
+
       </div>
 
-      {/* RIGHT SECTION */}
+      {/* =====================================
+          RIGHT SECTION
+      ===================================== */}
+
       <div className="alka-topbar-right">
-        {/* Search */}
+
+        {/* ===================================
+            SEARCH
+        =================================== */}
+
         <div
           className={`alka-search-wrapper ${
             searchOpen ? "alka-search-active" : ""
           }`}
           ref={searchRef}
         >
+
+          {/* SEARCH BOX */}
+
           <div className="alka-search-box">
-            <Search size={18} className="alka-search-icon" />
+
+            <Search
+              size={18}
+              className="alka-search-icon"
+            />
 
             <input
               type="text"
               value={searchValue}
-              onChange={(event) => handleSearchChange(event.target.value)}
+              onChange={(event) =>
+                handleSearchChange(event.target.value)
+              }
               onFocus={() => {
                 if (searchValue.trim()) {
                   setSearchOpen(true);
@@ -285,75 +456,118 @@ const Topbar = ({ toggleSidebar }) => {
               aria-label="Search admin pages"
             />
 
+            {/* CLEAR SEARCH */}
+
             {searchValue && (
               <button
                 type="button"
                 className="alka-search-clear"
-                onClick={() => {
-                  setSearchValue("");
-                  setSearchOpen(false);
-                }}
+                onClick={handleClearSearch}
                 aria-label="Clear search"
               >
                 <X size={15} />
               </button>
             )}
+
           </div>
+
+          {/* SEARCH RESULTS */}
 
           {searchOpen && (
             <div className="alka-search-dropdown">
-              <div className="alka-dropdown-heading">SEARCH RESULTS</div>
+
+              <div className="alka-dropdown-heading">
+                SEARCH RESULTS
+              </div>
 
               {filteredPages.length > 0 ? (
+
                 filteredPages.map((page) => {
-                  const PageIcon = routeIcons[page.path] || LayoutDashboard;
+
+                  const PageIcon =
+                    routeIcons[page.path] || LayoutDashboard;
 
                   return (
                     <button
                       key={page.path}
                       type="button"
                       className="alka-search-result"
-                      onClick={() => handleSearchNavigate(page.path)}
+                      onClick={() =>
+                        handleSearchNavigate(page.path)
+                      }
                     >
+
                       <span className="alka-search-result-icon">
                         <PageIcon size={17} />
                       </span>
 
                       <span>{page.title}</span>
+
                     </button>
                   );
+
                 })
+
               ) : (
-                <div className="alka-search-empty">No pages found</div>
+
+                <div className="alka-search-empty">
+                  No pages found
+                </div>
+
               )}
+
             </div>
           )}
+
         </div>
 
-        {/* Notifications */}
-        <div className="alka-topbar-dropdown-wrapper" ref={notificationRef}>
+        {/* ===================================
+            NOTIFICATIONS
+        =================================== */}
+
+        <div
+          className="alka-topbar-dropdown-wrapper"
+          ref={notificationRef}
+        >
+
+          {/* NOTIFICATION BUTTON */}
+
           <button
             type="button"
             className={`alka-topbar-icon-button ${
-              notificationOpen ? "alka-topbar-button-active" : ""
+              notificationOpen
+                ? "alka-topbar-button-active"
+                : ""
             }`}
-            onClick={() => setNotificationOpen((previous) => !previous)}
+            onClick={handleNotificationToggle}
             aria-label="Notifications"
             aria-expanded={notificationOpen}
           >
+
             <Bell size={19} strokeWidth={1.9} />
+
+            {/* UNREAD BADGE */}
 
             {unreadCount > 0 && (
               <span className="alka-notification-badge">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
+
           </button>
 
+          {/* NOTIFICATION DROPDOWN */}
+
           {notificationOpen && (
+
             <div className="alka-notification-dropdown">
+
+              {/* HEADER */}
+
               <div className="alka-notification-header">
+
                 <div>
+
                   <h3>Notifications</h3>
 
                   <span>
@@ -361,128 +575,227 @@ const Topbar = ({ toggleSidebar }) => {
                       ? `${unreadCount} unread notifications`
                       : "You're all caught up"}
                   </span>
+
                 </div>
+
+                {/* MARK ALL READ */}
 
                 <button
                   type="button"
                   className="alka-mark-read"
                   onClick={markAllRead}
+                  disabled={unreadCount === 0}
                 >
                   Mark all read
                 </button>
+
               </div>
 
+              {/* NOTIFICATION LIST */}
+
               <div className="alka-notification-list">
+
                 {notifications.length > 0 ? (
+
                   notifications.map((notification) => (
+
                     <button
                       key={notification.id}
                       type="button"
                       className={`alka-notification-item ${
-                        notification.unread ? "alka-notification-unread" : ""
+                        notification.unread
+                          ? "alka-notification-unread"
+                          : ""
                       }`}
-                      onClick={() => handleNotificationClick(notification.id)}
+                      onClick={() =>
+                        handleNotificationClick(notification.id)
+                      }
                     >
+
+                      {/* ICON */}
+
                       <span className="alka-notification-icon">
                         <Bell size={17} />
                       </span>
 
+                      {/* CONTENT */}
+
                       <span className="alka-notification-content">
-                        <strong>{notification.title}</strong>
 
-                        <span>{notification.message}</span>
+                        <strong>
+                          {notification.title}
+                        </strong>
 
-                        <small>{notification.time}</small>
+                        <span>
+                          {notification.message}
+                        </span>
+
+                        <small>
+                          {notification.time}
+                        </small>
+
                       </span>
+
+                      {/* UNREAD DOT */}
 
                       {notification.unread && (
                         <span className="alka-unread-dot" />
                       )}
+
                     </button>
+
                   ))
+
                 ) : (
+
                   <div className="alka-notification-empty">
+
                     <Bell size={24} />
 
                     <span>No notifications</span>
+
                   </div>
+
                 )}
+
               </div>
+
+              {/* FOOTER */}
 
               <div className="alka-notification-footer">
+
                 <span>Alka Drops Admin</span>
+
               </div>
+
             </div>
+
           )}
+
         </div>
 
-        {/* Profile */}
-        <div className="alka-topbar-dropdown-wrapper" ref={profileRef}>
+        {/* ===================================
+            PROFILE
+        =================================== */}
+
+        <div
+          className="alka-topbar-dropdown-wrapper"
+          ref={profileRef}
+        >
+
+          {/* PROFILE BUTTON */}
+
           <button
             type="button"
             className={`alka-profile-button ${
               profileOpen ? "alka-profile-active" : ""
             }`}
-            onClick={() => setProfileOpen((previous) => !previous)}
+            onClick={handleProfileToggle}
             aria-expanded={profileOpen}
+            aria-label="Admin profile"
           >
+
+            {/* AVATAR */}
+
             <div className="alka-profile-avatar">
+
               <UserRound size={19} />
+
             </div>
+
+            {/* PROFILE INFO */}
 
             <div className="alka-profile-info">
-              <span className="alka-profile-name">Admin</span>
 
-              <span className="alka-profile-role">Administrator</span>
+              <span className="alka-profile-name">
+                Admin
+              </span>
+
+              <span className="alka-profile-role">
+                Administrator
+              </span>
+
             </div>
+
+            {/* CHEVRON */}
 
             <ChevronDown
               size={16}
               className={`alka-profile-chevron ${
-                profileOpen ? "alka-profile-chevron-open" : ""
+                profileOpen
+                  ? "alka-profile-chevron-open"
+                  : ""
               }`}
             />
+
           </button>
 
+          {/* PROFILE DROPDOWN */}
+
           {profileOpen && (
+
             <div className="alka-profile-dropdown">
+
+              {/* PROFILE HEADER */}
+
               <div className="alka-profile-dropdown-header">
+
                 <div className="alka-profile-avatar-large">
+
                   <UserRound size={23} />
+
                 </div>
 
                 <div className="alka-profile-dropdown-text">
+
                   <strong>Admin</strong>
 
                   <small>Administrator</small>
+
                 </div>
+
               </div>
 
+              {/* DIVIDER */}
+
               <div className="alka-profile-dropdown-divider" />
+
+              {/* SETTINGS */}
 
               <Link
                 to="/admin/settings"
                 className="alka-profile-dropdown-item"
                 onClick={() => setProfileOpen(false)}
               >
+
                 <Settings size={17} />
 
                 <span>Settings</span>
+
               </Link>
+
+              {/* LOGOUT */}
 
               <button
                 type="button"
                 className="alka-profile-dropdown-item alka-logout-item"
                 onClick={handleLogout}
               >
+
                 <LogOut size={17} />
 
                 <span>Logout</span>
+
               </button>
+
             </div>
+
           )}
+
         </div>
+
       </div>
+
     </header>
   );
 };

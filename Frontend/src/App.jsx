@@ -17,11 +17,10 @@ import Faq from "./Pages/Faq/Faq";
 import Cart from "./Pages/Cart/Cart";
 
 import Blog from "./Pages/Blog/Blog";
-import BlogCommentsSection from "./Components/BlogCommentsSection/BlogCommentsSection";
+import BlogDetails from "./Pages/BlogDetails/BlogDetails";
 import Team from "./Pages/Team/Team";
 import Gallary from "./Pages/Gallary/Gallary";
 import Service from "./Pages/Service/Service";
-import BlogDetails from "./Pages/BlogDetails/BlogDetails";
 import FloatingIcons from "./Components/FloatingIcons/FloatingIcons";
 import Login from "./Components/Login/Login";
 
@@ -39,18 +38,17 @@ const App = () => {
 
             {/* Services */}
             <Route path="/services" element={<Service />} />
-            <Route path="/service-details" element={<Service/>} />
+            <Route path="/service-details" element={<Service />} />
 
             {/* Contact */}
             <Route path="/contact" element={<Contact />} />
 
             {/* Blog */}
             <Route path="/blog" element={<Blog />} />
-            <Route path="/blog-detais" element={<BlogDetails/>} />
-            <Route
-              path="/blog-details"
-              element={<BlogCommentsSection />}
-            />
+            <Route path="/blog/:slug" element={<BlogDetails />} />
+            <Route path="/blog-details" element={<BlogDetails />} />
+            <Route path="/blog-details/:slug" element={<BlogDetails />} />
+            <Route path="/blog-detais" element={<BlogDetails />} />
 
             {/* Team and Gallery */}
             <Route path="/team" element={<Team />} />
@@ -64,13 +62,13 @@ const App = () => {
             <Route path="/pricing" element={<Subscription />} />
             <Route path="/faq" element={<Faq />} />
             <Route path="/cart" element={<Cart />} />
-            <Route path="/login" element={<Login/>} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </main>
 
         <Footer />
       </div>
-      <FloatingIcons/>
+      <FloatingIcons />
     </BrowserRouter>
   );
 };

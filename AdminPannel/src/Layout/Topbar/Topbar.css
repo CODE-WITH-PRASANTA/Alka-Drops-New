@@ -1,6 +1,8 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
 /* =========================================
    ALKA DROPS TOPBAR
    Compact • Responsive • Clean
@@ -796,6 +798,92 @@
   .alka-breadcrumb-current {
     max-width: 145px;
     font-size: 10px;
+  }
+
+  .alka-search-wrapper {
+    width: auto;
+  }
+
+  .alka-search-box {
+    width: 37px;
+    height: 37px;
+
+    justify-content: center;
+
+    padding: 0;
+  }
+
+  .alka-search-box input {
+    display: none;
+  }
+
+  .alka-search-wrapper:focus-within .alka-search-box {
+    position: absolute;
+
+    right: 0;
+
+    width: min(260px, 75vw);
+
+    justify-content: flex-start;
+
+    padding: 0 12px;
+
+    z-index: 10;
+  }
+
+  .alka-search-wrapper:focus-within .alka-search-box input {
+    display: block;
+  }
+
+  .alka-profile-info,
+  .alka-profile-chevron {
+    display: none;
+  }
+
+  .alka-profile-avatar {
+    width: 37px;
+    height: 37px;
+  }
+
+  .alka-notification-dropdown {
+    right: -45px;
+
+    width: min(330px, 88vw);
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 420px) {
+  .alka-topbar {
+    height: 60px;
+    min-height: 60px;
+
+    padding: 0 9px 0 0;
+  }
+
+  .alka-topbar-right {
+    gap: 5px;
+  }
+
+  .alka-topbar-toggle {
+    width: 44px;
+  }
+
+  .alka-topbar-icon-button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .alka-search-box {
+    width: 34px;
+    height: 34px;
+  }
+
+  .alka-breadcrumb-current {
+    max-width: 120px;
   }
 
   .alka-search-wrapper {

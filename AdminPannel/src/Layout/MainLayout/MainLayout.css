@@ -54,17 +54,6 @@
   box-sizing: border-box;
 }
 
-/* Page title */
-
-.MainLayout-content .page-title {
-  margin: 0 0 24px;
-  color: #193b38;
-  font-family: "Inter", sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.4;
-}
-
 /* Ensure page content uses same font */
 
 .MainLayout-content > * {

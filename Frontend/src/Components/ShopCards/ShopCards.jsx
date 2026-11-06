@@ -7,192 +7,21 @@ import {
   ChevronRight,
   ArrowUp,
   X,
-  Check,
   SlidersHorizontal,
   Star,
   Droplets,
   Truck,
   ShieldCheck,
+  Loader2,
+  RefreshCw,
+  ShoppingCart,
+  Plus,
+  Minus,
+  Check,
 } from "lucide-react";
-
+import API from "../../services/api";
+import { useShop } from "../../context/ShopContext";
 import "./ShopCards.css";
-
-/* ---------------------------------------------------------
-   PRODUCTS  (prices in INR – replace images with your own
-   Alka Drops product photos for the best result)
---------------------------------------------------------- */
-const productsData = [
-  {
-    id: 1,
-    name: "Alka Drops 20L Jar",
-    description: "pH 8.5+ alkaline water in a sealed, food-grade 20 litre jar.",
-    price: 70,
-    oldPrice: 85,
-    category: "Jars & Cans",
-    size: "20 L",
-    rating: 4.9,
-    reviews: 124,
-    badge: "Best Seller",
-    image:
-      "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 2,
-    name: "Family Pack – 5 Jars",
-    description: "Five sealed 20L jars delivered together for the whole family.",
-    price: 330,
-    oldPrice: 375,
-    category: "Jars & Cans",
-    size: "5 × 20 L",
-    rating: 4.8,
-    reviews: 98,
-    badge: "Save 12%",
-    image:
-      "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 3,
-    name: "Alka Drops 10L Can",
-    description: "Compact 10 litre can that fits easily in small kitchens.",
-    price: 45,
-    oldPrice: 55,
-    category: "Jars & Cans",
-    size: "10 L",
-    rating: 4.7,
-    reviews: 87,
-    badge: "",
-    image:
-      "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 4,
-    name: "Alka Drops 5L Bottle",
-    description: "Easy-to-carry 5 litre bottle for travel and daily use.",
-    price: 35,
-    oldPrice: 42,
-    category: "Bottles",
-    size: "5 L",
-    rating: 4.9,
-    reviews: 156,
-    badge: "New",
-    image:
-      "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 5,
-    name: "1L Bottle Case – 12 Pack",
-    description: "Twelve 1 litre alkaline bottles, ideal for offices and shops.",
-    price: 180,
-    oldPrice: 215,
-    category: "Bottles",
-    size: "12 × 1 L",
-    rating: 4.6,
-    reviews: 76,
-    badge: "",
-    image:
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 6,
-    name: "500ml Bottle Case – 24 Pack",
-    description: "Grab-and-go 500 ml bottles for meetings, events and trips.",
-    price: 230,
-    oldPrice: 270,
-    category: "Bottles",
-    size: "24 × 500 ml",
-    rating: 4.8,
-    reviews: 112,
-    badge: "Popular",
-    image:
-      "https://images.unsplash.com/photo-1564419320461-6870880221ad?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 7,
-    name: "Top-Load Water Dispenser",
-    description: "Hot and normal water dispenser that fits any 20L jar.",
-    price: 6499,
-    oldPrice: 7499,
-    category: "Accessories",
-    size: "Hot + Normal",
-    rating: 4.9,
-    reviews: 64,
-    badge: "Premium",
-    image:
-      "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 8,
-    name: "Manual Jar Pump",
-    description: "Hygienic hand pump that dispenses water straight from the jar.",
-    price: 299,
-    oldPrice: 399,
-    category: "Accessories",
-    size: "Fits 20 L",
-    rating: 4.7,
-    reviews: 91,
-    badge: "",
-    image:
-      "https://images.unsplash.com/photo-1608270586620-248524c67de9?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 9,
-    name: "250ml Event Pack – 48",
-    description: "Small 250 ml bottles perfect for weddings, parties and events.",
-    price: 360,
-    oldPrice: 420,
-    category: "Bottles",
-    size: "48 × 250 ml",
-    rating: 4.8,
-    reviews: 103,
-    badge: "Popular",
-    image:
-      "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 10,
-    name: "Jar Stand & Rack",
-    description: "Sturdy stand that keeps your jar stable, clean and off the floor.",
-    price: 549,
-    oldPrice: 649,
-    category: "Accessories",
-    size: "Fits 20 L",
-    rating: 4.5,
-    reviews: 53,
-    badge: "",
-    image:
-      "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 11,
-    name: "Alka Drops 2L Bottle – 6 Pack",
-    description: "Six 2 litre bottles for daily family hydration at home.",
-    price: 150,
-    oldPrice: 180,
-    category: "Bottles",
-    size: "6 × 2 L",
-    rating: 4.9,
-    reviews: 145,
-    badge: "Best Seller",
-    image:
-      "https://images.unsplash.com/photo-1564419320461-6870880221ad?w=900&auto=format&fit=crop&q=85",
-  },
-  {
-    id: 12,
-    name: "Steel Hydration Bottle",
-    description: "Insulated 1 litre steel bottle to carry your alkaline water.",
-    price: 449,
-    oldPrice: 599,
-    category: "Accessories",
-    size: "1 L",
-    rating: 4.8,
-    reviews: 78,
-    badge: "New",
-    image:
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=900&auto=format&fit=crop&q=85",
-  },
-];
-
-const categories = ["All Products", "Jars & Cans", "Bottles", "Accessories"];
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=900&auto=format&fit=crop&q=85";
@@ -202,25 +31,53 @@ const formatPrice = (price) =>
     style: "currency",
     currency: "INR",
     maximumFractionDigits: 0,
-  }).format(price);
+  }).format(price || 0);
 
-const discountPercent = (price, oldPrice) =>
-  Math.round(((oldPrice - price) / oldPrice) * 100);
+const discountPercent = (price, oldPrice) => {
+  if (!oldPrice || oldPrice <= price) return 0;
+  return Math.round(((oldPrice - price) / oldPrice) * 100);
+};
 
 const ShopCards = () => {
-  const [products] = useState(productsData);
+  const { addToCart, isInCart, toggleWishlist, isInWishlist } = useShop();
+
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All Products");
   const [sort, setSort] = useState("default");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [wishlist, setWishlist] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const [notification, setNotification] = useState("");
+  const [modalQty, setModalQty] = useState(1);
   const [showTop, setShowTop] = useState(false);
 
   const itemsPerPage = 6;
+
+  // Fetch products from database
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      setLoadError(null);
+      const res = await API.get("/products?limit=150");
+      if (res.data?.success && Array.isArray(res.data.products)) {
+        setProducts(res.data.products);
+      } else {
+        setProducts([]);
+      }
+    } catch (err) {
+      console.error("Error fetching shop products:", err);
+      setLoadError("Unable to load shop products from server.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   /* ---------- back to top visibility ---------- */
   useEffect(() => {
@@ -229,34 +86,41 @@ const ShopCards = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ---------- toast ---------- */
-  useEffect(() => {
-    if (!notification) return undefined;
-    const timer = window.setTimeout(() => setNotification(""), 2200);
-    return () => window.clearTimeout(timer);
-  }, [notification]);
-
-  const showMessage = (message) => setNotification(message);
+  /* ---------- dynamic categories from database products ---------- */
+  const categories = useMemo(() => {
+    const base = ["All Products", "Alkaline Water", "Jars & Cans", "Bottles", "Accessories"];
+    const fromProducts = products.map((p) => p.category).filter(Boolean);
+    return Array.from(new Set([...base, ...fromProducts]));
+  }, [products]);
 
   /* ---------- filter + sort ---------- */
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLowerCase();
 
     const result = products.filter((product) => {
+      const name = (product.name || product.title || "").toLowerCase();
+      const desc = (product.description || "").toLowerCase();
+      const cat = (product.category || "").toLowerCase();
+
       const matchesSearch =
-        product.name.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query);
+        !query || name.includes(query) || desc.includes(query) || cat.includes(query);
 
       const matchesCategory =
-        category === "All Products" || product.category === category;
+        category === "All Products" ||
+        cat === category.toLowerCase();
 
       return matchesSearch && matchesCategory;
     });
 
     if (sort === "low") result.sort((a, b) => a.price - b.price);
     else if (sort === "high") result.sort((a, b) => b.price - a.price);
-    else if (sort === "name") result.sort((a, b) => a.name.localeCompare(b.name));
-    else if (sort === "rating") result.sort((a, b) => b.rating - a.rating);
+    else if (sort === "name") {
+      result.sort((a, b) =>
+        (a.name || a.title || "").localeCompare(b.name || b.title || "")
+      );
+    } else if (sort === "rating") {
+      result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    }
 
     return result;
   }, [products, search, category, sort]);
@@ -288,19 +152,15 @@ const ShopCards = () => {
     setCurrentPage(1);
   };
 
-  /* ---------- wishlist ---------- */
-  const toggleWishlist = (product) => {
-    const exists = wishlist.includes(product.id);
-    setWishlist((previous) =>
-      exists ? previous.filter((id) => id !== product.id) : [...previous, product.id]
-    );
-    showMessage(exists ? "Removed from wishlist" : "Saved to wishlist");
-  };
-
   const handleImageError = (e) => {
     if (e.currentTarget.src !== FALLBACK_IMAGE) {
       e.currentTarget.src = FALLBACK_IMAGE;
     }
+  };
+
+  const openQuickView = (product) => {
+    setSelectedProduct(product);
+    setModalQty(1);
   };
 
   return (
@@ -325,7 +185,7 @@ const ShopCards = () => {
               <Search size={17} />
               <input
                 type="text"
-                placeholder="Search jars, bottles..."
+                placeholder="Search jars, bottles, alkaline..."
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
               />
@@ -374,96 +234,151 @@ const ShopCards = () => {
           </span>
         </div>
 
-        {/* ================= PRODUCT GRID ================= */}
-        {currentProducts.length > 0 ? (
+        {/* ================= LOADING & ERROR STATES ================= */}
+        {isLoading ? (
+          <div
+            style={{
+              padding: "90px 20px",
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "14px",
+              color: "#0a53c1",
+            }}
+          >
+            <Loader2 size={36} className="spin" style={{ animation: "spin 1s linear infinite" }} />
+            <h4 style={{ fontWeight: 600, fontSize: "17px" }}>Loading products from catalog...</h4>
+          </div>
+        ) : loadError ? (
+          <div className="ShopCards-empty">
+            <div className="ShopCards-emptyIcon">
+              <RefreshCw size={34} />
+            </div>
+            <h3>{loadError}</h3>
+            <p>Please check your connection and try again.</p>
+            <button onClick={fetchProducts}>Retry Loading</button>
+          </div>
+        ) : currentProducts.length > 0 ? (
+          /* ================= PRODUCT GRID ================= */
           <div className="ShopCards-grid">
-            {currentProducts.map((product) => (
-              <article className="ShopCards-card" key={product.id}>
-                <div className="ShopCards-imageWrapper">
-                  <img
-                    className="ShopCards-productImage"
-                    src={product.image}
-                    alt={product.name}
-                    loading="lazy"
-                    onError={handleImageError}
-                  />
+            {currentProducts.map((product) => {
+              const pId = String(product._id || product.id);
+              const pName = product.name || product.title;
+              const pImage = product.image || FALLBACK_IMAGE;
+              const pSize = product.size || product.liter || "1 Litre";
+              const pOldPrice =
+                product.oldPrice ||
+                (product.discount > 0
+                  ? Math.round(product.price / (1 - product.discount / 100))
+                  : 0);
+              const pDiscount =
+                product.discount || discountPercent(product.price, pOldPrice);
 
-                  {product.badge && (
-                    <span className="ShopCards-productBadge">{product.badge}</span>
-                  )}
+              const inWishlist = isInWishlist(pId);
+              const inCart = isInCart(pId);
 
-                  <span className="ShopCards-phChip">
-                    <Droplets size={12} /> pH 8.5+
-                  </span>
+              return (
+                <article className="ShopCards-card" key={pId}>
+                  <div className="ShopCards-imageWrapper">
+                    <img
+                      className="ShopCards-productImage"
+                      src={pImage}
+                      alt={pName}
+                      loading="lazy"
+                      onError={handleImageError}
+                    />
 
-                  <div className="ShopCards-quickActions">
-                    <button
-                      className={`ShopCards-iconButton ${
-                        wishlist.includes(product.id) ? "selected" : ""
-                      }`}
-                      onClick={() => toggleWishlist(product)}
-                      title="Add to wishlist"
-                      aria-label="Add to wishlist"
-                    >
-                      <Heart
-                        size={17}
-                        fill={wishlist.includes(product.id) ? "currentColor" : "none"}
-                      />
-                    </button>
+                    {product.badge && (
+                      <span className="ShopCards-productBadge">{product.badge}</span>
+                    )}
 
-                    <button
-                      className="ShopCards-iconButton"
-                      onClick={() => setSelectedProduct(product)}
-                      title="Quick view"
-                      aria-label="Quick view"
-                    >
-                      <Eye size={17} />
-                    </button>
-                  </div>
-                </div>
+                    <span className="ShopCards-phChip">
+                      <Droplets size={12} /> pH 8.5+
+                    </span>
 
-                <div className="ShopCards-productContent">
-                  <div className="ShopCards-metaRow">
-                    <span className="ShopCards-productCategory">{product.category}</span>
-                    <span className="ShopCards-sizeTag">{product.size}</span>
-                  </div>
+                    <div className="ShopCards-quickActions">
+                      <button
+                        className={`ShopCards-iconButton ${inWishlist ? "selected in-wishlist" : ""}`}
+                        onClick={() => toggleWishlist(product)}
+                        title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                        aria-label="Wishlist"
+                      >
+                        <Heart
+                          size={17}
+                          fill={inWishlist ? "#ef4444" : "none"}
+                          color={inWishlist ? "#ef4444" : "currentColor"}
+                        />
+                      </button>
 
-                  <button
-                    className="ShopCards-productName"
-                    onClick={() => setSelectedProduct(product)}
-                  >
-                    {product.name}
-                  </button>
-
-                  <p className="ShopCards-productDescription">{product.description}</p>
-
-                  <div className="ShopCards-rating">
-                    <Star size={14} fill="#FFB800" color="#FFB800" />
-                    <strong>{product.rating}</strong>
-                    <span>({product.reviews} reviews)</span>
-                  </div>
-
-                  <div className="ShopCards-priceRow">
-                    <div className="ShopCards-prices">
-                      <span className="ShopCards-currentPrice">
-                        {formatPrice(product.price)}
-                      </span>
-                      <del className="ShopCards-oldPrice">
-                        {formatPrice(product.oldPrice)}
-                      </del>
-                      <span className="ShopCards-save">
-                        {discountPercent(product.price, product.oldPrice)}% off
-                      </span>
+                      <button
+                        className="ShopCards-iconButton"
+                        onClick={() => openQuickView(product)}
+                        title="Quick view"
+                        aria-label="Quick view"
+                      >
+                        <Eye size={17} />
+                      </button>
                     </div>
                   </div>
 
-                  <a className="ShopCards-addButton" href="/contact">
-                    <Truck size={17} />
-                    Order Now
-                  </a>
-                </div>
-              </article>
-            ))}
+                  <div className="ShopCards-productContent">
+                    <div className="ShopCards-metaRow">
+                      <span className="ShopCards-productCategory">{product.category}</span>
+                      <span className="ShopCards-sizeTag">{pSize}</span>
+                    </div>
+
+                    <button
+                      className="ShopCards-productName"
+                      onClick={() => openQuickView(product)}
+                    >
+                      {pName}
+                    </button>
+
+                    <p className="ShopCards-productDescription">
+                      {product.description
+                        ? product.description.replace(/<[^>]*>?/gm, "")
+                        : "Premium pH 8.5+ natural alkaline drinking water for optimal vitality."}
+                    </p>
+
+                    <div className="ShopCards-rating">
+                      <Star size={14} fill="#FFB800" color="#FFB800" />
+                      <strong>{product.rating || 4.8}</strong>
+                      <span>({product.reviews || 24} reviews)</span>
+                    </div>
+
+                    <div className="ShopCards-priceRow">
+                      <div className="ShopCards-prices">
+                        <span className="ShopCards-currentPrice">
+                          {formatPrice(product.price)}
+                        </span>
+                        {pOldPrice > product.price && (
+                          <del className="ShopCards-oldPrice">
+                            {formatPrice(pOldPrice)}
+                          </del>
+                        )}
+                        {pDiscount > 0 && (
+                          <span className="ShopCards-save">
+                            {pDiscount}% off
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Developer-Engineered Add to Cart Button */}
+                    <button
+                      type="button"
+                      className={`ShopCards-addButton ${inCart ? "ShopCards-inCart" : ""}`}
+                      onClick={() => addToCart(product, 1)}
+                    >
+                      <ShoppingCart size={17} />
+                      {inCart ? "In Cart (+1)" : "Add to Cart"}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         ) : (
           <div className="ShopCards-empty">
@@ -550,15 +465,7 @@ const ShopCards = () => {
         </div>
       </div>
 
-      {/* ================= TOAST ================= */}
-      {notification && (
-        <div className="ShopCards-toast" role="status">
-          <Check size={18} />
-          <span>{notification}</span>
-        </div>
-      )}
-
-      {/* ================= QUICK VIEW ================= */}
+      {/* ================= QUICK VIEW MODAL ================= */}
       {selectedProduct && (
         <div className="ShopCards-modalOverlay" onClick={() => setSelectedProduct(null)}>
           <div className="ShopCards-quickModal" onClick={(e) => e.stopPropagation()}>
@@ -572,8 +479,8 @@ const ShopCards = () => {
 
             <div className="ShopCards-modalImage">
               <img
-                src={selectedProduct.image}
-                alt={selectedProduct.name}
+                src={selectedProduct.image || FALLBACK_IMAGE}
+                alt={selectedProduct.name || selectedProduct.title}
                 onError={handleImageError}
               />
               <span className="ShopCards-phChip">
@@ -583,18 +490,25 @@ const ShopCards = () => {
 
             <div className="ShopCards-modalContent">
               <span className="ShopCards-modalCategory">
-                {selectedProduct.category} · {selectedProduct.size}
+                {selectedProduct.category} · {selectedProduct.size || selectedProduct.liter || "1 Litre"}
               </span>
 
-              <h2>{selectedProduct.name}</h2>
+              <h2>{selectedProduct.name || selectedProduct.title}</h2>
 
               <div className="ShopCards-rating ShopCards-modalRating">
                 <Star size={16} fill="#FFB800" color="#FFB800" />
-                <strong>{selectedProduct.rating}</strong>
-                <span>({selectedProduct.reviews} reviews)</span>
+                <strong>{selectedProduct.rating || 4.8}</strong>
+                <span>({selectedProduct.reviews || 24} reviews)</span>
               </div>
 
-              <p>{selectedProduct.description}</p>
+              <div
+                style={{ fontSize: "14px", color: "var(--muted)", margin: "10px 0" }}
+                dangerouslySetInnerHTML={{
+                  __html:
+                    selectedProduct.description ||
+                    "Premium bottled alkaline water enriched with essential minerals.",
+                }}
+              />
 
               <ul className="ShopCards-modalPerks">
                 <li>
@@ -606,29 +520,122 @@ const ShopCards = () => {
               </ul>
 
               <div className="ShopCards-modalPrice">
-                {formatPrice(selectedProduct.price)}
-                <del>{formatPrice(selectedProduct.oldPrice)}</del>
-                <span className="ShopCards-save">
-                  {discountPercent(selectedProduct.price, selectedProduct.oldPrice)}% off
-                </span>
+                {formatPrice(selectedProduct.price * modalQty)}
+                {selectedProduct.oldPrice > selectedProduct.price && (
+                  <del>{formatPrice(selectedProduct.oldPrice * modalQty)}</del>
+                )}
+                {selectedProduct.discount > 0 && (
+                  <span className="ShopCards-save">
+                    {selectedProduct.discount}% off
+                  </span>
+                )}
               </div>
 
-              <a className="ShopCards-modalAdd" href="/contact">
-                <Truck size={19} />
-                Order Now
-              </a>
+              {/* Quantity Selector */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  margin: "14px 0",
+                }}
+              >
+                <span style={{ fontSize: "13px", fontWeight: "600", color: "var(--muted)" }}>
+                  Quantity:
+                </span>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    border: "1px solid var(--line)",
+                    borderRadius: "10px",
+                    overflow: "hidden",
+                    background: "#ffffff",
+                  }}
+                >
+                  <button
+                    type="button"
+                    style={{
+                      padding: "8px 14px",
+                      border: "none",
+                      background: "#f8fafc",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                    onClick={() => setModalQty((q) => Math.max(1, q - 1))}
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus size={15} />
+                  </button>
+                  <span
+                    style={{
+                      padding: "8px 16px",
+                      fontWeight: "700",
+                      minWidth: "32px",
+                      textAlign: "center",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {modalQty}
+                  </span>
+                  <button
+                    type="button"
+                    style={{
+                      padding: "8px 14px",
+                      border: "none",
+                      background: "#f8fafc",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                    onClick={() => setModalQty((q) => q + 1)}
+                    aria-label="Increase quantity"
+                  >
+                    <Plus size={15} />
+                  </button>
+                </div>
+              </div>
 
+              {/* Add to Cart in Modal */}
               <button
-                className="ShopCards-modalWishlist"
+                type="button"
+                className="ShopCards-modalAdd"
+                onClick={() => {
+                  addToCart(selectedProduct, modalQty);
+                  setSelectedProduct(null);
+                }}
+              >
+                <ShoppingCart size={19} />
+                Add to Cart ({formatPrice(selectedProduct.price * modalQty)})
+              </button>
+
+              {/* Wishlist in Modal */}
+              <button
+                type="button"
+                className={`ShopCards-modalWishlist ${
+                  isInWishlist(selectedProduct._id || selectedProduct.id)
+                    ? "in-wishlist"
+                    : ""
+                }`}
                 onClick={() => toggleWishlist(selectedProduct)}
               >
                 <Heart
                   size={18}
-                  fill={wishlist.includes(selectedProduct.id) ? "currentColor" : "none"}
+                  fill={
+                    isInWishlist(selectedProduct._id || selectedProduct.id)
+                      ? "#ef4444"
+                      : "none"
+                  }
+                  color={
+                    isInWishlist(selectedProduct._id || selectedProduct.id)
+                      ? "#ef4444"
+                      : "currentColor"
+                  }
                 />
-                {wishlist.includes(selectedProduct.id)
-                  ? "Remove from wishlist"
-                  : "Add to wishlist"}
+                {isInWishlist(selectedProduct._id || selectedProduct.id)
+                  ? "Saved in Wishlist"
+                  : "Add to Wishlist"}
               </button>
             </div>
           </div>

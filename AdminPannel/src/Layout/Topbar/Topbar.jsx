@@ -24,6 +24,10 @@ import {
   Star,
   FileText,
   ClipboardList,
+  Tag,
+  MessageSquare,
+  PackageCheck,
+  Boxes,
 } from "lucide-react";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -36,27 +40,64 @@ import "./Topbar.css";
 
 const routeTitles = {
   "/admin/dashboard": "Dashboard",
+  "/dashboard": "Dashboard",
 
   "/admin/blog-post": "Blog Post",
+  "/blog-post": "Blog Post",
+
   "/admin/blog-management": "Blog Management",
+  "/blog-management": "Blog Management",
+
+  "/admin/blog-category": "Add Category",
+  "/blog-category": "Add Category",
+
+  "/admin/blog-comments": "Blog Comments",
+  "/blog-comments": "Blog Comments",
+
+  "/admin/shop/manage": "Shop Manage",
+  "/shop/manage": "Shop Manage",
+
+  "/admin/shop/add-stock": "Add Stock",
+  "/shop/add-stock": "Add Stock",
 
   "/admin/product-management": "Product Management",
+  "/product-management": "Product Management",
+
   "/admin/team-management": "Team Management",
+  "/team-management": "Team Management",
+
   "/admin/gallery-management": "Gallery Management",
+  "/gallery-management": "Gallery Management",
 
   "/admin/subscription-management": "Subscription Management",
+  "/subscription-management": "Subscription Management",
+
   "/admin/order-management": "Order Management",
+  "/order-management": "Order Management",
+
   "/admin/subscription-orders": "Subscription Orders Management",
+  "/subscription-orders": "Subscription Orders Management",
 
   "/admin/user-management": "User Management",
+  "/user-management": "User Management",
 
   "/admin/delivery-boy-id": "Delivery Boy ID Generation",
+  "/delivery-boy-id": "Delivery Boy ID Generation",
+
   "/admin/assigning-bottle": "Assigning Bottle",
+  "/assigning-bottle": "Assigning Bottle",
 
   "/admin/settings": "Settings",
+  "/settings": "Settings",
+
   "/admin/report-management": "Report Management",
+  "/report-management": "Report Management",
+
   "/admin/enquiry-management": "Enquiry Management",
+  "/enquiry-management": "Enquiry Management",
+
   "/admin/review-management": "Review Management",
+  "/review-management": "Review Management",
 };
 
 /* =========================================
@@ -65,27 +106,64 @@ const routeTitles = {
 
 const routeIcons = {
   "/admin/dashboard": LayoutDashboard,
+  "/dashboard": LayoutDashboard,
 
   "/admin/blog-post": FileText,
+  "/blog-post": FileText,
+
   "/admin/blog-management": Newspaper,
+  "/blog-management": Newspaper,
+
+  "/admin/blog-category": Tag,
+  "/blog-category": Tag,
+
+  "/admin/blog-comments": MessageSquare,
+  "/blog-comments": MessageSquare,
+
+  "/admin/shop/manage": PackageCheck,
+  "/shop/manage": PackageCheck,
+
+  "/admin/shop/add-stock": Boxes,
+  "/shop/add-stock": Boxes,
 
   "/admin/product-management": Package,
+  "/product-management": Package,
+
   "/admin/team-management": Users,
+  "/team-management": Users,
+
   "/admin/gallery-management": Images,
+  "/gallery-management": Images,
 
   "/admin/subscription-management": Crown,
+  "/subscription-management": Crown,
+
   "/admin/order-management": ShoppingCart,
+  "/order-management": ShoppingCart,
+
   "/admin/subscription-orders": CalendarDays,
+  "/subscription-orders": CalendarDays,
 
   "/admin/user-management": Users,
+  "/user-management": Users,
 
   "/admin/delivery-boy-id": Truck,
+  "/delivery-boy-id": Truck,
+
   "/admin/assigning-bottle": ClipboardList,
+  "/assigning-bottle": ClipboardList,
 
   "/admin/settings": Settings,
+  "/settings": Settings,
+
   "/admin/report-management": ChartNoAxesColumn,
+  "/report-management": ChartNoAxesColumn,
+
   "/admin/enquiry-management": Mail,
+  "/enquiry-management": Mail,
+
   "/admin/review-management": Star,
+  "/review-management": Star,
 };
 
 /* =========================================
@@ -94,10 +172,28 @@ const routeIcons = {
 
 const routeParents = {
   "/admin/blog-post": "Blog Management",
+  "/blog-post": "Blog Management",
+
   "/admin/blog-management": "Blog Management",
+  "/blog-management": "Blog Management",
+
+  "/admin/blog-category": "Blog Management",
+  "/blog-category": "Blog Management",
+
+  "/admin/blog-comments": "Blog Management",
+  "/blog-comments": "Blog Management",
+
+  "/admin/shop/manage": "Shop",
+  "/shop/manage": "Shop",
+
+  "/admin/shop/add-stock": "Shop",
+  "/shop/add-stock": "Shop",
 
   "/admin/delivery-boy-id": "Delivery Boy Management",
+  "/delivery-boy-id": "Delivery Boy Management",
+
   "/admin/assigning-bottle": "Delivery Boy Management",
+  "/assigning-bottle": "Delivery Boy Management",
 };
 
 /* =========================================

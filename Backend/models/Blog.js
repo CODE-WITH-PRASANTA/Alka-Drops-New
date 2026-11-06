@@ -138,4 +138,9 @@ blogSchema.pre("save", function (next) {
   next();
 });
 
+// Indexes for slug lookups, status filtering and category listings
+blogSchema.index({ slug: 1 });
+blogSchema.index({ status: 1, createdAt: -1 });
+blogSchema.index({ category: 1, status: 1 });
+
 module.exports = mongoose.model("Blog", blogSchema);

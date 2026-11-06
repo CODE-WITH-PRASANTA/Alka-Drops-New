@@ -498,6 +498,28 @@
   transform: translateY(-2px);
 }
 
+.ShopCards-addButton.ShopCards-inCart {
+  background: linear-gradient(135deg, #047857 0%, #10b981 100%);
+  box-shadow: 0 10px 22px rgba(16, 185, 129, 0.28);
+}
+
+.ShopCards-addButton.ShopCards-inCart:hover {
+  background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+  color: #ffffff;
+}
+
+.ShopCards-iconButton.in-wishlist {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #fca5a5;
+}
+
+.ShopCards-modalWishlist.in-wishlist {
+  background: #fef2f2;
+  color: #ef4444;
+  border-color: #fca5a5;
+}
+
 /* =========================================
    EMPTY STATE
 ========================================= */

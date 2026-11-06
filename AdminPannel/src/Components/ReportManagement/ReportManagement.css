@@ -1,0 +1,194 @@
+.ReportManagement {
+  padding: 24px 32px 48px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 72px);
+  color: #0f172a;
+}
+.ReportManagement-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.ReportManagement-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ReportManagement-headingIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+.ReportManagement-heading h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0d3b43;
+  margin: 0;
+}
+.ReportManagement-actions {
+  display: flex;
+  gap: 12px;
+}
+.ReportManagement-btn.primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: #0d9488;
+  color: #ffffff;
+}
+.ReportManagement-statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.ReportManagement-statCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.ReportManagement-statIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.ReportManagement-statIcon.rev { background: #f0fdfa; color: #0d9488; }
+.ReportManagement-statIcon.water { background: #f0f9ff; color: #0284c7; }
+.ReportManagement-statIcon.jars { background: #ecfdf5; color: #10b981; }
+.ReportManagement-statIcon.growth { background: #fffbeb; color: #f59e0b; }
+.ReportManagement-statLabel { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; display: block; }
+.ReportManagement-statValue { font-size: 22px; font-weight: 700; color: #0f172a; }
+.ReportManagement-layoutGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+.ReportManagement-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.ReportManagement-cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+.ReportManagement-cardHeader h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.ReportManagement-cardHeader select {
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 12.5px;
+  background: #f8fafc;
+}
+.ReportManagement-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.ReportManagement-table th {
+  background: #f8fafc;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e2e8f0;
+}
+.ReportManagement-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13.5px;
+}
+.growthBadge {
+  background: #ecfdf5;
+  color: #059669;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.waterText {
+  color: #0284c7;
+  font-weight: 600;
+}
+.ReportManagement-zoneList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ReportManagement-zoneItem .zoneHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.shareBadge {
+  background: #f0fdfa;
+  color: #0d9488;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.zoneMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+.ReportManagement-zoneItem .progressBar {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.ReportManagement-zoneItem .progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #0d9488, #0284c7);
+}
+@media (max-width: 1024px) {
+  .ReportManagement-statsGrid { grid-template-columns: repeat(2, 1fr); }
+  .ReportManagement-layoutGrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .ReportManagement { padding: 16px; }
+  .ReportManagement-header { flex-direction: column; align-items: stretch; gap: 12px; }
+  .ReportManagement-statsGrid { grid-template-columns: 1fr; }
+  .ReportManagement-card { overflow-x: auto; }
+}
+

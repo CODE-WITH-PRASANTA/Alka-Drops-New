@@ -1,5 +1,6 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import API from "../../services/api";
 import {
   FaCheckCircle,
   FaWater,
@@ -79,8 +80,49 @@ const subscriptionPlans = [
   },
 ];
 
+const getFeatureIcon = (text = "") => {
+  const lower = text.toLowerCase();
+  if (lower.includes("delivery") || lower.includes("express") || lower.includes("truck")) return <FaTruck />;
+  if (lower.includes("pickup") || lower.includes("recycle") || lower.includes("replacement")) return <FaRecycle />;
+  if (lower.includes("bottle") || lower.includes("water") || lower.includes("can")) return <FaWater />;
+  return <FaCheckCircle />;
+};
+
 const SubscriptionOne = () => {
+  const [plans, setPlans] = useState(subscriptionPlans);
   const [flippedCards, setFlippedCards] = useState({});
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const res = await API.get("/subscription-plans");
+        if (res.data?.plans && res.data.plans.length > 0) {
+          const formatted = res.data.plans
+            .filter((p) => p.status !== "Inactive")
+            .map((p) => ({
+              id: p._id,
+              title: p.title,
+              subtitle: p.subtitle,
+              price: p.price,
+              period: p.period || "MO",
+              description: p.description,
+              featured: Boolean(p.featured),
+              features: (p.features || []).map((feat) => {
+                if (typeof feat === "string") {
+                  return { text: feat, icon: getFeatureIcon(feat) };
+                }
+                return feat;
+              }),
+            }));
+          setPlans(formatted);
+        }
+      } catch (err) {
+        console.error("Failed to load subscription plans:", err);
+      }
+    };
+
+    fetchPlans();
+  }, []);
 
   const toggleCardFlip = (id, featured) => {
     if (featured) return;
@@ -127,7 +169,7 @@ const SubscriptionOne = () => {
       {/* SUBSCRIPTION PLANS */}
       <div className="SubscriptionOne-container">
 
-        {subscriptionPlans.map((plan) => (
+        {plans.map((plan) => (
           <div
             key={plan.id}
             className={`SubscriptionOne-card ${

@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
+import API from "../../services/api";
 import "./ContactMain.css";
 
 const CONTACT_INFO = {
@@ -39,18 +41,33 @@ const ArrowIcon = () => (
 
 const ContactMain = () => {
   const sectionRef = useRef(null);
+  const location = useLocation();
 
   const [isVisible, setIsVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState({ type: "", message: "" });
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    interest: "",
-    subject: "",
-    message: "",
+  const [formData, setFormData] = useState(() => {
+    const state = location?.state;
+    if (state && Array.isArray(state.cart) && state.cart.length > 0) {
+      const itemList = state.cart.map((i) => `${i.qty || 1}x ${i.name}`).join(", ");
+      return {
+        name: "",
+        email: "",
+        phone: "",
+        interest: "20L Water Jar",
+        subject: "Order Delivery Inquiry",
+        message: `Hello Alka Drops team, I would like to inquire about doorstep delivery for my selected items: ${itemList} (Estimated Total: ₹${state.total || state.subtotal || ""}).`,
+      };
+    }
+    return {
+      name: "",
+      email: "",
+      phone: "",
+      interest: "",
+      subject: "",
+      message: "",
+    };
   });
 
   /* Reveal on scroll */
@@ -95,41 +112,54 @@ const ContactMain = () => {
     clearStatus();
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (isSubmitting) return;
+
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      setFormStatus({
+        type: "error",
+        message: "Please fill in all required fields (Name, Email, Message).",
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     setFormStatus({ type: "", message: "" });
 
     try {
-      /*
-       * Frontend-only behavior: opens the visitor's email app with the
-       * enquiry filled in. Connect your backend API here to store enquiries.
-       */
-      const subject = encodeURIComponent(
-        formData.subject.trim() || `Website enquiry from ${formData.name.trim()}`
-      );
-
-      const body = encodeURIComponent(
-        `Name: ${formData.name.trim()}\n` +
-          `Email: ${formData.email.trim()}\n` +
-          `Phone: ${formData.phone.trim() || "Not provided"}\n` +
-          `Interested in: ${formData.interest || "Not specified"}\n\n` +
-          `Message:\n${formData.message.trim()}`
-      );
-
-      window.location.href = `mailto:${CONTACT_INFO.email}?subject=${subject}&body=${body}`;
+      const res = await API.post("/contact", {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        subject:
+          formData.subject.trim() ||
+          (formData.interest ? `${formData.interest} Enquiry` : "Website Enquiry"),
+        interest: formData.interest || "Water Delivery",
+        message: formData.message.trim(),
+      });
 
       setFormStatus({
         type: "success",
         message:
-          "Your email app should open with your enquiry filled in. Press send there to complete your request.",
+          res.data?.message ||
+          "Thank you! Your enquiry has been received. Our team will contact you soon.",
       });
-    } catch {
+
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        interest: "",
+        subject: "",
+        message: "",
+      });
+    } catch (err) {
       setFormStatus({
         type: "error",
-        message: "Something went wrong. Please call or email us directly.",
+        message:
+          err.response?.data?.message ||
+          "Failed to submit your message. Please check your connection or contact us directly.",
       });
     } finally {
       setIsSubmitting(false);
@@ -387,7 +417,7 @@ const ContactMain = () => {
                   type="submit"
                   disabled={isSubmitting}
                 >
-                  <span>{isSubmitting ? "Preparing Email..." : "Send Message"}</span>
+                  <span>{isSubmitting ? "Submitting..." : "Send Message"}</span>
                   <ArrowIcon />
                 </button>
 

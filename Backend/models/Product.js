@@ -110,5 +110,10 @@ productSchema.pre("save", function (next) {
   next();
 });
 
+// Indexes for category filtering, pricing and stock sorting
+productSchema.index({ category: 1, inStock: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ isFeatured: 1, createdAt: -1 });
+
 module.exports = mongoose.model("Product", productSchema);
 

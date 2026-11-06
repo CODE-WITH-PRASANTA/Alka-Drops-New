@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import API from "../../services/api";
 import "./GallaryCards.css";
 
 const CLOSE_DELAY = 400; // ms, must match the CSS transition
@@ -43,18 +44,12 @@ const baseImages = [
   },
 ];
 
-/*
- * 12 photos so the pagination can be used. These are the 6 photos above
- * repeated: replace this with your own full list of gallery photos.
- */
-const images = [...baseImages, ...baseImages].map((image, index) => ({
+const defaultImages = [...baseImages, ...baseImages].map((image, index) => ({
   ...image,
   id: index + 1,
 }));
 
 const ITEMS_PER_PAGE = 6; // photos shown on each page
-const TOTAL = images.length;
-const TOTAL_PAGES = Math.ceil(TOTAL / ITEMS_PER_PAGE);
 
 const pad = (number) => String(number).padStart(2, "0");
 
@@ -103,6 +98,47 @@ const GallaryCards = () => {
   const [page, setPage] = useState(1);
   const [pageChanged, setPageChanged] = useState(false);
 
+  // Dynamic gallery data fetched via Axios
+  const [galleryData, setGalleryData] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchGalleryImages = async () => {
+      try {
+        const res = await API.get("/gallery", {
+          params: { status: "active" },
+        });
+        if (
+          isMounted &&
+          res.data?.success &&
+          Array.isArray(res.data.items) &&
+          res.data.items.length > 0
+        ) {
+          const formatted = res.data.items.map((item, index) => ({
+            src: item.image,
+            alt: item.alt || item.title || "Alka Drops Gallery",
+            title: item.title,
+            category: item.category || "Alkaline Water",
+            id: item._id || index + 1,
+          }));
+          setGalleryData(formatted);
+        }
+      } catch (err) {
+        console.error("Error fetching live gallery images:", err);
+      }
+    };
+
+    fetchGalleryImages();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const images = galleryData.length > 0 ? galleryData : defaultImages;
+  const TOTAL = images.length;
+  const TOTAL_PAGES = Math.max(1, Math.ceil(TOTAL / ITEMS_PER_PAGE));
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState("next");
   const [lightboxMounted, setLightboxMounted] = useState(false);
@@ -126,8 +162,8 @@ const GallaryCards = () => {
 
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
   const pageImages = images.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  const firstShown = startIndex + 1;
-  const lastShown = startIndex + pageImages.length;
+  const firstShown = TOTAL > 0 ? startIndex + 1 : 0;
+  const lastShown = Math.min(startIndex + pageImages.length, TOTAL);
 
   /* Reveal on scroll */
   useEffect(() => {
@@ -183,14 +219,14 @@ const GallaryCards = () => {
   const showNext = useCallback(() => {
     setDirection("next");
     setImageLoading(true);
-    setActiveIndex((current) => (current + 1) % TOTAL);
-  }, []);
+    setActiveIndex((current) => (TOTAL > 0 ? (current + 1) % TOTAL : 0));
+  }, [TOTAL]);
 
   const showPrevious = useCallback(() => {
     setDirection("prev");
     setImageLoading(true);
-    setActiveIndex((current) => (current - 1 + TOTAL) % TOTAL);
-  }, []);
+    setActiveIndex((current) => (TOTAL > 0 ? (current - 1 + TOTAL) % TOTAL : 0));
+  }, [TOTAL]);
 
   const showImage = (index) => {
     if (index === activeIndex) return;
@@ -243,24 +279,29 @@ const GallaryCards = () => {
     };
   }, [lightboxMounted, closeLightbox, showNext, showPrevious]);
 
+  const safeActiveIndex = activeIndex >= TOTAL ? 0 : activeIndex;
+  const activeItem = images[safeActiveIndex] || images[0] || {};
+
   /* Preload the neighbouring photos and keep the active thumbnail in view */
   useEffect(() => {
-    if (!lightboxMounted) return;
+    if (!lightboxMounted || TOTAL === 0) return;
 
-    [(activeIndex + 1) % TOTAL, (activeIndex - 1 + TOTAL) % TOTAL].forEach((i) => {
-      const preload = new Image();
-      preload.src = images[i].src;
+    [(safeActiveIndex + 1) % TOTAL, (safeActiveIndex - 1 + TOTAL) % TOTAL].forEach((i) => {
+      if (images[i]?.src) {
+        const preload = new Image();
+        preload.src = images[i].src;
+      }
     });
 
     const strip = thumbsRef.current;
-    const thumb = strip && strip.children[activeIndex];
+    const thumb = strip && strip.children[safeActiveIndex];
     if (strip && thumb) {
       strip.scrollTo({
         left: thumb.offsetLeft - strip.clientWidth / 2 + thumb.clientWidth / 2,
         behavior: "smooth",
       });
     }
-  }, [activeIndex, lightboxMounted]);
+  }, [safeActiveIndex, lightboxMounted, TOTAL, images]);
 
   /* Swipe on touch screens */
   const handleTouchStart = (event) => {
@@ -278,8 +319,6 @@ const GallaryCards = () => {
       else showPrevious();
     }
   };
-
-  const activeItem = images[activeIndex];
 
   return (
     <section
@@ -444,7 +483,7 @@ const GallaryCards = () => {
           >
             <div className="gallery-lightbox-top">
               <span className="gallery-counter">
-                <strong>{pad(activeIndex + 1)}</strong> / {pad(TOTAL)}
+                <strong>{pad(safeActiveIndex + 1)}</strong> / {pad(TOTAL)}
               </span>
 
               <button
@@ -490,7 +529,7 @@ const GallaryCards = () => {
                   {imageLoading && <span className="gallery-spinner" aria-hidden="true"></span>}
 
                   <img
-                    key={activeIndex}
+                    key={safeActiveIndex}
                     className={`gallery-full-image gallery-full-image--${direction} ${
                       imageLoading ? "gallery-full-image--loading" : ""
                     }`}
@@ -533,11 +572,11 @@ const GallaryCards = () => {
                   key={image.id}
                   type="button"
                   className={`gallery-thumb ${
-                    index === activeIndex ? "gallery-thumb--active" : ""
+                    index === safeActiveIndex ? "gallery-thumb--active" : ""
                   }`}
                   onClick={() => showImage(index)}
                   aria-label={`Show image ${index + 1}: ${image.title}`}
-                  aria-current={index === activeIndex ? "true" : undefined}
+                  aria-current={index === safeActiveIndex ? "true" : undefined}
                 >
                   {failed[image.src] ? (
                     <DropFallback />

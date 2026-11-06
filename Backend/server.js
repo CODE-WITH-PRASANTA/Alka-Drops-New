@@ -61,6 +61,7 @@ app.get("/api/health", (req, res) => {
 
 // Mount API Routes
 app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/users", require("./routes/authRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/blogs", require("./routes/blogRoutes"));
 app.use("/api/categories", require("./routes/categoryRoutes"));
@@ -68,6 +69,9 @@ app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/contact", require("./routes/contactRoutes"));
 app.use("/api/upload", require("./routes/uploadRoutes"));
 app.use("/api/team", require("./routes/teamRoutes"));
+app.use("/api/gallery", require("./routes/galleryRoutes"));
+app.use("/api/comments", require("./routes/commentRoutes"));
+app.use("/api/subscription-plans", require("./routes/subscriptionPlanRoutes"));
 
 // Error handling middlewares
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");

@@ -11,7 +11,9 @@ import {
   RotateCcw,
   Package,
   X,
+  Heart,
 } from "lucide-react";
+import { useShop } from "../../context/ShopContext";
 
 import "./ShopDetailsOne.css";
 
@@ -23,6 +25,7 @@ import thumbTwo from "../../assets/ourproduct-3.png";
 import thumbThree from "../../assets/whychoose-2.png";
 
 const ShopDetailsOne = ({ onAddToCart }) => {
+  const { addToCart } = useShop();
   const [activeImage, setActiveImage] = useState(mainImage);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
@@ -72,6 +75,20 @@ const ShopDetailsOne = ({ onAddToCart }) => {
       quantity,
       totalPrice: product.price * quantity,
     };
+
+    addToCart(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        oldPrice: product.oldPrice,
+        image: activeImage,
+        category: product.category,
+        size: "250 mL",
+        description: product.description,
+      },
+      quantity
+    );
 
     // Pass product data to the parent cart if a callback is provided.
     if (onAddToCart) {

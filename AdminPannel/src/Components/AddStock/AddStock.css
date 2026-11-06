@@ -982,6 +982,39 @@
   color: var(--alka-accent);
 }
 
+.AddStock-notification.error {
+  background: #7f1d1d;
+  color: #ffffff;
+}
+
+.AddStock-notification.error svg {
+  color: #f87171;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.AddStock-loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 12px;
+  color: var(--alka-teal-dark);
+  font-weight: 500;
+  font-size: 15px;
+}
+
 /* Responsive Scaling */
 @media (max-width: 1024px) {
   .AddStock-form-columns {

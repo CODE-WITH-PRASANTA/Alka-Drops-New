@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useShop } from "../../context/ShopContext";
 import "./HomeOurProducts.css";
 
 import product1 from "../../assets/ourproduct-1.png";
@@ -50,6 +51,7 @@ const HomeOurProducts = () => {
   const sectionRef = useRef(null);
   const timeoutRef = useRef(null);
 
+  const { addToCart } = useShop();
   const [isVisible, setIsVisible] = useState(false);
   const [flippedId, setFlippedId] = useState(null); // touch / keyboard
   const [addedId, setAddedId] = useState(null);
@@ -91,11 +93,20 @@ const HomeOurProducts = () => {
     }
   };
 
-  const handleAddToCart = (id) => {
-    setAddedId(id);
+  const handleAddToCart = (product) => {
+    addToCart({
+      id: `home-prod-${product.id}`,
+      name: product.name,
+      title: product.name,
+      price: product.price,
+      oldPrice: product.oldPrice,
+      image: product.image,
+      size: product.pack,
+      category: "Alkaline Water",
+    });
+    setAddedId(product.id);
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => setAddedId(null), 1800);
-    // TODO: connect with your cart logic / API here
   };
 
   return (
@@ -224,7 +235,7 @@ const HomeOurProducts = () => {
                     className={`home-our-products__button ${
                       isAdded ? "home-our-products__button--added" : ""
                     }`}
-                    onClick={() => handleAddToCart(product.id)}
+                    onClick={() => handleAddToCart(product)}
                   >
                     <span className="home-our-products__button-icon">
                       {isAdded ? (

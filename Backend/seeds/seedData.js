@@ -5,6 +5,8 @@ const Product = require("../models/Product");
 const Blog = require("../models/Blog");
 const Category = require("../models/Category");
 const Team = require("../models/Team");
+const Gallery = require("../models/Gallery");
+const Comment = require("../models/Comment");
 
 dotenv.config();
 
@@ -269,6 +271,117 @@ const seedData = async () => {
       console.log(`[Seeder] Seeded ${initialTeam.length} initial team members.`);
     } else {
       console.log(`[Seeder] Team members already exist (${teamCount} found).`);
+    }
+
+    // Seed Gallery
+    const galleryCount = await Gallery.countDocuments();
+    if (galleryCount === 0) {
+      const initialGallery = [
+        {
+          title: "Fresh Drinking Water",
+          category: "Alkaline Water",
+          image: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=1200&q=80",
+          alt: "Fresh drinking water",
+          order: 1,
+          status: "active",
+        },
+        {
+          title: "Happy Little Moments",
+          category: "Family",
+          image: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=900&q=80",
+          alt: "Happy children",
+          order: 2,
+          status: "active",
+        },
+        {
+          title: "Pure in Every Bottle",
+          category: "Our Bottles",
+          image: "https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=900&q=80",
+          alt: "Water bottle",
+          order: 3,
+          status: "active",
+        },
+        {
+          title: "Healthy Lifestyle",
+          category: "Wellness",
+          image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=80",
+          alt: "Healthy lifestyle",
+          order: 4,
+          status: "active",
+        },
+        {
+          title: "Refreshing Taste",
+          category: "Alkaline Water",
+          image: "https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=900&q=80",
+          alt: "Refreshing water",
+          order: 5,
+          status: "active",
+        },
+        {
+          title: "Healthy Living",
+          category: "Wellness",
+          image: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80",
+          alt: "Healthy living",
+          order: 6,
+          status: "active",
+        },
+        {
+          title: "Pristine Mountain Stream Hydration",
+          category: "Alkaline Water",
+          image: "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=900&q=80",
+          alt: "Pure mountain stream",
+          order: 7,
+          status: "active",
+        },
+        {
+          title: "Hydration For Active Workouts",
+          category: "Wellness",
+          image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=900&q=80",
+          alt: "Hydration during fitness workout",
+          order: 8,
+          status: "active",
+        },
+      ];
+      await Gallery.insertMany(initialGallery);
+      console.log(`[Seeder] Seeded ${initialGallery.length} initial gallery items.`);
+    } else {
+      console.log(`[Seeder] Gallery items already exist (${galleryCount} found).`);
+    }
+
+    // Seed Initial Comments
+    const commentCount = await Comment.countDocuments();
+    if (commentCount === 0) {
+      const firstBlog = await Blog.findOne();
+      if (firstBlog) {
+        const jamesComment = await Comment.create({
+          blog: firstBlog._id,
+          blogTitle: firstBlog.title,
+          blogSlug: firstBlog.slug,
+          name: "James Hayden",
+          email: "james.hayden@example.com",
+          comment:
+            "Proin ac quam et lectus vestibulum blandit. Nunc maximus nibh at placerat tincidunt. Nam sem lacus, ornare non ante sed, ultricies",
+          status: "published",
+          createdAt: new Date("2021-01-31T14:40:00Z"),
+        });
+
+        await Comment.create({
+          blog: firstBlog._id,
+          blogTitle: firstBlog.title,
+          blogSlug: firstBlog.slug,
+          parentComment: jamesComment._id,
+          name: "Tyson Matthew",
+          email: "tyson.matthew@example.com",
+          comment:
+            "Proin ac quam et lectus vestibulum blandit. Nunc maximus nibh at placerat tincidunt. Nam sem lacus, ornare non ante sed, ultricies",
+          status: "published",
+          createdAt: new Date("2021-01-31T14:40:00Z"),
+        });
+
+        console.log("[Seeder] Seeded 2 initial published comments.");
+      }
+    } else {
+      console.log(`[Seeder] Comments already exist (${commentCount} found).`);
     }
 
     // Create Admin User if doesn't exist

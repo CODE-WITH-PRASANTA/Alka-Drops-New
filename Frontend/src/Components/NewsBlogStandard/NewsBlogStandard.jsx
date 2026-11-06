@@ -161,10 +161,12 @@ const NewsBlogStandard = () => {
     setIsLoading(true);
     setError(null);
 
-    // 1. Fetch all blogs for recent list & categories
-    API.get("/blogs")
-      .then((res) => {
+    const loadBlogData = async () => {
+      try {
+        // 1. Fetch all blogs for recent list & categories
+        const res = await API.get("/blogs");
         if (!isMounted) return;
+
         const list = res.data?.blogs || [];
         const publishedList = list.filter(
           (b) => !b.status || b.status.toLowerCase() === "published"
@@ -183,56 +185,48 @@ const NewsBlogStandard = () => {
         setCategories(cats);
 
         // 2. Resolve current blog by slug or id, or pick first published
+        let activeTargetBlog = null;
         if (slug) {
-          return API.get(`/blogs/${slug}`)
-            .then((detailRes) => {
-              if (!isMounted) return;
-              if (detailRes.data?.blog) {
-                setBlog(detailRes.data.blog);
-                setComments(detailRes.data.blog.comments || []);
-              } else {
-                // Try finding by slug from list
-                const found = publishedList.find(
-                  (b) => b.slug === slug || b._id === slug
-                );
-                if (found) {
-                  setBlog(found);
-                  setComments(found.comments || []);
-                } else {
-                  setError("Blog post not found.");
-                }
-              }
-            })
-            .catch(() => {
-              if (!isMounted) return;
-              const found = publishedList.find(
-                (b) => b.slug === slug || b._id === slug
-              );
-              if (found) {
-                setBlog(found);
-                setComments(found.comments || []);
-              } else {
-                setError("Article could not be loaded.");
-              }
-            });
-        } else {
-          // If no slug specified, show first published blog
-          if (publishedList.length > 0) {
-            setBlog(publishedList[0]);
-            setComments(publishedList[0].comments || []);
+          const detailRes = await API.get(`/blogs/${slug}`).catch(() => null);
+          if (detailRes?.data?.blog) {
+            activeTargetBlog = detailRes.data.blog;
           } else {
-            setError("No blog articles available yet.");
+            activeTargetBlog = publishedList.find(
+              (b) => b.slug === slug || b._id === slug
+            );
           }
+        } else if (publishedList.length > 0) {
+          activeTargetBlog = publishedList[0];
         }
-      })
-      .catch((err) => {
+
+        if (activeTargetBlog && isMounted) {
+          setBlog(activeTargetBlog);
+          // Fetch live published comments
+          try {
+            const commentRes = await API.get(
+              `/comments/blog/${activeTargetBlog.slug || activeTargetBlog._id}`
+            );
+            if (commentRes.data?.success && Array.isArray(commentRes.data.comments)) {
+              setComments(commentRes.data.comments);
+            } else {
+              setComments([]);
+            }
+          } catch {
+            setComments([]);
+          }
+        } else if (isMounted) {
+          setError("Blog post not found.");
+        }
+      } catch (err) {
         if (!isMounted) return;
         console.error("Error loading blog details with axios:", err);
         setError("Failed to connect to database. Please check your backend.");
-      })
-      .finally(() => {
+      } finally {
         if (isMounted) setIsLoading(false);
-      });
+      }
+    };
+
+    loadBlogData();
 
     return () => {
       isMounted = false;
@@ -534,61 +528,6 @@ const NewsBlogStandard = () => {
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* comments */}
-          <div className="news-comments">
-            <h3>
-              {comments.length === 0
-                ? "Comments"
-                : `${String(comments.length).padStart(2, "0")} ${
-                    comments.length === 1 ? "Comment" : "Comments"
-                  }`}
-            </h3>
-
-            {comments.length === 0 ? (
-              <p className="news-comments-empty">
-                Be the first to share your thoughts on this article.
-              </p>
-            ) : (
-              <div className="news-comment-list">
-                {comments.map((comment, index) => (
-                  <div className="news-comment" key={comment._id || comment.id || index}>
-                    <span className="news-comment-avatar">
-                      {(comment.name || "A").charAt(0).toUpperCase()}
-                    </span>
-                    <div>
-                      <strong>{comment.name}</strong>
-                      <small>{formatDate(comment.createdAt || comment.date)}</small>
-                      <p>{comment.comment || comment.text}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <form className="news-comment-form" onSubmit={submitComment}>
-              <input
-                type="text"
-                placeholder="Your name"
-                value={commentName}
-                onChange={(e) => setCommentName(e.target.value)}
-                aria-label="Your name"
-                required
-              />
-              <textarea
-                rows="4"
-                placeholder="Write your comment..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                aria-label="Your comment"
-                required
-              />
-              <button type="submit" disabled={isSubmittingComment}>
-                {isSubmittingComment ? "Posting..." : "Post Comment"}
-                <Icon name="arrow" />
-              </button>
-            </form>
           </div>
         </main>
 

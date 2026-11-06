@@ -24,23 +24,46 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       default: "",
+      trim: true,
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user",
+      enum: ["user", "admin", "Subscriber", "Retail Customer", "Corporate", "Administrator"],
+      default: "Retail Customer",
+    },
+    status: {
+      type: String,
+      enum: ["Active", "Blocked", "Inactive"],
+      default: "Active",
+    },
+    plan: {
+      type: String,
+      default: "Standard Retail",
+      trim: true,
     },
     address: {
       street: { type: String, default: "" },
-      city: { type: String, default: "" },
-      state: { type: String, default: "" },
-      postalCode: { type: String, default: "" },
+      city: { type: String, default: "Bhubaneswar" },
+      state: { type: String, default: "Odisha" },
+      postalCode: { type: String, default: "751012" },
+    },
+    ordersCount: {
+      type: Number,
+      default: 0,
+    },
+    totalSpend: {
+      type: Number,
+      default: 0,
     },
   },
   {
     timestamps: true,
   }
 );
+
+// Indexes for quick lookups, auth and admin queries
+userSchema.index({ role: 1, status: 1 });
+userSchema.index({ createdAt: -1 });
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {
@@ -58,4 +81,5 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 module.exports = mongoose.model("User", userSchema);
+
 

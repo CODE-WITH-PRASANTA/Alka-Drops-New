@@ -69,5 +69,11 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
+// Indexes for performant filtering, sorting & customer lookups
+orderSchema.index({ orderStatus: 1, createdAt: -1 });
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ "shippingAddress.phone": 1 });
+
 module.exports = mongoose.model("Order", orderSchema);
 

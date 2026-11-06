@@ -1,0 +1,237 @@
+.ProductManagement {
+  padding: 24px 32px 48px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 72px);
+  color: #0f172a;
+}
+.ProductManagement-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.ProductManagement-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ProductManagement-headingIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+.ProductManagement-heading h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0d3b43;
+  margin: 0;
+}
+.ProductManagement-actions {
+  display: flex;
+  gap: 12px;
+}
+.ProductManagement-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+}
+.ProductManagement-statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.ProductManagement-statCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.ProductManagement-statIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.ProductManagement-statIcon.total { background: #f0fdfa; color: #0d9488; }
+.ProductManagement-statIcon.stock { background: #f0f9ff; color: #0284c7; }
+.ProductManagement-statIcon.price { background: #ecfdf5; color: #10b981; }
+.ProductManagement-statIcon.cat { background: #fffbeb; color: #f59e0b; }
+.ProductManagement-statLabel { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; display: block; }
+.ProductManagement-statValue { font-size: 22px; font-weight: 700; color: #0f172a; }
+.ProductManagement-controlBar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.ProductManagement-searchBox {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+.ProductManagement-searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 11px;
+  color: #94a3b8;
+}
+.ProductManagement-searchBox input {
+  width: 100%;
+  padding: 9px 14px 9px 36px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13.5px;
+  outline: none;
+}
+.ProductManagement-filterGroup select {
+  padding: 8px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #f8fafc;
+  outline: none;
+}
+.ProductManagement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.ProductManagement-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ProductManagement-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+.ProductManagement-imgBox {
+  position: relative;
+  height: 180px;
+  background: #f1f5f9;
+}
+.ProductManagement-imgBox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ProductManagement-catBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(15, 23, 42, 0.75);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.ProductManagement-sizeBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #0d9488;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.ProductManagement-body {
+  padding: 16px;
+}
+.ProductManagement-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px;
+}
+.ProductManagement-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ProductManagement-price {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0d9488;
+}
+.ProductManagement-oldPrice {
+  font-size: 13px;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+.ProductManagement-stock {
+  margin-left: auto;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+.ProductManagement-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+.ProductManagement-statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.ProductManagement-statusPill.active { background: #ecfdf5; color: #059669; }
+.ProductManagement-iconBtn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 6px;
+  border-radius: 6px;
+  color: #475569;
+  cursor: pointer;
+}
+@media (max-width: 1024px) {
+  .ProductManagement-statsGrid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .ProductManagement { padding: 16px; }
+  .ProductManagement-header { flex-direction: column; align-items: stretch; gap: 12px; }
+  .ProductManagement-statsGrid { grid-template-columns: 1fr; }
+  .ProductManagement-controlBar { flex-direction: column; align-items: stretch; }
+}
+

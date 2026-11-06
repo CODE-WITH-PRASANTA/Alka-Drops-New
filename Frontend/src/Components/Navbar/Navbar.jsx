@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import {
   FiShoppingCart,
+  FiHeart,
   FiX,
 } from "react-icons/fi";
+import { useShop } from "../../context/ShopContext";
 
 import "./Navbar.css";
 import logo from "../../assets/ALKA DROPS LOGO.png";
@@ -27,6 +29,7 @@ const NAV_LINKS = [
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { cartCount, wishlistCount } = useShop();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -180,14 +183,36 @@ const Navbar = () => {
 
         {/* Right-Side Actions */}
         <div className="navbar-actions">
-          {/* Static Cart Icon — No Context or Dynamic Count */}
+          {/* Wishlist Icon Button */}
+          <button
+            type="button"
+            className="navbar-icon-btn cart-icon-relative"
+            onClick={() => handleNavigate("/wishlist")}
+            aria-label="View Wishlist"
+            title="My Wishlist"
+          >
+            <FiHeart />
+            {wishlistCount > 0 && (
+              <span className="navbar-cart-badge navbar-wishlist-badge">
+                {wishlistCount}
+              </span>
+            )}
+          </button>
+
+          {/* Cart Icon Button with Dynamic Badge */}
           <button
             type="button"
             className="navbar-icon-btn cart-icon-relative"
             onClick={() => handleNavigate("/cart")}
             aria-label="View Shopping Cart"
+            title="Shopping Cart"
           >
             <FiShoppingCart />
+            {cartCount > 0 && (
+              <span className="navbar-cart-badge">
+                {cartCount}
+              </span>
+            )}
           </button>
 
           {/* Desktop Login Button */}
@@ -199,14 +224,6 @@ const Navbar = () => {
             Log In
           </button>
 
-          {/* Desktop Contact Button */}
-          <button
-            type="button"
-            className="navbar-btn-primary hide-on-mobile"
-            onClick={() => handleNavigate("/contact")}
-          >
-            Contact Us
-          </button>
 
           {/* Mobile Menu Toggle */}
           <button

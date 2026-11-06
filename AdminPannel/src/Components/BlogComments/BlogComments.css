@@ -1,0 +1,952 @@
+/* ==========================================================================
+   ALKA DROPS - BLOG COMMENTS ADMIN STYLES
+   ========================================================================== */
+
+:root {
+  --bc-primary: #0d9488;
+  --bc-primary-hover: #0f766e;
+  --bc-accent: #0284c7;
+  --bc-text-main: #0f172a;
+  --bc-text-muted: #64748b;
+  --bc-text-light: #94a3b8;
+  --bc-bg-main: #f8fafc;
+  --bc-bg-card: #ffffff;
+  --bc-border: #e2e8f0;
+  --bc-border-subtle: #f1f5f9;
+  --bc-danger: #ef4444;
+  --bc-danger-hover: #dc2626;
+  --bc-warning: #f59e0b;
+  --bc-warning-bg: #fffbeb;
+  --bc-warning-border: #fde68a;
+  --bc-success: #10b981;
+  --bc-success-bg: #ecfdf5;
+  --bc-success-border: #a7f3d0;
+  --bc-radius-sm: 8px;
+  --bc-radius-md: 12px;
+  --bc-radius-lg: 16px;
+  --bc-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --bc-shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+  --bc-shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.12);
+  --bc-transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.BlogComments {
+  padding: 24px 32px 48px;
+  background-color: var(--bc-bg-main);
+  min-height: calc(100vh - 72px);
+  color: var(--bc-text-main);
+  font-family: inherit;
+}
+
+/* ==========================================================================
+   SINGLE LINE HEADER
+   ========================================================================== */
+.BlogComments-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.BlogComments-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.BlogComments-headingIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--bc-radius-md);
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+  flex-shrink: 0;
+}
+
+.BlogComments-heading h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0d3b43;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.BlogComments-headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.BlogComments-refreshButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #ffffff;
+  border: 1px solid var(--bc-border);
+  border-radius: var(--bc-radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bc-text-muted);
+  cursor: pointer;
+  transition: var(--bc-transition);
+}
+
+.BlogComments-refreshButton:hover {
+  background: #f1f5f9;
+  color: var(--bc-text-main);
+  border-color: #cbd5e1;
+}
+
+/* ==========================================================================
+   METRICS ROW
+   ========================================================================== */
+.BlogComments-statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.BlogComments-statCard {
+  background: var(--bc-bg-card);
+  border: 1px solid var(--bc-border);
+  border-radius: var(--bc-radius-md);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--bc-shadow-sm);
+  transition: var(--bc-transition);
+}
+
+.BlogComments-statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--bc-shadow-md);
+  border-color: #cbd5e1;
+}
+
+.BlogComments-statIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--bc-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.BlogComments-statIcon--total {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+.BlogComments-statIcon--draft {
+  background: var(--bc-warning-bg);
+  color: var(--bc-warning);
+}
+
+.BlogComments-statIcon--published {
+  background: var(--bc-success-bg);
+  color: var(--bc-success);
+}
+
+.BlogComments-statIcon--blogs {
+  background: #f0f9ff;
+  color: #0284c7;
+}
+
+.BlogComments-statContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.BlogComments-statLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bc-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.BlogComments-statValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--bc-text-main);
+}
+
+/* ==========================================================================
+   CONTROL BAR (SEARCH, BLOG FILTER, STATUS TABS)
+   ========================================================================== */
+.BlogComments-controlBar {
+  background: var(--bc-bg-card);
+  border: 1px solid var(--bc-border);
+  border-radius: var(--bc-radius-md);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  box-shadow: var(--bc-shadow-sm);
+  flex-wrap: wrap;
+}
+
+.BlogComments-searchBox {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+}
+
+.BlogComments-searchIcon {
+  position: absolute;
+  left: 14px;
+  font-size: 16px;
+  color: var(--bc-text-light);
+  pointer-events: none;
+}
+
+.BlogComments-searchBox input {
+  width: 100%;
+  padding: 9px 36px 9px 38px;
+  background: #f8fafc;
+  border: 1px solid var(--bc-border);
+  border-radius: var(--bc-radius-sm);
+  font-size: 14px;
+  color: var(--bc-text-main);
+  outline: none;
+  transition: var(--bc-transition);
+}
+
+.BlogComments-searchBox input:focus {
+  background: #ffffff;
+  border-color: var(--bc-primary);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.BlogComments-clearSearch {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--bc-text-light);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.BlogComments-clearSearch:hover {
+  color: var(--bc-text-main);
+}
+
+.BlogComments-filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.BlogComments-selectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.BlogComments-selectIcon {
+  position: absolute;
+  left: 12px;
+  font-size: 14px;
+  color: var(--bc-text-light);
+  pointer-events: none;
+}
+
+.BlogComments-selectWrapper select {
+  padding: 9px 16px 9px 34px;
+  background: #f8fafc;
+  border: 1px solid var(--bc-border);
+  border-radius: var(--bc-radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bc-text-main);
+  outline: none;
+  cursor: pointer;
+  max-width: 280px;
+  transition: var(--bc-transition);
+}
+
+.BlogComments-selectWrapper select:focus {
+  border-color: var(--bc-primary);
+  background: #ffffff;
+}
+
+.BlogComments-statusTabs {
+  display: flex;
+  background: #f1f5f9;
+  padding: 3px;
+  border-radius: var(--bc-radius-sm);
+  gap: 2px;
+}
+
+.BlogComments-statusTab {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--bc-text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--bc-transition);
+}
+
+.BlogComments-statusTab.active {
+  background: #ffffff;
+  color: var(--bc-text-main);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================================
+   COMMENTS CARDS LIST
+   ========================================================================== */
+.BlogComments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.BlogComments-card {
+  background: var(--bc-bg-card);
+  border: 1px solid var(--bc-border);
+  border-radius: var(--bc-radius-md);
+  padding: 20px 24px;
+  box-shadow: var(--bc-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: var(--bc-transition);
+}
+
+.BlogComments-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: var(--bc-shadow-md);
+}
+
+.BlogComments-card--draft {
+  border-left: 4px solid var(--bc-warning);
+  background: #fffdfa;
+}
+
+/* Top: Blog Title & Status */
+.BlogComments-cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--bc-border-subtle);
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.BlogComments-blogBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--bc-text-muted);
+}
+
+.BlogComments-blogTitle {
+  font-weight: 700;
+  color: var(--bc-text-main);
+}
+
+.BlogComments-viewLiveLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bc-accent);
+  text-decoration: none;
+  background: #f0f9ff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  transition: var(--bc-transition);
+}
+
+.BlogComments-viewLiveLink:hover {
+  background: #e0f2fe;
+}
+
+.BlogComments-statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.BlogComments-statusBadge--published {
+  background: var(--bc-success-bg);
+  color: var(--bc-success);
+  border: 1px solid var(--bc-success-border);
+}
+
+.BlogComments-statusBadge--draft {
+  background: var(--bc-warning-bg);
+  color: #b45309;
+  border: 1px solid var(--bc-warning-border);
+}
+
+.BlogComments-replyingNotice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--bc-accent);
+  background: #f0f9ff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+/* Commenter Content */
+.BlogComments-cardContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.BlogComments-avatarRing {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, #ffd23f 0%, #f59e0b 100%);
+  flex-shrink: 0;
+}
+
+.BlogComments-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #032169;
+  color: #ffd23f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.BlogComments-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.BlogComments-authorRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.BlogComments-authorName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--bc-text-main);
+}
+
+.BlogComments-authorEmail {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--bc-text-muted);
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.BlogComments-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--bc-text-light);
+}
+
+.BlogComments-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #334155;
+  background: #f8fafc;
+  padding: 12px 16px;
+  border-radius: var(--bc-radius-sm);
+  border: 1px solid var(--bc-border-subtle);
+}
+
+/* Actions */
+.BlogComments-actionsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.BlogComments-statusBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: var(--bc-radius-sm);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: var(--bc-transition);
+}
+
+.BlogComments-statusBtn.publish {
+  background: #10b981;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.BlogComments-statusBtn.publish:hover {
+  background: #059669;
+}
+
+.BlogComments-statusBtn.unpublish {
+  background: #f1f5f9;
+  color: var(--bc-text-muted);
+  border-color: var(--bc-border);
+}
+
+.BlogComments-statusBtn.unpublish:hover {
+  background: #e2e8f0;
+  color: var(--bc-text-main);
+}
+
+.BlogComments-actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--bc-radius-sm);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: var(--bc-transition);
+}
+
+.BlogComments-actionBtn.reply {
+  background: #f0fdfa;
+  color: #0d9488;
+  border-color: #ccfbf1;
+}
+
+.BlogComments-actionBtn.reply:hover {
+  background: #ccfbf1;
+}
+
+.BlogComments-actionBtn.delete {
+  background: #fef2f2;
+  color: var(--bc-danger);
+  border-color: #fee2e2;
+}
+
+.BlogComments-actionBtn.delete:hover {
+  background: #fee2e2;
+  color: var(--bc-danger-hover);
+}
+
+/* ==========================================================================
+   MODALS
+   ========================================================================== */
+.BlogComments-modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: bcFadeIn 0.2s ease-out;
+}
+
+.BlogComments-modalContent {
+  background: #ffffff;
+  border-radius: var(--bc-radius-lg);
+  width: 100%;
+  max-width: 520px;
+  overflow: hidden;
+  box-shadow: var(--bc-shadow-lg);
+  animation: bcScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.BlogComments-modalHeader {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--bc-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.BlogComments-modalTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: var(--bc-primary);
+}
+
+.BlogComments-modalTitle h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--bc-text-main);
+}
+
+.BlogComments-modalClose {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--bc-text-light);
+  cursor: pointer;
+}
+
+.BlogComments-replyOriginal {
+  padding: 16px 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--bc-border-subtle);
+}
+
+.BlogComments-replyOriginalLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--bc-text-muted);
+}
+
+.BlogComments-replyOriginal p {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: #334155;
+  font-style: italic;
+}
+
+.BlogComments-replyForm {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.BlogComments-replyForm label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bc-text-main);
+}
+
+.BlogComments-replyForm textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--bc-border);
+  border-radius: var(--bc-radius-sm);
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.BlogComments-replyForm textarea:focus {
+  border-color: var(--bc-primary);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.BlogComments-modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 10px;
+}
+
+.BlogComments-cancelBtn {
+  padding: 9px 16px;
+  background: #ffffff;
+  border: 1px solid var(--bc-border);
+  border-radius: var(--bc-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bc-text-muted);
+  cursor: pointer;
+}
+
+.BlogComments-submitBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  background: #0d9488;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--bc-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.BlogComments-submitBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Delete Confirm Modal */
+.BlogComments-confirmModal {
+  background: #ffffff;
+  border-radius: var(--bc-radius-lg);
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--bc-shadow-lg);
+}
+
+.BlogComments-confirmIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 16px;
+}
+
+.BlogComments-confirmModal h3 {
+  font-size: 18px;
+  margin: 0 0 8px;
+  color: var(--bc-text-main);
+}
+
+.BlogComments-confirmModal p {
+  font-size: 13px;
+  color: var(--bc-text-muted);
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.BlogComments-confirmActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.BlogComments-deleteConfirmBtn {
+  padding: 9px 20px;
+  background: var(--bc-danger);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--bc-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Toast */
+.BlogComments-toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: var(--bc-radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--bc-shadow-lg);
+}
+
+.BlogComments-toast--success {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.BlogComments-toast--error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* Empty & Loading states */
+.BlogComments-emptyState,
+.BlogComments-loadingState {
+  background: #ffffff;
+  border: 1px dashed var(--bc-border);
+  border-radius: var(--bc-radius-lg);
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.BlogComments-emptyIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f0fdfa;
+  color: var(--bc-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin: 0 auto 16px;
+}
+
+.BlogComments-emptyState h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.BlogComments-emptyState p {
+  font-size: 13px;
+  color: var(--bc-text-muted);
+  max-width: 420px;
+  margin: 0 auto 16px;
+}
+
+.BlogComments-secondaryBtn {
+  padding: 8px 18px;
+  background: #f1f5f9;
+  border: 1px solid var(--bc-border);
+  border-radius: var(--bc-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.BlogComments-loadingState {
+  color: var(--bc-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+}
+
+.BlogComments-loadingState p {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bc-text-muted);
+  margin: 0;
+}
+
+/* Animations */
+.spin {
+  animation: bcSpin 0.9s linear infinite;
+}
+
+@keyframes bcSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bcFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bcScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .BlogComments-statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .BlogComments {
+    padding: 16px;
+  }
+
+  .BlogComments-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .BlogComments-statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .BlogComments-controlBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .BlogComments-searchBox {
+    max-width: 100%;
+  }
+
+  .BlogComments-filterGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .BlogComments-selectWrapper select {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .BlogComments-cardContent {
+    flex-direction: column;
+  }
+}
+

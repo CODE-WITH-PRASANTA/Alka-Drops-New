@@ -1,0 +1,223 @@
+.SubscriptionOrders {
+  padding: 24px 32px 48px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 72px);
+  color: #0f172a;
+}
+.SubscriptionOrders-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.SubscriptionOrders-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.SubscriptionOrders-headingIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+.SubscriptionOrders-heading h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0d3b43;
+  margin: 0;
+}
+.SubscriptionOrders-actions {
+  display: flex;
+  gap: 12px;
+}
+.SubscriptionOrders-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+}
+.SubscriptionOrders-statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.SubscriptionOrders-statCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.SubscriptionOrders-statIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.SubscriptionOrders-statIcon.trips { background: #f0fdfa; color: #0d9488; }
+.SubscriptionOrders-statIcon.bottles { background: #f0f9ff; color: #0284c7; }
+.SubscriptionOrders-statIcon.delivered { background: #ecfdf5; color: #10b981; }
+.SubscriptionOrders-statIcon.transit { background: #fffbeb; color: #f59e0b; }
+.SubscriptionOrders-statLabel { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; display: block; }
+.SubscriptionOrders-statValue { font-size: 22px; font-weight: 700; color: #0f172a; }
+.SubscriptionOrders-controlBar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.SubscriptionOrders-searchBox {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+.SubscriptionOrders-searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 11px;
+  color: #94a3b8;
+}
+.SubscriptionOrders-searchBox input {
+  width: 100%;
+  padding: 9px 14px 9px 36px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13.5px;
+  outline: none;
+}
+.SubscriptionOrders-filterGroup {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.SubscriptionOrders-filterGroup select {
+  padding: 8px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #f8fafc;
+  outline: none;
+}
+.SubscriptionOrders-statusTabs {
+  display: flex;
+  background: #f1f5f9;
+  padding: 3px;
+  border-radius: 8px;
+}
+.SubscriptionOrders-statusTabs button {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.SubscriptionOrders-statusTabs button.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.SubscriptionOrders-tableCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow-x: auto;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.SubscriptionOrders-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.SubscriptionOrders-table th {
+  background: #f8fafc;
+  padding: 12px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+.SubscriptionOrders-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13.5px;
+  vertical-align: middle;
+}
+.SubscriptionOrders-subText {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 2px;
+}
+.SubscriptionOrders-bottlesBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  margin-right: 6px;
+}
+.SubscriptionOrders-bottlesBadge.deliver { background: #f0fdfa; color: #0d9488; }
+.SubscriptionOrders-bottlesBadge.return { background: #f1f5f9; color: #475569; }
+.SubscriptionOrders-rider {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #0284c7;
+}
+.SubscriptionOrders-statusPill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.SubscriptionOrders-statusPill.delivered { background: #ecfdf5; color: #059669; }
+.SubscriptionOrders-statusPill.out-for-delivery { background: #fffbeb; color: #b45309; }
+.SubscriptionOrders-statusPill.pending-dispatch { background: #f0f9ff; color: #0284c7; }
+.SubscriptionOrders-statusPill.customer-paused { background: #f1f5f9; color: #64748b; }
+@media (max-width: 1024px) {
+  .SubscriptionOrders-statsGrid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .SubscriptionOrders { padding: 16px; }
+  .SubscriptionOrders-header { flex-direction: column; align-items: stretch; gap: 12px; }
+  .SubscriptionOrders-statsGrid { grid-template-columns: 1fr; }
+  .SubscriptionOrders-controlBar { flex-direction: column; align-items: stretch; }
+}
+

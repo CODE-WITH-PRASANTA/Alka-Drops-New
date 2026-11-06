@@ -51,6 +51,7 @@ router.post("/", upload.single("image"), async (req, res, next) => {
       success: true,
       message: "Image uploaded and converted to WebP successfully!",
       url: fileUrl,
+      fileUrl: fileUrl,
       filename,
       mimetype: "image/webp",
       size: stats.size,

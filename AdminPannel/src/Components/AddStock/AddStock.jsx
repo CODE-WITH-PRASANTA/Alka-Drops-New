@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   PlusCircle,
   Table as TableIcon,
@@ -18,56 +18,12 @@ import {
   Sparkles,
   CheckCircle2,
   AlertTriangle,
-  Layers,
-  IndianRupee,
   Package,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
+import API from "../../services/api";
 import "./AddStock.css";
-
-const INITIAL_STOCKS = [
-  {
-    id: 1,
-    title: "Alkaline Natural Spring Water",
-    category: "Alkaline Water",
-    liter: "1 Litre",
-    price: 45,
-    discount: 10,
-    badge: "Best Seller",
-    quantity: 120,
-    description: "Premium natural pH 8.5+ mineral enriched drinking water.",
-    image:
-      "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=300&auto=format&fit=crop&q=80",
-    createdAt: "2026-11-01",
-  },
-  {
-    id: 2,
-    title: "Copper Infused Ionized Water",
-    category: "Ionized Water",
-    liter: "500 ml",
-    price: 35,
-    discount: 5,
-    badge: "Popular",
-    quantity: 65,
-    description: "Infused with pure copper ions for enhanced metabolism.",
-    image:
-      "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=300&auto=format&fit=crop&q=80",
-    createdAt: "2026-11-02",
-  },
-  {
-    id: 3,
-    title: "Alka Drops Jumbo Canister",
-    category: "Alkaline Water",
-    liter: "20 Litre",
-    price: 180,
-    discount: 15,
-    badge: "New",
-    quantity: 40,
-    description: "Household and enterprise pack with easy dispenser neck.",
-    image:
-      "https://images.unsplash.com/photo-1560023907-5f339617ea30?w=300&auto=format&fit=crop&q=80",
-    createdAt: "2026-11-03",
-  },
-];
 
 const CATEGORIES = [
   "Alkaline Water",
@@ -75,6 +31,9 @@ const CATEGORIES = [
   "Mineral Water",
   "Sparkling Water",
   "Flavored Water",
+  "Jars & Cans",
+  "Bottles",
+  "Accessories",
 ];
 
 const LITERS = [
@@ -84,17 +43,26 @@ const LITERS = [
   "1 Litre",
   "2 Litre",
   "5 Litre",
+  "10 Litre",
   "20 Litre",
 ];
 
-const BADGES = ["None", "Best Seller", "Popular", "New"];
+const BADGES = ["None", "Best Seller", "Popular", "New", "Save 12%", "Premium"];
+
+const DEFAULT_IMAGE =
+  "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=700&auto=format&fit=crop&q=85";
 
 const AddStock = () => {
   // Navigation View: 'form' | 'table'
   const [activeView, setActiveView] = useState("form");
 
-  // Stock Items State
-  const [stocks, setStocks] = useState(INITIAL_STOCKS);
+  // Stock Items State from MongoDB
+  const [stocks, setStocks] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIds, setSelectedIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -113,6 +81,7 @@ const AddStock = () => {
     image: null,
   };
   const [formData, setFormData] = useState(initialFormState);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const editorRef = useRef(null);
 
@@ -120,87 +89,211 @@ const AddStock = () => {
   const [viewItem, setViewItem] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
-  const [toastMessage, setToastMessage] = useState("");
+  const [toast, setToast] = useState({ message: "", type: "success" });
 
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(""), 3500);
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast({ message: "", type: "success" }), 3500);
   };
+
+  // Fetch all products from MongoDB
+  const fetchStocks = async () => {
+    try {
+      setIsLoading(true);
+      const res = await API.get("/products?limit=200");
+      if (res.data?.success && Array.isArray(res.data.products)) {
+        setStocks(res.data.products);
+      }
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+      showToast(
+        err.response?.data?.message || "Failed to load stocks from server.",
+        "error"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStocks();
+  }, []);
 
   // Text Editor Toolbar Commands
   const executeEditorCommand = (command, value = null) => {
     document.execCommand(command, false, value);
   };
 
-  // Image Upload Handler
+  // Image File Selection Handler
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
+      if (!file.type.startsWith("image/")) {
+        showToast("Please choose an image file (PNG, JPG, WEBP).", "error");
+        return;
+      }
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setFormData((prev) => ({ ...prev, image: reader.result }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Form Submit Handler
-  const handleFormSubmit = (e) => {
+  // Form Submit Handler (Dynamically save to database)
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.title || !formData.price || !formData.quantity) {
-      showToast("Please complete all required fields.");
+
+    if (!formData.title.trim()) {
+      showToast("Please enter a bottle title.", "error");
+      return;
+    }
+    if (formData.price === "" || isNaN(Number(formData.price))) {
+      showToast("Please enter a valid price.", "error");
+      return;
+    }
+    if (formData.quantity === "" || isNaN(Number(formData.quantity))) {
+      showToast("Please enter a valid stock quantity.", "error");
       return;
     }
 
-    const newStockItem = {
-      id: Date.now(),
-      title: formData.title,
-      category: formData.category,
-      liter: formData.liter,
-      price: parseFloat(formData.price),
-      discount: parseFloat(formData.discount) || 0,
-      badge: formData.badge,
-      quantity: parseInt(formData.quantity, 10),
-      description: editorRef.current
+    try {
+      setIsSubmitting(true);
+      let uploadedImageUrl = formData.image;
+
+      // Upload image to server if file selected
+      if (selectedFile) {
+        try {
+          const uploadData = new FormData();
+          uploadData.append("image", selectedFile);
+          const uploadRes = await API.post("/upload", uploadData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          if (uploadRes.data?.success && uploadRes.data?.url) {
+            uploadedImageUrl = uploadRes.data.url;
+          }
+        } catch (uploadErr) {
+          console.warn("Image upload failed, using fallback:", uploadErr);
+        }
+      }
+
+      const descriptionContent = editorRef.current
         ? editorRef.current.innerHTML
-        : formData.description,
-      image:
-        imagePreview ||
-        "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=300&auto=format&fit=crop&q=80",
-      createdAt: new Date().toISOString().split("T")[0],
-    };
+        : formData.description;
 
-    setStocks([newStockItem, ...stocks]);
-    setFormData(initialFormState);
-    setImagePreview(null);
-    if (editorRef.current) editorRef.current.innerHTML = "";
-    showToast("Stock added to catalog successfully!");
-    setActiveView("table");
+      const payload = {
+        title: formData.title.trim(),
+        name: formData.title.trim(),
+        category: formData.category,
+        liter: formData.liter,
+        size: formData.liter,
+        price: parseFloat(formData.price),
+        discount: parseFloat(formData.discount) || 0,
+        badge: formData.badge === "None" ? "" : formData.badge,
+        quantity: parseInt(formData.quantity, 10),
+        description: descriptionContent || "",
+        image: uploadedImageUrl || DEFAULT_IMAGE,
+      };
+
+      const res = await API.post("/products", payload);
+
+      if (res.data?.success) {
+        showToast("Stock added to catalog & saved to database successfully!");
+        setFormData(initialFormState);
+        setSelectedFile(null);
+        setImagePreview(null);
+        if (editorRef.current) editorRef.current.innerHTML = "";
+        await fetchStocks();
+        setActiveView("table");
+      } else {
+        showToast(res.data?.message || "Failed to create product.", "error");
+      }
+    } catch (err) {
+      console.error("Error creating product:", err);
+      showToast(
+        err.response?.data?.message || "Network error: Failed to save product.",
+        "error"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Edit Submission Handler
-  const handleEditSubmit = (e) => {
+  // Edit Submission Handler (PUT /api/products/:id)
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
-    setStocks(
-      stocks.map((item) => (item.id === editItem.id ? { ...editItem } : item))
-    );
-    setEditItem(null);
-    showToast("Stock details updated successfully.");
+    if (!editItem) return;
+
+    try {
+      setIsUpdating(true);
+      const id = editItem._id || editItem.id;
+
+      const payload = {
+        title: editItem.title.trim(),
+        name: editItem.title.trim(),
+        category: editItem.category,
+        liter: editItem.liter,
+        size: editItem.liter,
+        price: parseFloat(editItem.price),
+        discount: parseFloat(editItem.discount) || 0,
+        quantity: parseInt(editItem.quantity, 10),
+        badge: editItem.badge === "None" ? "" : editItem.badge,
+        description: editItem.description || "",
+      };
+
+      const res = await API.put(`/products/${id}`, payload);
+
+      if (res.data?.success) {
+        showToast("Stock details updated successfully in database!");
+        setEditItem(null);
+        await fetchStocks();
+      } else {
+        showToast(res.data?.message || "Failed to update stock.", "error");
+      }
+    } catch (err) {
+      console.error("Error updating product:", err);
+      showToast(
+        err.response?.data?.message || "Network error updating stock record.",
+        "error"
+      );
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
-  // Delete Confirmation Handler
-  const confirmDelete = () => {
-    setStocks(stocks.filter((item) => item.id !== deleteItem.id));
-    setSelectedIds(selectedIds.filter((id) => id !== deleteItem.id));
-    setDeleteItem(null);
-    showToast("Product deleted from stock.");
+  // Delete Confirmation Handler (DELETE /api/products/:id)
+  const confirmDelete = async () => {
+    if (!deleteItem) return;
+
+    try {
+      setIsDeleting(true);
+      const id = deleteItem._id || deleteItem.id;
+      const res = await API.delete(`/products/${id}`);
+
+      if (res.data?.success) {
+        showToast("Product deleted from stock and database!");
+        setSelectedIds((prev) => prev.filter((itemKey) => itemKey !== id));
+        setDeleteItem(null);
+        await fetchStocks();
+      } else {
+        showToast(res.data?.message || "Failed to delete product.", "error");
+      }
+    } catch (err) {
+      console.error("Error deleting product:", err);
+      showToast(
+        err.response?.data?.message || "Network error deleting product.",
+        "error"
+      );
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Selection Checkboxes
   const handleSelectAll = (e) => {
     if (e.target.checked) {
-      setSelectedIds(filteredStocks.map((s) => s.id));
+      setSelectedIds(filteredStocks.map((s) => s._id || s.id));
     } else {
       setSelectedIds([]);
     }
@@ -213,12 +306,13 @@ const AddStock = () => {
   };
 
   // Search Filter & Pagination Logic
-  const filteredStocks = stocks.filter(
-    (stock) =>
-      stock.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      stock.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      stock.liter.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredStocks = stocks.filter((stock) => {
+    const sTerm = searchTerm.toLowerCase();
+    const title = (stock.title || stock.name || "").toLowerCase();
+    const cat = (stock.category || "").toLowerCase();
+    const vol = (stock.liter || stock.size || "").toLowerCase();
+    return title.includes(sTerm) || cat.includes(sTerm) || vol.includes(sTerm);
+  });
 
   const totalPages = Math.ceil(filteredStocks.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -229,7 +323,7 @@ const AddStock = () => {
 
   return (
     <div className="AddStock">
-      {/* Premium Integrated Header */}
+      {/* Topbar */}
       <div className="AddStock-topbar">
         <div className="AddStock-header-left">
           <div className="AddStock-header-icon-box">
@@ -238,27 +332,40 @@ const AddStock = () => {
           <div>
             <h1 className="AddStock-header-title">Shop / Stock Management</h1>
             <p className="AddStock-header-desc">
-              Manage alkaline bottles, volume tiers, pricing inventory, and live availability.
+              Manage alkaline bottles, volume tiers, pricing inventory, and live database availability.
             </p>
           </div>
         </div>
 
-        {/* View Switch Pill */}
-        <div className="AddStock-tab-pills">
+        {/* View Switch Pills & Refresh */}
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           <button
             type="button"
-            className={`AddStock-tab-btn ${activeView === "form" ? "active" : ""}`}
-            onClick={() => setActiveView("form")}
+            className="AddStock-tab-btn"
+            style={{ background: "#ffffff", border: "1px solid var(--alka-border)", borderRadius: "8px" }}
+            onClick={fetchStocks}
+            disabled={isLoading}
+            title="Refresh database records"
           >
-            <PlusCircle size={15} /> Add Stock Form
+            <RefreshCw size={14} className={isLoading ? "spin" : ""} /> Refresh
           </button>
-          <button
-            type="button"
-            className={`AddStock-tab-btn ${activeView === "table" ? "active" : ""}`}
-            onClick={() => setActiveView("table")}
-          >
-            <TableIcon size={15} /> Stock Inventory Table
-          </button>
+
+          <div className="AddStock-tab-pills">
+            <button
+              type="button"
+              className={`AddStock-tab-btn ${activeView === "form" ? "active" : ""}`}
+              onClick={() => setActiveView("form")}
+            >
+              <PlusCircle size={15} /> Add Stock Form
+            </button>
+            <button
+              type="button"
+              className={`AddStock-tab-btn ${activeView === "table" ? "active" : ""}`}
+              onClick={() => setActiveView("table")}
+            >
+              <TableIcon size={15} /> Stock Inventory Table ({stocks.length})
+            </button>
+          </div>
         </div>
       </div>
 
@@ -281,7 +388,7 @@ const AddStock = () => {
                 <div className="AddStock-col-left">
                   <div className="AddStock-form-group">
                     <label className="AddStock-label">
-                      Bottle Image <span className="AddStock-required">*</span>
+                      Bottle Image
                     </label>
                     <div className="AddStock-uploader-area">
                       {imagePreview ? (
@@ -296,6 +403,7 @@ const AddStock = () => {
                             className="AddStock-preview-remove"
                             onClick={() => {
                               setImagePreview(null);
+                              setSelectedFile(null);
                               setFormData({ ...formData, image: null });
                             }}
                           >
@@ -311,7 +419,7 @@ const AddStock = () => {
                             Click or drag bottle photo here
                           </span>
                           <span className="AddStock-dropzone-sub">
-                            PNG, JPG, WEBP (High Resolution recommended)
+                            PNG, JPG, WEBP (Uploaded directly to server)
                           </span>
                           <input
                             type="file"
@@ -519,8 +627,20 @@ const AddStock = () => {
                   </div>
 
                   <div className="AddStock-submit-wrap">
-                    <button type="submit" className="AddStock-save-btn">
-                      <PlusCircle size={18} /> Confirm & Add to Inventory
+                    <button
+                      type="submit"
+                      className="AddStock-save-btn"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 size={18} className="spin" /> Saving to Database...
+                        </>
+                      ) : (
+                        <>
+                          <PlusCircle size={18} /> Confirm & Add to Inventory
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -536,7 +656,7 @@ const AddStock = () => {
               <div>
                 <h2 className="AddStock-table-title">Live Stock Catalog</h2>
                 <span className="AddStock-table-sub">
-                  Showing {paginatedStocks.length} of {filteredStocks.length} total inventory records
+                  Showing {paginatedStocks.length} of {filteredStocks.length} total inventory records from database
                 </span>
               </div>
 
@@ -558,177 +678,199 @@ const AddStock = () => {
 
             {/* Table Container */}
             <div className="AddStock-table-wrapper">
-              <table className="AddStock-datatable">
-                <thead>
-                  <tr>
-                    <th className="th-select">
-                      <input
-                        type="checkbox"
-                        onChange={handleSelectAll}
-                        checked={
-                          paginatedStocks.length > 0 &&
-                          paginatedStocks.every((s) => selectedIds.includes(s.id))
-                        }
-                      />
-                    </th>
-                    <th>#</th>
-                    <th>Bottle Product</th>
-                    <th>Category</th>
-                    <th>Volume</th>
-                    <th>Price</th>
-                    <th>Discount</th>
-                    <th>Tag</th>
-                    <th>Stock</th>
-                    <th className="th-actions">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedStocks.length > 0 ? (
-                    paginatedStocks.map((item, index) => {
-                      const isSelected = selectedIds.includes(item.id);
-                      return (
-                        <tr
-                          key={item.id}
-                          className={isSelected ? "row-selected" : ""}
-                        >
-                          <td className="td-select">
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={() => handleSelectItem(item.id)}
-                            />
-                          </td>
-                          <td className="td-index">
-                            {startIndex + index + 1}
-                          </td>
-                          <td>
-                            <div className="AddStock-bottle-group">
-                              <img
-                                src={item.image}
-                                alt={item.title}
-                                className="AddStock-table-avatar"
-                              />
-                              <div className="AddStock-bottle-txt">
-                                <span className="bottle-name">{item.title}</span>
-                                <span className="bottle-id">
-                                  ID: ALKA-{item.id.toString().slice(-4)}
-                                </span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <span className="pill-category">{item.category}</span>
-                          </td>
-                          <td>
-                            <span className="pill-vol">{item.liter}</span>
-                          </td>
-                          <td className="td-price">₹{item.price}</td>
-                          <td className="td-discount">
-                            {item.discount > 0 ? `${item.discount}% OFF` : "—"}
-                          </td>
-                          <td>
-                            <span
-                              className={`pill-badge badge-${item.badge
-                                .toLowerCase()
-                                .replace(/\s+/g, "-")}`}
-                            >
-                              {item.badge}
-                            </span>
-                          </td>
-                          <td>
-                            <span
-                              className={`pill-stock ${
-                                item.quantity <= 10
-                                  ? "stock-critical"
-                                  : item.quantity <= 50
-                                  ? "stock-low"
-                                  : "stock-good"
-                              }`}
-                            >
-                              {item.quantity} units
-                            </span>
-                          </td>
-                          <td>
-                            <div className="AddStock-action-row">
-                              <button
-                                type="button"
-                                className="btn-action view"
-                                title="View Details"
-                                onClick={() => setViewItem(item)}
-                              >
-                                <Eye size={15} />
-                              </button>
-                              <button
-                                type="button"
-                                className="btn-action edit"
-                                title="Edit Product"
-                                onClick={() => setEditItem({ ...item })}
-                              >
-                                <Edit2 size={15} />
-                              </button>
-                              <button
-                                type="button"
-                                className="btn-action delete"
-                                title="Remove Stock"
-                                onClick={() => setDeleteItem(item)}
-                              >
-                                <Trash2 size={15} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
+              {isLoading ? (
+                <div className="AddStock-loading-state">
+                  <Loader2 size={24} className="spin" /> Loading stock records from database...
+                </div>
+              ) : (
+                <table className="AddStock-datatable">
+                  <thead>
                     <tr>
-                      <td colSpan="10" className="AddStock-zero-data">
-                        No bottle inventory records found matching your query.
-                      </td>
+                      <th className="th-select">
+                        <input
+                          type="checkbox"
+                          onChange={handleSelectAll}
+                          checked={
+                            paginatedStocks.length > 0 &&
+                            paginatedStocks.every((s) =>
+                              selectedIds.includes(s._id || s.id)
+                            )
+                          }
+                        />
+                      </th>
+                      <th>#</th>
+                      <th>Bottle Product</th>
+                      <th>Category</th>
+                      <th>Volume</th>
+                      <th>Price</th>
+                      <th>Discount</th>
+                      <th>Tag</th>
+                      <th>Stock</th>
+                      <th className="th-actions">Actions</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {paginatedStocks.length > 0 ? (
+                      paginatedStocks.map((item, index) => {
+                        const itemId = item._id || item.id;
+                        const isSelected = selectedIds.includes(itemId);
+                        const itemTitle = item.title || item.name;
+                        const itemVol = item.liter || item.size || "1 Litre";
+                        const itemImg = item.image || DEFAULT_IMAGE;
+
+                        return (
+                          <tr
+                            key={itemId}
+                            className={isSelected ? "row-selected" : ""}
+                          >
+                            <td className="td-select">
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => handleSelectItem(itemId)}
+                              />
+                            </td>
+                            <td className="td-index">
+                              {startIndex + index + 1}
+                            </td>
+                            <td>
+                              <div className="AddStock-bottle-group">
+                                <img
+                                  src={itemImg}
+                                  alt={itemTitle}
+                                  className="AddStock-table-avatar"
+                                  onError={(e) => {
+                                    e.currentTarget.src = DEFAULT_IMAGE;
+                                  }}
+                                />
+                                <div className="AddStock-bottle-txt">
+                                  <span className="bottle-name">{itemTitle}</span>
+                                  <span className="bottle-id">
+                                    ID: ALKA-{String(itemId).slice(-4).toUpperCase()}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <span className="pill-category">{item.category}</span>
+                            </td>
+                            <td>
+                              <span className="pill-vol">{itemVol}</span>
+                            </td>
+                            <td className="td-price">₹{item.price}</td>
+                            <td className="td-discount">
+                              {item.discount > 0 ? `${item.discount}% OFF` : "—"}
+                            </td>
+                            <td>
+                              {item.badge ? (
+                                <span
+                                  className={`pill-badge badge-${item.badge
+                                    .toLowerCase()
+                                    .replace(/\s+/g, "-")}`}
+                                >
+                                  {item.badge}
+                                </span>
+                              ) : (
+                                <span style={{ color: "#9ca3af", fontSize: "12px" }}>—</span>
+                              )}
+                            </td>
+                            <td>
+                              <span
+                                className={`pill-stock ${
+                                  (item.quantity ?? 0) <= 10
+                                    ? "stock-critical"
+                                    : (item.quantity ?? 0) <= 50
+                                    ? "stock-low"
+                                    : "stock-good"
+                                }`}
+                              >
+                                {item.quantity ?? 0} units
+                              </span>
+                            </td>
+                            <td>
+                              <div className="AddStock-action-row">
+                                <button
+                                  type="button"
+                                  className="btn-action view"
+                                  title="View Details"
+                                  onClick={() => setViewItem(item)}
+                                >
+                                  <Eye size={15} />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-action edit"
+                                  title="Edit Product"
+                                  onClick={() => setEditItem({ ...item })}
+                                >
+                                  <Edit2 size={15} />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-action delete"
+                                  title="Remove Stock"
+                                  onClick={() => setDeleteItem(item)}
+                                >
+                                  <Trash2 size={15} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="10" className="AddStock-zero-data">
+                          No bottle inventory records found matching your query.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
 
             {/* Pagination Controls */}
-            <div className="AddStock-pagination">
-              <span className="AddStock-page-stat">
-                Page <strong>{currentPage}</strong> of{" "}
-                <strong>{totalPages}</strong>
-              </span>
-              <div className="AddStock-pager-btns">
-                <button
-                  type="button"
-                  className="btn-pager"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                >
-                  <ChevronLeft size={16} /> Prev
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => (
+            {totalPages > 1 && (
+              <div className="AddStock-pagination">
+                <span className="AddStock-page-stat">
+                  Page <strong>{currentPage}</strong> of{" "}
+                  <strong>{totalPages}</strong>
+                </span>
+                <div className="AddStock-pager-btns">
                   <button
-                    key={pg}
                     type="button"
-                    className={`btn-pager-num ${
-                      pg === currentPage ? "active" : ""
-                    }`}
-                    onClick={() => setCurrentPage(pg)}
+                    className="btn-pager"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                   >
-                    {pg}
+                    <ChevronLeft size={16} /> Prev
                   </button>
-                ))}
-                <button
-                  type="button"
-                  className="btn-pager"
-                  disabled={currentPage === totalPages}
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(p + 1, totalPages))
-                  }
-                >
-                  Next <ChevronRight size={16} />
-                </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => (
+                    <button
+                      key={pg}
+                      type="button"
+                      className={`btn-pager-num ${
+                        pg === currentPage ? "active" : ""
+                      }`}
+                      onClick={() => setCurrentPage(pg)}
+                    >
+                      {pg}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="btn-pager"
+                    disabled={currentPage === totalPages}
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(p + 1, totalPages))
+                    }
+                  >
+                    Next <ChevronRight size={16} />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
@@ -755,13 +897,21 @@ const AddStock = () => {
             </div>
             <div className="AddStock-dialog-body">
               <div className="AddStock-view-hero">
-                <img src={viewItem.image} alt={viewItem.title} />
+                <img
+                  src={viewItem.image || DEFAULT_IMAGE}
+                  alt={viewItem.title || viewItem.name}
+                  onError={(e) => {
+                    e.currentTarget.src = DEFAULT_IMAGE;
+                  }}
+                />
                 <div className="AddStock-view-hero-txt">
-                  <h4>{viewItem.title}</h4>
+                  <h4>{viewItem.title || viewItem.name}</h4>
                   <div className="AddStock-view-pills">
                     <span className="pill-category">{viewItem.category}</span>
-                    <span className="pill-vol">{viewItem.liter}</span>
-                    <span className="pill-badge">{viewItem.badge}</span>
+                    <span className="pill-vol">{viewItem.liter || viewItem.size}</span>
+                    {viewItem.badge && (
+                      <span className="pill-badge">{viewItem.badge}</span>
+                    )}
                   </div>
                   <div className="AddStock-view-price-tag">
                     <span className="price-num">₹{viewItem.price}</span>
@@ -780,8 +930,10 @@ const AddStock = () => {
                   <span>{viewItem.quantity} units</span>
                 </div>
                 <div>
-                  <label>Catalog Entry Date</label>
-                  <span>{viewItem.createdAt}</span>
+                  <label>Database Record ID</label>
+                  <span style={{ fontFamily: "monospace", fontSize: "12px" }}>
+                    {viewItem._id || viewItem.id}
+                  </span>
                 </div>
               </div>
 
@@ -812,7 +964,7 @@ const AddStock = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="AddStock-dialog-head">
-              <h3>Edit Stock Record</h3>
+              <h3>Edit Stock Record (Database Sync)</h3>
               <button
                 type="button"
                 className="AddStock-dialog-close"
@@ -828,7 +980,7 @@ const AddStock = () => {
                   type="text"
                   required
                   className="AddStock-input"
-                  value={editItem.title}
+                  value={editItem.title || editItem.name || ""}
                   onChange={(e) =>
                     setEditItem({ ...editItem, title: e.target.value })
                   }
@@ -840,7 +992,7 @@ const AddStock = () => {
                   <label className="AddStock-label">Category</label>
                   <select
                     className="AddStock-select"
-                    value={editItem.category}
+                    value={editItem.category || "Alkaline Water"}
                     onChange={(e) =>
                       setEditItem({ ...editItem, category: e.target.value })
                     }
@@ -856,9 +1008,13 @@ const AddStock = () => {
                   <label className="AddStock-label">Volume</label>
                   <select
                     className="AddStock-select"
-                    value={editItem.liter}
+                    value={editItem.liter || editItem.size || "1 Litre"}
                     onChange={(e) =>
-                      setEditItem({ ...editItem, liter: e.target.value })
+                      setEditItem({
+                        ...editItem,
+                        liter: e.target.value,
+                        size: e.target.value,
+                      })
                     }
                   >
                     {LITERS.map((l) => (
@@ -876,6 +1032,7 @@ const AddStock = () => {
                   <input
                     type="number"
                     step="0.01"
+                    required
                     className="AddStock-input"
                     value={editItem.price}
                     onChange={(e) =>
@@ -887,8 +1044,10 @@ const AddStock = () => {
                   <label className="AddStock-label">Discount (%)</label>
                   <input
                     type="number"
+                    min="0"
+                    max="100"
                     className="AddStock-input"
-                    value={editItem.discount}
+                    value={editItem.discount || 0}
                     onChange={(e) =>
                       setEditItem({ ...editItem, discount: e.target.value })
                     }
@@ -898,6 +1057,8 @@ const AddStock = () => {
                   <label className="AddStock-label">Stock Qty</label>
                   <input
                     type="number"
+                    min="0"
+                    required
                     className="AddStock-input"
                     value={editItem.quantity}
                     onChange={(e) =>
@@ -911,7 +1072,7 @@ const AddStock = () => {
                 <label className="AddStock-label">Tag / Badge</label>
                 <select
                   className="AddStock-select"
-                  value={editItem.badge}
+                  value={editItem.badge || "None"}
                   onChange={(e) =>
                     setEditItem({ ...editItem, badge: e.target.value })
                   }
@@ -932,8 +1093,18 @@ const AddStock = () => {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="AddStock-save-btn">
-                  Update Stock Record
+                <button
+                  type="submit"
+                  className="AddStock-save-btn"
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? (
+                    <>
+                      <Loader2 size={16} className="spin" /> Updating...
+                    </>
+                  ) : (
+                    "Update Stock Record"
+                  )}
                 </button>
               </div>
             </form>
@@ -954,10 +1125,10 @@ const AddStock = () => {
             <div className="AddStock-delete-icon">
               <AlertTriangle size={32} />
             </div>
-            <h3>Delete Stock Item?</h3>
+            <h3>Delete Stock Item from Database?</h3>
             <p>
-              Are you sure you want to permanently remove{" "}
-              <strong>{deleteItem.title}</strong> from the catalog? This action
+              Are you sure you want to permanently delete{" "}
+              <strong>{deleteItem.title || deleteItem.name}</strong> from the database? This action
               cannot be undone.
             </p>
             <div className="AddStock-delete-actions">
@@ -972,8 +1143,9 @@ const AddStock = () => {
                 type="button"
                 className="btn-dialog-delete"
                 onClick={confirmDelete}
+                disabled={isDeleting}
               >
-                Yes, Delete Item
+                {isDeleting ? "Deleting..." : "Yes, Delete Item"}
               </button>
             </div>
           </div>
@@ -981,10 +1153,14 @@ const AddStock = () => {
       )}
 
       {/* FLOATING TOAST NOTIFICATION */}
-      {toastMessage && (
-        <div className="AddStock-notification">
-          <CheckCircle2 size={18} />
-          <span>{toastMessage}</span>
+      {toast.message && (
+        <div className={`AddStock-notification ${toast.type === "error" ? "error" : ""}`}>
+          {toast.type === "error" ? (
+            <AlertTriangle size={18} />
+          ) : (
+            <CheckCircle2 size={18} />
+          )}
+          <span>{toast.message}</span>
         </div>
       )}
     </div>

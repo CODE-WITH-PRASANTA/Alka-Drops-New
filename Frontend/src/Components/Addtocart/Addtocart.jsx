@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FiTrash2,
@@ -10,17 +10,22 @@ import {
   FiTruck,
   FiArrowRight,
   FiZap,
-  FiCheckCircle,
   FiPackage,
   FiShoppingCart,
   FiRefreshCw,
   FiDroplet,
   FiHeadphones,
+  FiHeart,
+  FiX,
+  FiCheckCircle,
+  FiMapPin,
+  FiPhone,
+  FiUser,
+  FiMail,
 } from "react-icons/fi";
-
+import API from "../../services/api";
+import { useShop } from "../../context/ShopContext";
 import "./Addtocart.css";
-
-const CART_STORAGE_KEY = "shoppingCart";
 
 const demoProducts = [
   {
@@ -78,87 +83,20 @@ const fallbackImage =
 
 const Addtocart = () => {
   const navigate = useNavigate();
-  const notificationTimer = useRef(null);
-
-  // =====================================
-  // INITIAL CART DATA
-  // =====================================
-
-  const [cart, setCart] = useState(() => {
-    try {
-      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
-
-      if (savedCart !== null) {
-        const parsedCart = JSON.parse(savedCart);
-        return Array.isArray(parsedCart) ? parsedCart : [];
-      }
-
-      // First visit: load sample products
-      return demoProducts;
-    } catch (error) {
-      console.error("Cart loading error:", error);
-      return demoProducts;
-    }
-  });
-
-  const [notification, setNotification] = useState("");
-
-  // =====================================
-  // SAVE CART
-  // =====================================
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-    } catch (error) {
-      console.error("Unable to save cart:", error);
-    }
-  }, [cart]);
-
-  // =====================================
-  // SYNC CART WITH SHOP COMPONENT
-  // =====================================
-
-  useEffect(() => {
-    const syncCart = () => {
-      try {
-        const savedCart = localStorage.getItem(CART_STORAGE_KEY);
-        if (savedCart !== null) {
-          const parsed = JSON.parse(savedCart);
-          setCart(Array.isArray(parsed) ? parsed : []);
-        }
-      } catch (error) {
-        console.error("Cart synchronization error:", error);
-      }
-    };
-
-    window.addEventListener("storage", syncCart);
-    window.addEventListener("shoppingCartUpdated", syncCart);
-
-    return () => {
-      window.removeEventListener("storage", syncCart);
-      window.removeEventListener("shoppingCartUpdated", syncCart);
-    };
-  }, []);
-
-  // clear pending notification timer on unmount
-  useEffect(() => () => window.clearTimeout(notificationTimer.current), []);
-
-  // =====================================
-  // NOTIFICATION
-  // =====================================
-
-  const showNotification = (message) => {
-    setNotification(message);
-    window.clearTimeout(notificationTimer.current);
-    notificationTimer.current = window.setTimeout(() => {
-      setNotification("");
-    }, 2200);
-  };
-
-  // =====================================
-  // PRICE FORMAT
-  // =====================================
+  const {
+    cart,
+    setCart,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+    addToWishlist,
+    cartCount,
+    cartSubtotal,
+    deliveryCharge,
+    cartTotal,
+    totalSavings,
+    showToast,
+  } = useShop();
 
   const formatPrice = (price) =>
     new Intl.NumberFormat("en-IN", {
@@ -168,118 +106,131 @@ const Addtocart = () => {
       maximumFractionDigits: 2,
     }).format(Number(price) || 0);
 
-  // =====================================
-  // CART CALCULATIONS
-  // =====================================
-
-  const cartTotalCount = cart.reduce(
-    (total, item) => total + Math.max(0, Number(item.qty) || 0),
-    0
-  );
-
-  const cartSubtotal = cart.reduce(
-    (total, item) =>
-      total + (Number(item.price) || 0) * Math.max(0, Number(item.qty) || 0),
-    0
-  );
-
-  const deliveryCharge = 0;
-  const cartTotal = cartSubtotal + deliveryCharge;
-
-  const totalSavings = cart.reduce(
-    (total, item) =>
-      total +
-      Math.max(0, (Number(item.oldPrice) || 0) - (Number(item.price) || 0)) *
-        Math.max(0, Number(item.qty) || 0),
-    0
-  );
-
-  // =====================================
-  // NAVIGATION
-  // =====================================
-
   const handleReturnToShop = () => {
     navigate("/shop");
   };
 
+  // Checkout Modal & Order State
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
+  const [placedOrder, setPlacedOrder] = useState(null);
+
+  const [shippingForm, setShippingForm] = useState({
+    fullName: "",
+    phone: "",
+    email: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "Bhubaneswar",
+    postalCode: "751012",
+    deliverySlot: "Standard (1-2 days)",
+    paymentMethod: "cod",
+    notes: "",
+  });
+
   const handleCheckout = () => {
     if (!cart.length) {
-      showNotification("Your cart is empty!");
+      showToast("Your cart is empty!", "error");
+      return;
+    }
+    setCheckoutError("");
+    setPlacedOrder(null);
+    setIsCheckoutOpen(true);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setShippingForm((prev) => ({ ...prev, [name]: value }));
+    if (checkoutError) setCheckoutError("");
+  };
+
+  const handlePlaceOrder = async (e) => {
+    e.preventDefault();
+    if (isSubmittingOrder) return;
+
+    if (!shippingForm.fullName.trim()) {
+      setCheckoutError("Please enter your full name.");
       return;
     }
 
-    navigate("/checkout", {
-      state: {
-        cart,
-        subtotal: cartSubtotal,
-        delivery: deliveryCharge,
-        total: cartTotal,
-        totalItems: cartTotalCount,
-      },
-    });
-  };
+    const cleanPhone = shippingForm.phone.replace(/\D/g, "");
+    if (!cleanPhone || cleanPhone.length < 10) {
+      setCheckoutError("Please enter a valid 10-digit mobile number.");
+      return;
+    }
 
-  // =====================================
-  // UPDATE QUANTITY
-  // =====================================
+    if (!shippingForm.addressLine1.trim()) {
+      setCheckoutError("Please enter your delivery street address / flat details.");
+      return;
+    }
 
-  const updateQuantity = (productId, change) => {
-    setCart((previousCart) =>
-      previousCart.map((item) => {
-        if (item.id !== productId) return item;
+    if (!shippingForm.city.trim()) {
+      setCheckoutError("Please enter your city.");
+      return;
+    }
 
-        const currentQuantity = Number(item.qty) || 1;
-        const nextQuantity = currentQuantity + change;
+    setIsSubmittingOrder(true);
+    setCheckoutError("");
 
-        return {
-          ...item,
-          qty: Math.max(1, nextQuantity),
-        };
-      })
-    );
-  };
+    try {
+      const orderPayload = {
+        items: cart.map((item) => {
+          const rawId = item._id || item.id;
+          const isMongoId = rawId && String(rawId).match(/^[0-9a-fA-F]{24}$/);
+          return {
+            product: isMongoId ? rawId : null,
+            title: item.name || item.title || "Alkaline Water Bottle",
+            price: Number(item.price) || 0,
+            quantity: Math.max(1, Number(item.qty) || 1),
+            image: item.image || "",
+            size: item.size || item.liter || "1 Litre",
+          };
+        }),
+        shippingAddress: {
+          fullName: shippingForm.fullName.trim(),
+          phone: cleanPhone,
+          email: shippingForm.email?.trim() || "customer@alkadrops.com",
+          addressLine1: shippingForm.addressLine1.trim(),
+          addressLine2: shippingForm.addressLine2?.trim() || "",
+          city: shippingForm.city.trim(),
+          postalCode: shippingForm.postalCode?.trim() || "751012",
+        },
+        paymentMethod: shippingForm.paymentMethod,
+        deliverySlot: shippingForm.deliverySlot,
+        notes: shippingForm.notes?.trim() || "",
+        shippingCost: deliveryCharge,
+        discountAmount: totalSavings,
+      };
 
-  // =====================================
-  // REMOVE PRODUCT
-  // =====================================
+      const res = await API.post("/orders", orderPayload);
 
-  const removeProduct = (productId) => {
-    setCart((previousCart) =>
-      previousCart.filter((item) => item.id !== productId)
-    );
-
-    showNotification("Product removed from your cart");
-  };
-
-  // =====================================
-  // CLEAR CART
-  // =====================================
-
-  const clearCart = () => {
-    if (!cart.length) return;
-
-    const confirmed = window.confirm(
-      "Are you sure you want to remove all products?"
-    );
-
-    if (confirmed) {
-      setCart([]);
-      showNotification("Your cart has been cleared");
+      if (res.data?.success && res.data?.order) {
+        setPlacedOrder(res.data.order);
+        clearCart();
+        showToast(`Order #${res.data.order.orderNumber} placed successfully!`, "success");
+      } else {
+        throw new Error(res.data?.message || "Failed to place order.");
+      }
+    } catch (err) {
+      console.error("Order submission error:", err);
+      setCheckoutError(
+        err.response?.data?.message || err.message || "Failed to submit order. Please try again."
+      );
+    } finally {
+      setIsSubmittingOrder(false);
     }
   };
 
-  // =====================================
-  // RESTORE DEMO PRODUCTS
-  // =====================================
-
   const restoreDemoProducts = () => {
     setCart(demoProducts);
-    showNotification("Demo products restored successfully");
+    showToast("Demo products loaded to cart!", "success");
   };
 
-  // =====================================
-  // COMPONENT UI
-  // =====================================
+  const handleSaveForLater = (item) => {
+    addToWishlist(item);
+    removeFromCart(item.id || item._id);
+  };
 
   return (
     <section className="Addtocart">
@@ -291,14 +242,6 @@ const Addtocart = () => {
       </div>
 
       <div className="Addtocart-container">
-        {/* NOTIFICATION */}
-        {notification && (
-          <div className="Addtocart-notification" role="status">
-            <FiCheckCircle />
-            <span>{notification}</span>
-          </div>
-        )}
-
         {/* PAGE HEADER */}
         <header className="Addtocart-page-header">
           <nav className="Addtocart-breadcrumb" aria-label="Breadcrumb">
@@ -321,15 +264,15 @@ const Addtocart = () => {
               </h1>
 
               <p>
-                Review your selected products and get ready for checkout.
-                Pure pH 8.5+ alkaline water, delivered with care.
+                Review your selected alkaline bottles and water cans.
+                Pure pH 8.5+ mineral water, delivered straight to your door with care.
               </p>
             </div>
 
             <div className="Addtocart-header-badge" aria-hidden="true">
               <FiShoppingBag />
-              <strong>{cartTotalCount}</strong>
-              <em>{cartTotalCount === 1 ? "ITEM" : "ITEMS"}</em>
+              <strong>{cartCount}</strong>
+              <em>{cartCount === 1 ? "ITEM" : "ITEMS"}</em>
             </div>
           </div>
         </header>
@@ -357,8 +300,8 @@ const Addtocart = () => {
             <h2>Your Shopping Cart is Empty</h2>
 
             <p>
-              Your favourite products are waiting for you. Explore our
-              collection and add something wonderful.
+              Your favorite alkaline bottles and jars are waiting for you.
+              Explore our collection and add something pure and refreshing.
             </p>
 
             <div className="Addtocart-empty-actions">
@@ -377,7 +320,7 @@ const Addtocart = () => {
                 onClick={restoreDemoProducts}
               >
                 <FiRefreshCw />
-                Load Demo Products
+                Load Sample Products
               </button>
             </div>
           </div>
@@ -395,7 +338,7 @@ const Addtocart = () => {
                 <h2 className="Addtocart-cart-title">
                   Your Cart
                   <span className="Addtocart-item-count">
-                    {cartTotalCount} {cartTotalCount === 1 ? "Item" : "Items"}
+                    {cartCount} {cartCount === 1 ? "Item" : "Items"}
                   </span>
                 </h2>
               </div>
@@ -449,13 +392,14 @@ const Addtocart = () => {
 
                 <div className="Addtocart-products-list">
                   {cart.map((item) => {
+                    const itemId = item.id || item._id;
                     const price = Number(item.price) || 0;
                     const oldPrice = Number(item.oldPrice) || 0;
                     const quantity = Number(item.qty) || 1;
                     const lineTotal = price * quantity;
 
                     return (
-                      <article className="Addtocart-product-card" key={item.id}>
+                      <article className="Addtocart-product-card" key={itemId}>
                         {/* IMAGE */}
                         <div className="Addtocart-product-image-wrapper">
                           <img
@@ -479,14 +423,14 @@ const Addtocart = () => {
                         {/* INFO */}
                         <div className="Addtocart-product-info">
                           <span className="Addtocart-product-category">
-                            {item.category || "General"}
+                            {item.category || "Alkaline Water"} {item.size ? `· ${item.size}` : ""}
                           </span>
 
                           <h3 className="Addtocart-product-name">{item.name}</h3>
 
                           <p className="Addtocart-product-description">
                             {item.description ||
-                              "Quality product selected for your everyday needs."}
+                              "Premium pH 8.5+ natural alkaline hydration bottled fresh for your wellness."}
                           </p>
 
                           <div className="Addtocart-product-price">
@@ -511,7 +455,7 @@ const Addtocart = () => {
                             <div className="Addtocart-quantity-control">
                               <button
                                 type="button"
-                                onClick={() => updateQuantity(item.id, -1)}
+                                onClick={() => updateQuantity(itemId, -1)}
                                 disabled={quantity <= 1}
                                 aria-label="Decrease quantity"
                               >
@@ -522,7 +466,7 @@ const Addtocart = () => {
 
                               <button
                                 type="button"
-                                onClick={() => updateQuantity(item.id, 1)}
+                                onClick={() => updateQuantity(itemId, 1)}
                                 aria-label="Increase quantity"
                               >
                                 <FiPlus />
@@ -535,14 +479,27 @@ const Addtocart = () => {
                             <strong>{formatPrice(lineTotal)}</strong>
                           </div>
 
-                          <button
-                            type="button"
-                            className="Addtocart-remove-button"
-                            onClick={() => removeProduct(item.id)}
-                          >
-                            <FiTrash2 />
-                            Remove
-                          </button>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%" }}>
+                            <button
+                              type="button"
+                              className="Addtocart-remove-button"
+                              onClick={() => handleSaveForLater(item)}
+                              style={{ color: "#0a63c9", background: "rgba(10, 99, 201, 0.08)" }}
+                              title="Move to Wishlist"
+                            >
+                              <FiHeart />
+                              Save to Wishlist
+                            </button>
+
+                            <button
+                              type="button"
+                              className="Addtocart-remove-button"
+                              onClick={() => removeFromCart(itemId)}
+                            >
+                              <FiTrash2 />
+                              Remove
+                            </button>
+                          </div>
                         </div>
                       </article>
                     );
@@ -562,7 +519,7 @@ const Addtocart = () => {
 
                   <div className="Addtocart-products-note">
                     <FiPackage />
-                    Quality products, delivered to your door
+                    Quality alkaline products, delivered to your door
                   </div>
                 </div>
               </div>
@@ -587,26 +544,29 @@ const Addtocart = () => {
                   <div className="Addtocart-summary-body">
                     {/* ITEMS */}
                     <div className="Addtocart-summary-items">
-                      {cart.map((item) => (
-                        <div className="Addtocart-summary-product" key={item.id}>
-                          <div>
-                            <strong>{item.name}</strong>
-                            <span>Qty: {item.qty}</span>
-                          </div>
+                      {cart.map((item) => {
+                        const itemId = item.id || item._id;
+                        return (
+                          <div className="Addtocart-summary-product" key={itemId}>
+                            <div>
+                              <strong>{item.name}</strong>
+                              <span>Qty: {item.qty}</span>
+                            </div>
 
-                          <span>
-                            {formatPrice(
-                              (Number(item.price) || 0) * (Number(item.qty) || 1)
-                            )}
-                          </span>
-                        </div>
-                      ))}
+                            <span>
+                              {formatPrice(
+                                (Number(item.price) || 0) * (Number(item.qty) || 1)
+                              )}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
 
                     {/* BREAKDOWN */}
                     <div className="Addtocart-summary-breakdown">
                       <div className="Addtocart-summary-row">
-                        <span>Subtotal ({cartTotalCount} items)</span>
+                        <span>Subtotal ({cartCount} items)</span>
                         <strong>{formatPrice(cartSubtotal)}</strong>
                       </div>
 
@@ -666,10 +626,10 @@ const Addtocart = () => {
                       </div>
 
                       <div className="Addtocart-trust-item">
-                        <FiCheckCircle />
+                        <FiDroplet />
                         <div>
-                          <strong>Quality Products</strong>
-                          <span>Selected for your needs</span>
+                          <strong>pH 8.5+ Alkaline</strong>
+                          <span>Mineral enriched hydration</span>
                         </div>
                       </div>
                     </div>
@@ -684,7 +644,7 @@ const Addtocart = () => {
 
                   <div>
                     <strong>Need help with your order?</strong>
-                    <p>Contact our team for product and delivery enquiries.</p>
+                    <p>Contact our delivery team for bottle schedules and queries.</p>
                   </div>
                 </div>
               </aside>
@@ -697,8 +657,8 @@ const Addtocart = () => {
                   <FiTruck />
                 </span>
                 <div>
-                  <strong>Free Delivery</strong>
-                  <span>On your current order</span>
+                  <strong>Free Home Delivery</strong>
+                  <span>Prompt doorstep drops</span>
                 </div>
               </div>
 
@@ -707,8 +667,8 @@ const Addtocart = () => {
                   <FiShield />
                 </span>
                 <div>
-                  <strong>Safe Shopping</strong>
-                  <span>Shop with confidence</span>
+                  <strong>Sealed &amp; Safe</strong>
+                  <span>Hygienic food-grade canisters</span>
                 </div>
               </div>
 
@@ -725,6 +685,237 @@ const Addtocart = () => {
           </div>
         )}
       </div>
+
+      {/* CHECKOUT MODAL */}
+      {isCheckoutOpen && (
+        <div className="Addtocart-modal-overlay" onClick={() => !isSubmittingOrder && setIsCheckoutOpen(false)}>
+          <div className="Addtocart-checkout-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="Addtocart-modal-header">
+              <div className="Addtocart-modal-title">
+                <FiPackage className="Addtocart-modal-title-icon" />
+                <div>
+                  <h3>{placedOrder ? "Order Confirmed!" : "Doorstep Delivery Checkout"}</h3>
+                  <p>{placedOrder ? "Thank you for choosing Alka Drops" : "Provide your address for speedy delivery in Bhubaneswar"}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="Addtocart-modal-close"
+                onClick={() => setIsCheckoutOpen(false)}
+                aria-label="Close checkout"
+              >
+                <FiX />
+              </button>
+            </div>
+
+            {placedOrder ? (
+              <div className="Addtocart-order-success">
+                <div className="Addtocart-success-badge">
+                  <FiCheckCircle />
+                </div>
+                <h2>Order #{placedOrder.orderNumber} Confirmed!</h2>
+                <p className="Addtocart-success-text">
+                  We've received your order and our dispatch team is preparing your fresh alkaline water.
+                </p>
+
+                <div className="Addtocart-order-summary-box">
+                  <div className="Addtocart-summary-row">
+                    <span>Customer:</span>
+                    <strong>{placedOrder.shippingAddress?.fullName}</strong>
+                  </div>
+                  <div className="Addtocart-summary-row">
+                    <span>Contact Phone:</span>
+                    <strong>{placedOrder.shippingAddress?.phone}</strong>
+                  </div>
+                  <div className="Addtocart-summary-row">
+                    <span>Delivery Address:</span>
+                    <strong>
+                      {placedOrder.shippingAddress?.addressLine1}, {placedOrder.shippingAddress?.city} - {placedOrder.shippingAddress?.postalCode}
+                    </strong>
+                  </div>
+                  <div className="Addtocart-summary-row">
+                    <span>Delivery Slot:</span>
+                    <strong>{placedOrder.deliverySlot || "Standard (1-2 days)"}</strong>
+                  </div>
+                  <div className="Addtocart-summary-row">
+                    <span>Payment Method:</span>
+                    <strong>{placedOrder.paymentMethod?.toUpperCase()} (Pay ₹{placedOrder.totalAmount} on delivery)</strong>
+                  </div>
+                </div>
+
+                <div className="Addtocart-success-actions">
+                  <button
+                    type="button"
+                    className="Addtocart-primary-button"
+                    onClick={() => {
+                      setIsCheckoutOpen(false);
+                      navigate("/shop");
+                    }}
+                  >
+                    Continue Shopping
+                  </button>
+                  <button
+                    type="button"
+                    className="Addtocart-demo-button"
+                    onClick={() => setIsCheckoutOpen(false)}
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handlePlaceOrder} className="Addtocart-checkout-form">
+                {checkoutError && (
+                  <div className="Addtocart-form-alert error">
+                    {checkoutError}
+                  </div>
+                )}
+
+                <div className="Addtocart-form-grid">
+                  <div className="Addtocart-form-field">
+                    <label>
+                      <FiUser /> Full Name <span>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      placeholder="e.g. Ramesh Patel"
+                      value={shippingForm.fullName}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="Addtocart-form-field">
+                    <label>
+                      <FiPhone /> Mobile Number <span>*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="10-digit mobile number"
+                      value={shippingForm.phone}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="Addtocart-form-field full-col">
+                    <label>
+                      <FiMail /> Email Address
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="your.email@example.com (optional)"
+                      value={shippingForm.email}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className="Addtocart-form-field full-col">
+                    <label>
+                      <FiMapPin /> Delivery Address (House / Flat / Street / Landmark) <span>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="addressLine1"
+                      placeholder="e.g. Plot N5/22, IRC Village, Nayapalli"
+                      value={shippingForm.addressLine1}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="Addtocart-form-field">
+                    <label>City</label>
+                    <input
+                      type="text"
+                      name="city"
+                      value={shippingForm.city}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="Addtocart-form-field">
+                    <label>Pincode</label>
+                    <input
+                      type="text"
+                      name="postalCode"
+                      value={shippingForm.postalCode}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="Addtocart-form-field">
+                    <label>Delivery Window</label>
+                    <select
+                      name="deliverySlot"
+                      value={shippingForm.deliverySlot}
+                      onChange={handleInputChange}
+                    >
+                      <option value="Morning (7 AM - 10 AM)">Morning (7 AM - 10 AM)</option>
+                      <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+                      <option value="Evening (5 PM - 8 PM)">Evening (5 PM - 8 PM)</option>
+                      <option value="Standard (1-2 days)">Standard (1-2 days)</option>
+                    </select>
+                  </div>
+
+                  <div className="Addtocart-form-field">
+                    <label>Payment Method</label>
+                    <select
+                      name="paymentMethod"
+                      value={shippingForm.paymentMethod}
+                      onChange={handleInputChange}
+                    >
+                      <option value="cod">Cash on Delivery (COD)</option>
+                      <option value="upi">UPI / QR Code on Delivery</option>
+                    </select>
+                  </div>
+
+                  <div className="Addtocart-form-field full-col">
+                    <label>Order Notes / Instructions (Optional)</label>
+                    <input
+                      type="text"
+                      name="notes"
+                      placeholder="e.g. Ring doorbell twice, leave at reception"
+                      value={shippingForm.notes}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="Addtocart-checkout-footer">
+                  <div className="Addtocart-footer-summary">
+                    <span>Order Total ({cartCount} {cartCount === 1 ? "item" : "items"}):</span>
+                    <strong>{formatPrice(cartTotal)}</strong>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="Addtocart-place-order-btn"
+                    disabled={isSubmittingOrder}
+                  >
+                    {isSubmittingOrder ? (
+                      <>
+                        <FiRefreshCw className="spin" />
+                        <span>Processing Order...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiCheckCircle />
+                        <span>Place Order Now ({formatPrice(cartTotal)})</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 };

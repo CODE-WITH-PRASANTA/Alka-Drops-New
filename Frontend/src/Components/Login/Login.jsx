@@ -19,7 +19,7 @@ import {
   FiLoader,
 } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa";
+import API from "../../services/api";
 
 /* Put your image at src/assets/login-image.png and adjust this path if needed */
 import loginImage from "../../assets/login-image.png";
@@ -52,15 +52,6 @@ const getPasswordScore = (password) => {
 };
 
 const STRENGTH_LABELS = ["Too short", "Weak", "Fair", "Good", "Strong"];
-
-/*
- * Frontend-only placeholder request.
- * Replace the body of this function with your real API call (fetch / axios).
- */
-const fakeRequest = () =>
-  new Promise((resolve) => {
-    window.setTimeout(resolve, 1100);
-  });
 
 /* =========================================
    REUSABLE FIELD
@@ -118,12 +109,18 @@ const LoginStatus = ({ status }) =>
    MAIN COMPONENT
 ========================================= */
 
-const Login = () => {
+const Login = ({ defaultMode = "login" }) => {
   const navigate = useNavigate();
   const mounted = useRef(true);
 
   // "login" | "register" | "forgot"
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState(defaultMode);
+
+  useEffect(() => {
+    if (defaultMode && defaultMode !== mode) {
+      setMode(defaultMode);
+    }
+  }, [defaultMode]);
 
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
@@ -256,7 +253,18 @@ const Login = () => {
     setLoginStatus({ type: "", message: "" });
 
     try {
-      await fakeRequest(); // TODO: call your login API here
+      const res = await API.post("/auth/login", {
+        email: loginData.email.trim(),
+        password: loginData.password,
+      });
+
+      if (res.data?.token) {
+        localStorage.setItem("alka_user_token", res.data.token);
+      }
+      if (res.data?.user) {
+        localStorage.setItem("alka_user", JSON.stringify(res.data.user));
+      }
+      window.dispatchEvent(new Event("alkaAuthUpdated"));
 
       try {
         if (loginData.remember) {
@@ -269,16 +277,21 @@ const Login = () => {
       }
 
       if (!mounted.current) return;
-      setLoginStatus({ type: "success", message: "Login successful! Redirecting..." });
+      setLoginStatus({
+        type: "success",
+        message: res.data?.message || "Login successful! Redirecting...",
+      });
 
       window.setTimeout(() => {
         if (mounted.current) navigate("/");
       }, 900);
-    } catch {
+    } catch (err) {
       if (mounted.current) {
         setLoginStatus({
           type: "error",
-          message: "We could not log you in. Please try again.",
+          message:
+            err.response?.data?.message ||
+            "Unable to log in. Please verify your email and password.",
         });
       }
     } finally {
@@ -303,10 +316,8 @@ const Login = () => {
     if (!PHONE_PATTERN.test(registerData.phone.trim())) {
       errors.phone = "Enter a valid 10-digit mobile number.";
     }
-    if (registerData.password.length < 8) {
-      errors.password = "Password must be at least 8 characters.";
-    } else if (passwordScore < 2) {
-      errors.password = "Use letters, numbers or symbols for a stronger password.";
+    if (registerData.password.length < 6) {
+      errors.password = "Password must be at least 6 characters.";
     }
     if (registerData.confirmPassword !== registerData.password) {
       errors.confirmPassword = "Passwords do not match.";
@@ -322,15 +333,29 @@ const Login = () => {
     setRegisterStatus({ type: "", message: "" });
 
     try {
-      await fakeRequest(); // TODO: call your register API here
+      const res = await API.post("/auth/register", {
+        name: registerData.name.trim(),
+        email: registerData.email.trim(),
+        phone: registerData.phone.trim(),
+        password: registerData.password,
+      });
 
       if (!mounted.current) return;
 
       const registeredEmail = registerData.email.trim();
 
+      // If token & user returned, save to localStorage
+      if (res.data?.token) {
+        localStorage.setItem("alka_user_token", res.data.token);
+      }
+      if (res.data?.user) {
+        localStorage.setItem("alka_user", JSON.stringify(res.data.user));
+      }
+      window.dispatchEvent(new Event("alkaAuthUpdated"));
+
       setRegisterStatus({
         type: "success",
-        message: "Account created successfully! Taking you to login...",
+        message: res.data?.message || "Account created successfully! Welcome to Alka Drops.",
       });
 
       window.setTimeout(() => {
@@ -355,11 +380,13 @@ const Login = () => {
         });
         setMode("login");
       }, 1400);
-    } catch {
+    } catch (err) {
       if (mounted.current) {
         setRegisterStatus({
           type: "error",
-          message: "We could not create your account. Please try again.",
+          message:
+            err.response?.data?.message ||
+            "Could not create your account. Please try again or use another email.",
         });
       }
     } finally {
@@ -382,19 +409,25 @@ const Login = () => {
     setForgotStatus({ type: "", message: "" });
 
     try {
-      await fakeRequest(); // TODO: call your forgot-password API here
+      const res = await API.post("/auth/forgot-password", {
+        email: forgotData.email.trim(),
+      });
 
       if (mounted.current) {
         setForgotStatus({
           type: "success",
-          message: `If an account exists for ${forgotData.email.trim()}, a password reset link has been sent.`,
+          message:
+            res.data?.message ||
+            `If an account exists for ${forgotData.email.trim()}, a password reset link has been sent.`,
         });
       }
-    } catch {
+    } catch (err) {
       if (mounted.current) {
         setForgotStatus({
           type: "error",
-          message: "Something went wrong. Please try again.",
+          message:
+            err.response?.data?.message ||
+            "Failed to send password reset link. Please try again.",
         });
       }
     } finally {
@@ -462,15 +495,6 @@ const Login = () => {
         >
           <FcGoogle />
           <span>Continue with Google</span>
-        </button>
-
-        <button
-          type="button"
-          className="Login-social-button"
-          onClick={() => handleSocialLogin("Facebook")}
-        >
-          <FaFacebook className="Login-facebook" />
-          <span>Continue with Facebook</span>
         </button>
       </div>
     </>

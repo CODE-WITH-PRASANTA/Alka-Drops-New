@@ -16,10 +16,12 @@ const contactSchema = new mongoose.Schema(
     phone: {
       type: String,
       default: "",
+      trim: true,
     },
     subject: {
       type: String,
-      default: "",
+      default: "General Inquiry",
+      trim: true,
     },
     interest: {
       type: String,
@@ -28,11 +30,19 @@ const contactSchema = new mongoose.Schema(
     message: {
       type: String,
       required: [true, "Message is required"],
+      trim: true,
     },
     status: {
       type: String,
-      enum: ["unread", "read", "replied"],
-      default: "unread",
+      enum: ["Pending", "In Progress", "Resolved", "unread", "read", "replied"],
+      default: "Pending",
+    },
+    adminReply: {
+      type: String,
+      default: "",
+    },
+    repliedAt: {
+      type: Date,
     },
   },
   {
@@ -40,5 +50,8 @@ const contactSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Contact", contactSchema);
+// Indexes for anti-duplication queries and admin filtering
+contactSchema.index({ email: 1, createdAt: -1 });
+contactSchema.index({ status: 1, createdAt: -1 });
 
+module.exports = mongoose.model("Contact", contactSchema);

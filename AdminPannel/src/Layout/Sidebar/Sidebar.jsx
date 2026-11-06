@@ -10,7 +10,6 @@ import {
   CalendarDays,
   UserRound,
   Truck,
-  Settings,
   ChartNoAxesColumn,
   Mail,
   Star,
@@ -23,6 +22,7 @@ import {
   Boxes,
   PackageCheck,
   Tag,
+  MessageSquare,
 } from "lucide-react";
 
 import { NavLink, useLocation } from "react-router-dom";
@@ -44,6 +44,11 @@ const menuItems = [
         title: "Add Category",
         path: "/admin/blog-category",
         icon: Tag,
+      },
+      {
+        title: "Blog Comments",
+        path: "/admin/blog-comments",
+        icon: MessageSquare,
       },
     ],
   },
@@ -106,7 +111,6 @@ const menuItems = [
       },
     ],
   },
-  { title: "Settings", path: "/admin/settings", icon: Settings },
   {
     title: "Report Management",
     path: "/admin/report-management",
@@ -278,17 +282,6 @@ const Sidebar = ({
               );
             })}
           </nav>
-        </div>
-
-        <div className="alka-sidebar-footer">
-          <div className="alka-footer-icon">
-            <Droplets size={18} />
-          </div>
-
-          <div className="alka-footer-content">
-            <span className="alka-footer-title">Alka Drops</span>
-            <span className="alka-footer-version">Admin Dashboard</span>
-          </div>
         </div>
       </aside>
     </>

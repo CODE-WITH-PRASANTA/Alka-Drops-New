@@ -53,16 +53,29 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  // Toggle user status (Active <-> Blocked)
+  // Toggle user status (Active <-> Deactive)
   const toggleUserStatus = async (id, currentStatus, name) => {
-    const nextStatus = currentStatus === "Active" ? "Blocked" : "Active";
+    const isCurrentlyActive = (currentStatus || "Active").toLowerCase() === "active";
+    const nextStatus = isCurrentlyActive ? "Deactive" : "Active";
+
+    // Optimistic UI update for instantaneous responsiveness
+    setUsers((prev) =>
+      prev.map((u) => (u.id === id || u._id === id ? { ...u, status: nextStatus } : u))
+    );
     setActionLoadingId(id);
+
     try {
       const res = await API.patch(`/auth/users/${id}/status`, { status: nextStatus });
-      setUsers((prev) =>
-        prev.map((u) => (u.id === id || u._id === id ? { ...u, status: nextStatus } : u))
-      );
+      if (res.data?.user?.status) {
+        setUsers((prev) =>
+          prev.map((u) => (u.id === id || u._id === id ? { ...u, status: res.data.user.status } : u))
+        );
+      }
     } catch (err) {
+      // Rollback optimistic update on failure
+      setUsers((prev) =>
+        prev.map((u) => (u.id === id || u._id === id ? { ...u, status: currentStatus } : u))
+      );
       alert(err.response?.data?.message || "Failed to update user status.");
     } finally {
       setActionLoadingId(null);
@@ -99,9 +112,11 @@ const UserManagement = () => {
         roleFilter === "all" ||
         (u.role || "").toLowerCase() === roleFilter.toLowerCase();
 
+      const isUserActive = (u.status || "Active").toLowerCase() === "active";
       const matchStatus =
         statusFilter === "all" ||
-        (u.status || "").toLowerCase() === statusFilter.toLowerCase();
+        (statusFilter === "active" && isUserActive) ||
+        (statusFilter === "deactive" && !isUserActive);
 
       return matchSearch && matchRole && matchStatus;
     });
@@ -111,7 +126,7 @@ const UserManagement = () => {
     const total = users.length;
     const subscribers = users.filter((u) => (u.role || "").toLowerCase() === "subscriber").length;
     const corporate = users.filter((u) => (u.role || "").toLowerCase() === "corporate").length;
-    const active = users.filter((u) => (u.status || "").toLowerCase() === "active").length;
+    const active = users.filter((u) => (u.status || "Active").toLowerCase() === "active").length;
     return { total, subscribers, corporate, active };
   }, [users]);
 
@@ -203,6 +218,7 @@ const UserManagement = () => {
             <option value="Subscriber">Subscriber</option>
             <option value="Corporate">Corporate</option>
             <option value="Administrator">Administrator</option>
+            <option value="Delivery Boy">Delivery Boy</option>
           </select>
 
           <div className="UserManagement-statusTabs">
@@ -222,10 +238,10 @@ const UserManagement = () => {
             </button>
             <button
               type="button"
-              className={statusFilter === "blocked" ? "active" : ""}
-              onClick={() => setStatusFilter("blocked")}
+              className={statusFilter === "deactive" ? "active" : ""}
+              onClick={() => setStatusFilter("deactive")}
             >
-              Blocked
+              Deactive
             </button>
           </div>
         </div>
@@ -269,6 +285,7 @@ const UserManagement = () => {
                 const isPrimaryAdmin =
                   u.email === "admin@alkadrops.com" || u.role === "Administrator";
                 const isActing = actionLoadingId === (u.id || u._id);
+                const isActive = (u.status || "Active").toLowerCase() === "active";
 
                 return (
                   <tr key={u.id || u._id}>
@@ -297,29 +314,47 @@ const UserManagement = () => {
                       </span>
                     </td>
                     <td>
-                      <span
-                        className={`UserManagement-statusPill ${
-                          (u.status || "Active").toLowerCase()
-                        }`}
-                      >
-                        {u.status || "Active"}
-                      </span>
+                      <div className="UserManagement-statusToggleWrapper">
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={isActive}
+                          aria-label={`Toggle active status for ${u.name}`}
+                          className={`UserManagement-toggleSwitch ${
+                            isActive ? "active" : "deactive"
+                          } ${isPrimaryAdmin ? "disabled" : ""}`}
+                          onClick={() => {
+                            if (!isPrimaryAdmin && !isActing) {
+                              toggleUserStatus(u.id || u._id, u.status, u.name);
+                            }
+                          }}
+                          disabled={isPrimaryAdmin || isActing}
+                          title={
+                            isPrimaryAdmin
+                              ? "Primary administrator status cannot be changed"
+                              : isActive
+                              ? "Click to deactivate user"
+                              : "Click to activate user"
+                          }
+                        >
+                          <span className="UserManagement-toggleSlider">
+                            {isActing && (
+                              <span className="UserManagement-toggleSpinner" />
+                            )}
+                          </span>
+                        </button>
+                        <span
+                          className={`UserManagement-statusPill ${
+                            isActive ? "active" : "deactive"
+                          }`}
+                        >
+                          {isActive ? "Active" : "Deactive"}
+                        </span>
+                      </div>
                     </td>
                     <td style={{ textAlign: "right" }}>
                       {!isPrimaryAdmin && (
                         <div className="UserManagement-actionsGroup">
-                          <button
-                            type="button"
-                            className={`UserManagement-blockBtn ${
-                              u.status === "Active" ? "block" : "unblock"
-                            }`}
-                            onClick={() =>
-                              toggleUserStatus(u.id || u._id, u.status, u.name)
-                            }
-                            disabled={isActing}
-                          >
-                            {u.status === "Active" ? "Block" : "Activate"}
-                          </button>
                           <button
                             type="button"
                             className="UserManagement-deleteBtn"

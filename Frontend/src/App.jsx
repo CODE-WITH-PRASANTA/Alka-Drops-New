@@ -27,6 +27,7 @@ import Gallary from "./Pages/Gallary/Gallary";
 import Service from "./Pages/Service/Service";
 import FloatingIcons from "./Components/FloatingIcons/FloatingIcons";
 import Login from "./Components/Login/Login";
+import Account from "./Pages/Account/Account";
 
 const App = () => {
   return (
@@ -71,6 +72,9 @@ const App = () => {
               <Route path="/login" element={<Login defaultMode="login" />} />
               <Route path="/register" element={<Login defaultMode="register" />} />
               <Route path="/signup" element={<Login defaultMode="register" />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/my-account" element={<Account />} />
+              <Route path="/profile" element={<Account />} />
             </Routes>
           </main>
 

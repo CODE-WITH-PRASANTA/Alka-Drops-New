@@ -25,7 +25,7 @@ import thumbTwo from "../../assets/ourproduct-3.png";
 import thumbThree from "../../assets/whychoose-2.png";
 
 const ShopDetailsOne = ({ onAddToCart }) => {
-  const { addToCart } = useShop();
+  const { addToCart, isInWishlist, toggleWishlist } = useShop();
   const [activeImage, setActiveImage] = useState(mainImage);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
@@ -285,6 +285,26 @@ const ShopDetailsOne = ({ onAddToCart }) => {
               >
                 {added ? <Check size={19} /> : <ShoppingCart size={19} />}
                 {added ? "Added to Cart" : "Add To Cart"}
+              </button>
+
+              <button
+                type="button"
+                className={`ShopDetailsOne-wishlistBtn ${
+                  isInWishlist(product.id) ? "in-wishlist" : ""
+                }`}
+                onClick={() => toggleWishlist(product)}
+                title={
+                  isInWishlist(product.id)
+                    ? "Remove from Wishlist"
+                    : "Add to Wishlist"
+                }
+                aria-label="Wishlist"
+              >
+                <Heart
+                  size={20}
+                  fill={isInWishlist(product.id) ? "#ef4444" : "none"}
+                  color={isInWishlist(product.id) ? "#ef4444" : "currentColor"}
+                />
               </button>
             </div>
 

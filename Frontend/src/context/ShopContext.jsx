@@ -1,46 +1,73 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-
-const CART_KEY = "shoppingCart";
-const WISHLIST_KEY = "alkaWishlist";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=700&auto=format&fit=crop&q=85";
 
 const ShopContext = createContext();
 
+// Helper to obtain unique user identifier from localStorage
+const getUserIdentifier = () => {
+  try {
+    const raw = localStorage.getItem("alka_user");
+    if (!raw) return null;
+    const user = JSON.parse(raw);
+    return user ? String(user._id || user.id || user.email || "").trim() : null;
+  } catch {
+    return null;
+  }
+};
+
+const getCartStorageKey = (uid) => {
+  return uid ? `shoppingCart_user_${uid}` : "shoppingCart_guest";
+};
+
+const getWishlistStorageKey = (uid) => {
+  return uid ? `alkaWishlist_user_${uid}` : "alkaWishlist_guest";
+};
+
+// Safe storage reader with legacy fallback migration
+const loadStoredItems = (key, fallbackLegacyKey = null) => {
+  try {
+    let saved = localStorage.getItem(key);
+    if (!saved && fallbackLegacyKey) {
+      saved = localStorage.getItem(fallbackLegacyKey);
+      if (saved) {
+        localStorage.setItem(key, saved);
+        localStorage.removeItem(fallbackLegacyKey);
+      }
+    }
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    }
+    return [];
+  } catch (e) {
+    console.error("Storage read error:", e);
+    return [];
+  }
+};
+
 export const ShopProvider = ({ children }) => {
+  // Current user ID reference to manage cart isolation
+  const activeUserIdRef = useRef(getUserIdentifier());
+  const [activeUserId, setActiveUserId] = useState(() => getUserIdentifier());
+
   // ==========================================
-  // CART STATE
+  // CART STATE (ISOLATED PER USER / GUEST)
   // ==========================================
   const [cart, setCart] = useState(() => {
-    try {
-      const saved = localStorage.getItem(CART_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : [];
-      }
-      return [];
-    } catch (e) {
-      console.error("Error loading cart from storage:", e);
-      return [];
-    }
+    const uid = getUserIdentifier();
+    const storageKey = getCartStorageKey(uid);
+    return loadStoredItems(storageKey, uid ? null : "shoppingCart");
   });
 
   // ==========================================
-  // WISHLIST STATE
+  // WISHLIST STATE (ISOLATED PER USER / GUEST)
   // ==========================================
   const [wishlist, setWishlist] = useState(() => {
-    try {
-      const saved = localStorage.getItem(WISHLIST_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : [];
-      }
-      return [];
-    } catch (e) {
-      console.error("Error loading wishlist from storage:", e);
-      return [];
-    }
+    const uid = getUserIdentifier();
+    const storageKey = getWishlistStorageKey(uid);
+    return loadStoredItems(storageKey, uid ? null : "alkaWishlist");
   });
 
   // ==========================================
@@ -61,46 +88,124 @@ export const ShopProvider = ({ children }) => {
   }, [toast.visible]);
 
   // ==========================================
-  // PERSIST CART
+  // USER LOGIN / LOGOUT TRANSITION HANDLING
+  // ==========================================
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const newUid = getUserIdentifier();
+      const prevUid = activeUserIdRef.current;
+
+      if (newUid === prevUid) return;
+
+      activeUserIdRef.current = newUid;
+      setActiveUserId(newUid);
+
+      if (newUid && !prevUid) {
+        // CASE 1: Guest just LOGGED IN
+        // Take any items the guest had picked before logging in
+        const guestCart = loadStoredItems("shoppingCart_guest", "shoppingCart");
+        const userSavedCart = loadStoredItems(getCartStorageKey(newUid));
+
+        // Merge guest items into user cart without losing previous user items
+        let mergedCart = [...userSavedCart];
+        if (guestCart.length > 0) {
+          guestCart.forEach((gItem) => {
+            const gId = String(gItem.id || gItem._id);
+            const existingIdx = mergedCart.findIndex(
+              (uItem) => String(uItem.id || uItem._id) === gId
+            );
+            if (existingIdx > -1) {
+              const currentQty = Number(mergedCart[existingIdx].qty) || 1;
+              const addedQty = Number(gItem.qty) || 1;
+              mergedCart[existingIdx] = {
+                ...mergedCart[existingIdx],
+                qty: currentQty + addedQty,
+              };
+            } else {
+              mergedCart.push(gItem);
+            }
+          });
+          // Clear guest cart once absorbed
+          try {
+            localStorage.removeItem("shoppingCart_guest");
+            localStorage.removeItem("shoppingCart");
+          } catch {}
+        }
+
+        // Save merged cart to user's storage
+        try {
+          localStorage.setItem(getCartStorageKey(newUid), JSON.stringify(mergedCart));
+        } catch {}
+
+        setCart(mergedCart);
+
+        // Also merge wishlist
+        const guestWishlist = loadStoredItems("alkaWishlist_guest", "alkaWishlist");
+        const userWishlist = loadStoredItems(getWishlistStorageKey(newUid));
+        let mergedWishlist = [...userWishlist];
+        guestWishlist.forEach((gw) => {
+          const wId = String(gw.id || gw._id);
+          if (!mergedWishlist.some((uw) => String(uw.id || uw._id) === wId)) {
+            mergedWishlist.push(gw);
+          }
+        });
+        try {
+          localStorage.removeItem("alkaWishlist_guest");
+          localStorage.removeItem("alkaWishlist");
+          localStorage.setItem(getWishlistStorageKey(newUid), JSON.stringify(mergedWishlist));
+        } catch {}
+        setWishlist(mergedWishlist);
+      } else if (!newUid && prevUid) {
+        // CASE 2: User just LOGGED OUT
+        // DO NOT show the logged-out user's items! Switch to fresh guest cart.
+        const guestCart = loadStoredItems("shoppingCart_guest");
+        setCart(guestCart);
+
+        const guestWishlist = loadStoredItems("alkaWishlist_guest");
+        setWishlist(guestWishlist);
+      } else if (newUid && prevUid && newUid !== prevUid) {
+        // CASE 3: Switched between two different user accounts
+        const otherUserCart = loadStoredItems(getCartStorageKey(newUid));
+        setCart(otherUserCart);
+        const otherUserWishlist = loadStoredItems(getWishlistStorageKey(newUid));
+        setWishlist(otherUserWishlist);
+      }
+    };
+
+    window.addEventListener("alkaAuthUpdated", handleAuthChange);
+    window.addEventListener("storage", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("alkaAuthUpdated", handleAuthChange);
+      window.removeEventListener("storage", handleAuthChange);
+    };
+  }, []);
+
+  // ==========================================
+  // PERSIST CART (TIED TO CURRENT ACCOUNT)
   // ==========================================
   useEffect(() => {
     try {
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      const storageKey = getCartStorageKey(activeUserId);
+      localStorage.setItem(storageKey, JSON.stringify(cart));
       window.dispatchEvent(new Event("shoppingCartUpdated"));
     } catch (e) {
       console.error("Error saving cart to storage:", e);
     }
-  }, [cart]);
+  }, [cart, activeUserId]);
 
   // ==========================================
-  // PERSIST WISHLIST
+  // PERSIST WISHLIST (TIED TO CURRENT ACCOUNT)
   // ==========================================
   useEffect(() => {
     try {
-      localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
+      const storageKey = getWishlistStorageKey(activeUserId);
+      localStorage.setItem(storageKey, JSON.stringify(wishlist));
       window.dispatchEvent(new Event("wishlistUpdated"));
     } catch (e) {
       console.error("Error saving wishlist to storage:", e);
     }
-  }, [wishlist]);
-
-  // Cross-tab sync
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === CART_KEY && e.newValue) {
-        try {
-          setCart(JSON.parse(e.newValue));
-        } catch {}
-      }
-      if (e.key === WISHLIST_KEY && e.newValue) {
-        try {
-          setWishlist(JSON.parse(e.newValue));
-        } catch {}
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+  }, [wishlist, activeUserId]);
 
   // Helper to normalize product format
   const normalizeProduct = (product) => {
@@ -236,35 +341,63 @@ export const ShopProvider = ({ children }) => {
     );
   };
 
-  const addToWishlist = (product) => {
+  const addToWishlist = (product, silent = false) => {
     const normalized = normalizeProduct(product);
     if (!isInWishlist(normalized.id)) {
       setWishlist((prev) => [normalized, ...prev]);
-      showToast(`Saved "${normalized.name}" to wishlist!`, "success");
+      if (!silent) {
+        showToast(`Saved "${normalized.name}" to wishlist!`, "success");
+      }
       return true;
     }
     return false;
   };
 
-  const removeFromWishlist = (productId) => {
+  const removeFromWishlist = (productId, silent = false) => {
     const targetId = String(productId);
+    const targetItem = wishlist.find(
+      (item) => String(item.id) === targetId || String(item._id) === targetId
+    );
     setWishlist((prev) =>
       prev.filter(
         (item) => String(item.id) !== targetId && String(item._id) !== targetId
       )
     );
-    showToast("Item removed from wishlist.", "info");
+    if (!silent) {
+      const name = targetItem?.name || targetItem?.title || "Item";
+      showToast(`Removed "${name}" from wishlist.`, "info");
+    }
   };
 
   const toggleWishlist = (product) => {
-    const normalized = normalizeProduct(product);
-    if (isInWishlist(normalized.id)) {
-      removeFromWishlist(normalized.id);
+    if (!product) return false;
+    const pId = String(product._id || product.id);
+    if (isInWishlist(pId)) {
+      removeFromWishlist(pId);
       return false;
     } else {
-      addToWishlist(normalized);
+      addToWishlist(product);
       return true;
     }
+  };
+
+  const moveToCart = (product, quantity = 1) => {
+    if (!product) return;
+    const pId = String(product._id || product.id);
+    const normalized = normalizeProduct(product);
+    addToCart(normalized, quantity);
+    removeFromWishlist(pId, true);
+    showToast(`Moved "${normalized.name}" to cart!`, "success");
+  };
+
+  const moveAllToCart = () => {
+    if (wishlist.length === 0) return;
+    const count = wishlist.length;
+    wishlist.forEach((item) => {
+      addToCart(item, 1);
+    });
+    setWishlist([]);
+    showToast(`Moved all ${count} item(s) to your cart!`, "success");
   };
 
   const clearWishlist = () => {
@@ -272,27 +405,11 @@ export const ShopProvider = ({ children }) => {
     showToast("Wishlist cleared.", "info");
   };
 
-  const moveToCart = (product, quantity = 1) => {
-    const normalized = normalizeProduct(product);
-    addToCart(normalized, quantity);
-    removeFromWishlist(normalized.id);
-  };
-
-  const moveAllToCart = () => {
-    if (wishlist.length === 0) return;
-    wishlist.forEach((item) => {
-      addToCart(item, 1);
-    });
-    setWishlist([]);
-    showToast(`Moved all ${wishlist.length} items to shopping cart!`, "success");
-  };
-
   const wishlistCount = wishlist.length;
 
   return (
     <ShopContext.Provider
       value={{
-        // Cart
         cart,
         setCart,
         addToCart,
@@ -305,20 +422,16 @@ export const ShopProvider = ({ children }) => {
         deliveryCharge,
         cartTotal,
         totalSavings,
-
-        // Wishlist
         wishlist,
         setWishlist,
         addToWishlist,
         removeFromWishlist,
         toggleWishlist,
-        isInWishlist,
         clearWishlist,
         moveToCart,
         moveAllToCart,
+        isInWishlist,
         wishlistCount,
-
-        // Notifications
         toast,
         showToast,
       }}
@@ -335,6 +448,3 @@ export const useShop = () => {
   }
   return context;
 };
-
-export default ShopContext;
-

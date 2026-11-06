@@ -221,3 +221,129 @@
   .SubscriptionOrders-controlBar { flex-direction: column; align-items: stretch; }
 }
 
+
+
+/* Date Pill in Table */
+.SubscriptionOrders-datesPill {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  min-width: 140px;
+}
+.SubscriptionOrders-dateTag {
+  font-size: 10px;
+  font-weight: 800;
+  color: #004ea8;
+  margin-right: 4px;
+}
+.SubscriptionOrders-dateTag.end {
+  color: #059669;
+}
+
+/* Status Dropdown */
+.SubscriptionOrders-statusDropdown {
+  padding: 5px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1.5px solid transparent;
+  outline: none;
+  cursor: pointer;
+}
+.SubscriptionOrders-statusDropdown.active {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
+}
+.SubscriptionOrders-statusDropdown.paused {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+.SubscriptionOrders-statusDropdown.completed {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+.SubscriptionOrders-statusDropdown.cancelled {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* Partner Select */
+.SubscriptionOrders-assignSelect {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 12.5px;
+  background: #ffffff;
+  color: #0f172a;
+  outline: none;
+  max-width: 160px;
+}
+.SubscriptionOrders-assignSelect:focus {
+  border-color: #004ea8;
+}
+
+/* Delete Button */
+.SubscriptionOrders-deleteBtn {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #ef4444;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.SubscriptionOrders-deleteBtn:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* Toast */
+.SubscriptionOrders-toast {
+  position: fixed;
+  top: 24px;
+  right: 28px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideInToast 0.2s ease-out;
+}
+@keyframes slideInToast {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.SubscriptionOrders-alert-box {
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+}
+.SubscriptionOrders-alert-box.error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}

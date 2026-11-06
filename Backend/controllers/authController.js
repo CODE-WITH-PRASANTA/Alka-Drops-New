@@ -2,13 +2,67 @@ const User = require("../models/User");
 const Order = require("../models/Order");
 const jwt = require("jsonwebtoken");
 
-// Generate JWT token helper
-const generateToken = (id) => {
+const ACCESS_TOKEN_SECRET =
+  process.env.JWT_ACCESS_SECRET ||
+  process.env.JWT_SECRET ||
+  "alka_drops_access_jwt_key_2026_super_secure_access";
+
+const REFRESH_TOKEN_SECRET =
+  process.env.JWT_REFRESH_SECRET ||
+  "alka_drops_refresh_jwt_key_2026_super_secure_refresh";
+
+// Access Token: Short-lived (15 minutes)
+const generateAccessToken = (user) => {
   return jwt.sign(
-    { id },
-    process.env.JWT_SECRET || "alka_drops_secret_jwt_key_2026_super_secure",
-    { expiresIn: "30d" }
+    { id: user._id, role: user.role },
+    ACCESS_TOKEN_SECRET,
+    { expiresIn: "15m" }
   );
+};
+
+// Refresh Token: Long-lived (7 days)
+const generateRefreshToken = (user) => {
+  return jwt.sign(
+    { id: user._id },
+    REFRESH_TOKEN_SECRET,
+    { expiresIn: "7d" }
+  );
+};
+
+// Set secure HTTP-only cookies for Access and Refresh tokens
+const setAuthCookies = (res, accessToken, refreshToken) => {
+  const isProduction = process.env.NODE_ENV === "production";
+  const baseCookieOptions = {
+    httpOnly: true, // Prevents access from client-side JS (XSS defense)
+    secure: isProduction, // HTTPS required in production
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
+  };
+
+  // 15 minutes for access token
+  res.cookie("accessToken", accessToken, {
+    ...baseCookieOptions,
+    maxAge: 15 * 60 * 1000,
+  });
+
+  // 7 days for refresh token
+  res.cookie("refreshToken", refreshToken, {
+    ...baseCookieOptions,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+};
+
+// Clear HTTP-only auth cookies
+const clearAuthCookies = (res) => {
+  const isProduction = process.env.NODE_ENV === "production";
+  const clearOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
+  };
+  res.clearCookie("accessToken", clearOptions);
+  res.clearCookie("refreshToken", clearOptions);
 };
 
 // @desc    Register a new user
@@ -88,12 +142,21 @@ const registerUser = async (req, res, next) => {
       address: userAddress,
     });
 
-    const token = generateToken(user._id);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Store in HTTP-only cookies
+    setAuthCookies(res, accessToken, refreshToken);
 
     res.status(201).json({
       success: true,
       message: "Account created successfully! Welcome to Alka Drops.",
-      token,
+      accessToken,
+      refreshToken,
+      token: accessToken, // backward compatibility
       user: {
         id: user._id,
         _id: user._id,
@@ -103,6 +166,8 @@ const registerUser = async (req, res, next) => {
         role: user.role,
         status: user.status,
         plan: user.plan,
+        avatar: user.avatar || "",
+        subscription: user.subscription,
         address: user.address,
       },
     });
@@ -111,7 +176,7 @@ const registerUser = async (req, res, next) => {
   }
 };
 
-// @desc    Authenticate user & get token
+// @desc    Authenticate user & set HTTP-only cookies
 // @route   POST /api/auth/login
 // @access  Public
 const loginUser = async (req, res, next) => {
@@ -126,7 +191,7 @@ const loginUser = async (req, res, next) => {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const user = await User.findOne({ email: cleanEmail });
+    const user = await User.findOne({ email: cleanEmail }).select("+password");
 
     if (!user) {
       return res.status(401).json({
@@ -135,10 +200,10 @@ const loginUser = async (req, res, next) => {
       });
     }
 
-    if (user.status === "Blocked") {
+    if (user.status === "Blocked" || user.status === "Deactive" || user.status === "Inactive") {
       return res.status(403).json({
         success: false,
-        message: "Your account is currently blocked. Please contact support@alkadrops.com for assistance.",
+        message: "Your account is currently deactivated. Please contact support@alkadrops.com for assistance.",
       });
     }
 
@@ -150,12 +215,21 @@ const loginUser = async (req, res, next) => {
       });
     }
 
-    const token = generateToken(user._id);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Store in HTTP-only cookies
+    setAuthCookies(res, accessToken, refreshToken);
 
     res.json({
       success: true,
       message: `Welcome back, ${user.name}!`,
-      token,
+      accessToken,
+      refreshToken,
+      token: accessToken, // backward compatibility
       user: {
         id: user._id,
         _id: user._id,
@@ -165,8 +239,125 @@ const loginUser = async (req, res, next) => {
         role: user.role,
         status: user.status,
         plan: user.plan,
+        avatar: user.avatar || "",
+        subscription: user.subscription,
         address: user.address,
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Refresh Access Token using HTTP-only Refresh Cookie
+// @route   POST /api/auth/refresh
+// @access  Public
+const refreshAccessToken = async (req, res, next) => {
+  try {
+    const token = req.cookies?.refreshToken || req.body?.refreshToken;
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "No refresh token provided. Please log in again.",
+      });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, REFRESH_TOKEN_SECRET);
+    } catch (err) {
+      clearAuthCookies(res);
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token has expired or is invalid. Please log in again.",
+      });
+    }
+
+    const user = await User.findById(decoded.id).select("+refreshToken");
+
+    if (!user) {
+      clearAuthCookies(res);
+      return res.status(401).json({
+        success: false,
+        message: "User account no longer exists.",
+      });
+    }
+
+    if (user.status === "Blocked" || user.status === "Deactive" || user.status === "Inactive") {
+      clearAuthCookies(res);
+      return res.status(403).json({
+        success: false,
+        message: "Your account is currently deactivated. Please contact support.",
+      });
+    }
+
+    // Verify token matches the stored token in DB (anti-replay check)
+    if (user.refreshToken && user.refreshToken !== token) {
+      user.refreshToken = "";
+      await user.save();
+      clearAuthCookies(res);
+      return res.status(401).json({
+        success: false,
+        message: "Invalid session or token re-use detected. Please log in again.",
+      });
+    }
+
+    // Rotate tokens
+    const newAccessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    setAuthCookies(res, newAccessToken, newRefreshToken);
+
+    res.json({
+      success: true,
+      message: "Session refreshed successfully.",
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+      token: newAccessToken,
+      user: {
+        id: user._id,
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+        plan: user.plan,
+        avatar: user.avatar || "",
+        subscription: user.subscription,
+        address: user.address,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Logout user & clear HTTP-only cookies
+// @route   POST /api/auth/logout
+// @access  Public
+const logoutUser = async (req, res, next) => {
+  try {
+    const token = req.cookies?.refreshToken || req.body?.refreshToken;
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, REFRESH_TOKEN_SECRET);
+        await User.findByIdAndUpdate(decoded.id, { refreshToken: "" });
+      } catch {
+        // Token invalid or already expired, proceed with clearing
+      }
+    }
+
+    clearAuthCookies(res);
+
+    res.json({
+      success: true,
+      message: "Logged out successfully. All session cookies cleared.",
     });
   } catch (error) {
     next(error);
@@ -283,9 +474,19 @@ const updateUserStatus = async (req, res, next) => {
 
     const { status } = req.body;
     if (status) {
-      user.status = status.toLowerCase() === "blocked" ? "Blocked" : "Active";
+      const s = String(status).trim().toLowerCase();
+      if (s === "deactive" || s === "inactive" || s === "blocked") {
+        user.status = "Deactive";
+      } else {
+        user.status = "Active";
+      }
     } else {
-      user.status = user.status === "Active" ? "Blocked" : "Active";
+      user.status = user.status === "Active" ? "Deactive" : "Active";
+    }
+
+    // If deactivated, invalidate active session refresh token immediately
+    if (user.status !== "Active") {
+      user.refreshToken = "";
     }
 
     await user.save();
@@ -390,14 +591,123 @@ const forgotPassword = async (req, res, next) => {
   }
 };
 
+// @desc    Update current user profile (name, phone, address)
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    const { name, phone, address, subscription, plan, password, avatar } = req.body;
+    if (name && name.trim()) user.name = name.trim();
+    if (phone !== undefined) user.phone = phone.trim();
+    if (plan !== undefined) user.plan = plan;
+    if (avatar !== undefined) user.avatar = avatar;
+    if (password && password.length >= 6) {
+      user.password = password; // pre-save hook handles hashing
+    }
+    if (address) {
+      user.address = {
+        street: address.street !== undefined ? address.street : user.address.street,
+        city: address.city || user.address.city || "Bhubaneswar",
+        state: address.state || user.address.state || "Odisha",
+        postalCode: address.postalCode || user.address.postalCode || "751012",
+      };
+    }
+    if (subscription) {
+      user.subscription = {
+        ...(user.subscription ? user.subscription.toObject?.() || user.subscription : {}),
+        ...subscription,
+      };
+    }
+
+    await user.save();
+    const updated = await User.findById(user._id).select("-password");
+
+    res.json({
+      success: true,
+      message: "Profile updated successfully.",
+      user: updated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Upload profile picture / avatar
+// @route   POST /api/auth/profile/avatar
+// @access  Private
+const uploadAvatar = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image file provided. Please choose a valid image.",
+      });
+    }
+
+    const avatarUrl = `/uploads/${req.file.filename}`;
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    user.avatar = avatarUrl;
+    await user.save();
+
+    const updated = await User.findById(user._id).select("-password");
+    res.json({
+      success: true,
+      message: "Profile picture uploaded successfully!",
+      avatar: avatarUrl,
+      user: updated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Remove profile picture
+// @route   DELETE /api/auth/profile/avatar
+// @access  Private
+const removeAvatar = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    user.avatar = "";
+    await user.save();
+
+    const updated = await User.findById(user._id).select("-password");
+    res.json({
+      success: true,
+      message: "Profile picture removed successfully.",
+      user: updated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  refreshAccessToken,
+  logoutUser,
   getUsers,
   updateUserStatus,
   deleteUser,
   getMe,
+  updateProfile,
+  uploadAvatar,
+  removeAvatar,
   forgotPassword,
 };
+
 
 

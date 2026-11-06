@@ -1864,3 +1864,70 @@
     text-align: left;
   }
 }
+
+/* =========================================
+   DELIVERY DESTINATION BOX IN CART SUMMARY
+========================================= */
+.Addtocart-delivery-destination {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.Addtocart-destination-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.Addtocart-destination-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.Addtocart-pin-icon {
+  color: var(--ad-blue, #004ea8);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.Addtocart-destination-label {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.Addtocart-destination-title strong {
+  font-size: 13.5px;
+  color: #0f172a;
+  font-weight: 700;
+}
+.Addtocart-destination-change-btn {
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  color: #004ea8;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.Addtocart-destination-change-btn:hover {
+  background: #004ea8;
+  color: #ffffff;
+}
+.Addtocart-destination-address {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #475569;
+  padding-left: 28px;
+}

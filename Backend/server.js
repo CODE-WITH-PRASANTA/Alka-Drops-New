@@ -13,14 +13,35 @@ connectDB();
 
 const app = express();
 
+// Allowed CORS origins with credentials support
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+];
+if (process.env.CLIENT_URL) allowedOrigins.push(process.env.CLIENT_URL);
+if (process.env.ADMIN_URL) allowedOrigins.push(process.env.ADMIN_URL);
+
 // Middlewares
 app.use(
   cors({
-    origin: "*", // allow requests from frontend (5173) and admin panel (5174)
+    origin: (origin, callback) => {
+      // Allow non-browser requests (Postman, curl) or matching origins or dev environments
+      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production") {
+        return callback(null, origin || true);
+      }
+      return callback(new Error("CORS policy violation: origin not allowed."));
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
   })
 );
+
+// Custom cookie parser middleware
+const cookieParser = require("./middleware/cookieMiddleware");
+app.use(cookieParser);
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
@@ -72,6 +93,9 @@ app.use("/api/team", require("./routes/teamRoutes"));
 app.use("/api/gallery", require("./routes/galleryRoutes"));
 app.use("/api/comments", require("./routes/commentRoutes"));
 app.use("/api/subscription-plans", require("./routes/subscriptionPlanRoutes"));
+app.use("/api/reviews", require("./routes/reviewRoutes"));
+app.use("/api/delivery-boys", require("./routes/deliveryBoyRoutes"));
+app.use("/api/subscription-orders", require("./routes/subscriptionOrderRoutes"));
 
 // Error handling middlewares
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");

@@ -1,73 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./Aboutclientfeedback.css";
+import API from "../../services/api";
 
 const AUTOPLAY_DELAY = 3500; // ms between slides
 const MAX_PER_VIEW = 4; // clones needed for a seamless loop
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Kelly Coleman",
-    role: "Happy Customer",
-    rating: 5,
-    image:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&h=200&q=85",
-    feedback:
-      "The water quality is excellent, and the delivery service is always reliable. I am very happy with Alka Drops!",
-  },
-  {
-    id: 2,
-    name: "Philip Mendez",
-    role: "Regular Customer",
-    rating: 5,
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&h=200&q=85",
-    feedback:
-      "Excellent service and fresh drinking water every time. The team is friendly, professional, and always on time.",
-  },
-  {
-    id: 3,
-    name: "Eugene Freeman",
-    role: "Business Customer",
-    rating: 5,
-    image:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&h=200&q=85",
-    feedback:
-      "We have been using Alka Drops for our daily water needs. Their consistent quality and quick delivery are impressive.",
-  },
-  {
-    id: 4,
-    name: "Sophia Williams",
-    role: "Happy Customer",
-    rating: 5,
-    image:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&h=200&q=85",
-    feedback:
-      "A wonderful experience from ordering to delivery. The water tastes fresh, and the service makes everything easy.",
-  },
-  {
-    id: 5,
-    name: "Daniel Carter",
-    role: "Regular Customer",
-    rating: 5,
-    image:
-      "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&w=200&h=200&q=85",
-    feedback:
-      "Great customer support and dependable deliveries. Alka Drops has become our trusted choice for drinking water.",
-  },
-  {
-    id: 6,
-    name: "Olivia Martin",
-    role: "Happy Customer",
-    rating: 5,
-    image:
-      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=200&h=200&q=85",
-    feedback:
-      "Ordering is simple, delivery is smooth, and the quality is consistently good. I would happily recommend their service.",
-  },
-];
-
-const TOTAL = testimonials.length;
 
 /* Cards per screen: 4 desktop, 3 laptop, 2 tablet, 1 mobile */
 const getVisibleCards = () => {
@@ -78,13 +14,14 @@ const getVisibleCards = () => {
   return 1;
 };
 
-const getInitials = (name) =>
+const getInitials = (name = "") =>
   name
     .split(" ")
+    .filter(Boolean)
     .map((part) => part[0])
     .slice(0, 2)
     .join("")
-    .toUpperCase();
+    .toUpperCase() || "C";
 
 /* Shows the photo, or coloured initials if the photo cannot load */
 const Avatar = ({ name, image, hidden }) => {
@@ -130,33 +67,41 @@ const Stars = ({ rating }) => (
   </div>
 );
 
-const FeedbackCard = ({ testimonial, hidden }) => (
-  <article
-    className="about-feedback-card"
-    aria-hidden={hidden ? "true" : undefined}
-  >
-    <Avatar
-      name={testimonial.name}
-      image={testimonial.image}
-      hidden={hidden}
-    />
+const FeedbackCard = ({ testimonial, hidden }) => {
+  const authorName = testimonial.name || testimonial.customer || "Customer";
+  const authorRole = testimonial.role || "Verified Customer";
+  const commentText = testimonial.feedback || testimonial.comment || testimonial.text || "";
+  const ratingValue = Number(testimonial.rating) || 5;
+  const authorImage = testimonial.image || testimonial.avatar;
 
-    <Stars rating={testimonial.rating} />
+  return (
+    <article
+      className="about-feedback-card"
+      aria-hidden={hidden ? "true" : undefined}
+    >
+      <Avatar
+        name={authorName}
+        image={authorImage}
+        hidden={hidden}
+      />
 
-    <p className="about-feedback-text">{testimonial.feedback}</p>
+      <Stars rating={ratingValue} />
 
-    <div className="about-feedback-author">
-      <h3 className="about-feedback-name">{testimonial.name}</h3>
-      <span className="about-feedback-role">{testimonial.role}</span>
-    </div>
+      <p className="about-feedback-text">{commentText}</p>
 
-    <div className="about-feedback-quote" aria-hidden="true">
-      <svg viewBox="0 0 48 48" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 10H10C5.6 10 3 13.4 3 18v16h16V18h-8c0-3 2-4 5-4h4v-4Zm25 0H35c-4.4 0-7 3.4-7 8v16h16V18h-8c0-3 2-4 5-4h4v-4Z" />
-      </svg>
-    </div>
-  </article>
-);
+      <div className="about-feedback-author">
+        <h3 className="about-feedback-name">{authorName}</h3>
+        <span className="about-feedback-role">{authorRole}</span>
+      </div>
+
+      <div className="about-feedback-quote" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 10H10C5.6 10 3 13.4 3 18v16h16V18h-8c0-3 2-4 5-4h4v-4Zm25 0H35c-4.4 0-7 3.4-7 8v16h16V18h-8c0-3 2-4 5-4h4v-4Z" />
+        </svg>
+      </div>
+    </article>
+  );
+};
 
 const ArrowButton = ({ direction, onClick, className }) => (
   <button
@@ -182,6 +127,10 @@ const Aboutclientfeedback = () => {
   const lockTimerRef = useRef(null);
   const touchStartRef = useRef(null);
 
+  const [testimonials, setTestimonials] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [isVisible, setIsVisible] = useState(false);
   const [visibleCards, setVisibleCards] = useState(getVisibleCards);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -193,6 +142,44 @@ const Aboutclientfeedback = () => {
     typeof window !== "undefined" &&
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Fetch live published reviews from backend */
+  useEffect(() => {
+    let isMounted = true;
+    const fetchReviews = async () => {
+      try {
+        setIsLoading(true);
+        const res = await API.get("/reviews", {
+          params: { status: "Published" },
+        });
+        if (isMounted) {
+          const list = Array.isArray(res.data?.reviews)
+            ? res.data.reviews
+            : Array.isArray(res.data?.data)
+            ? res.data.data
+            : Array.isArray(res.data)
+            ? res.data
+            : [];
+          setTestimonials(list);
+          setError(null);
+        }
+      } catch (err) {
+        console.error("Failed to load client feedback:", err);
+        if (isMounted) {
+          setError("Failed to load client feedback.");
+        }
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    fetchReviews();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const TOTAL = testimonials.length;
 
   /* Reveal when the section enters the viewport */
   useEffect(() => {
@@ -249,14 +236,14 @@ const Aboutclientfeedback = () => {
   }, []);
 
   const goToNext = useCallback(() => {
-    if (lockRef.current) return;
+    if (TOTAL === 0 || lockRef.current) return;
     lock();
     setAnimate(true);
     setCurrentIndex((index) => index + 1);
-  }, [lock]);
+  }, [lock, TOTAL]);
 
   const goToPrevious = useCallback(() => {
-    if (lockRef.current) return;
+    if (TOTAL === 0 || lockRef.current) return;
     lock();
 
     if (currentIndex === 0) {
@@ -273,21 +260,21 @@ const Aboutclientfeedback = () => {
       setAnimate(true);
       setCurrentIndex((index) => index - 1);
     }
-  }, [currentIndex, lock]);
+  }, [currentIndex, lock, TOTAL]);
 
   const goToPosition = useCallback(
     (target) => {
-      if (lockRef.current || target === currentIndex % TOTAL) return;
+      if (TOTAL === 0 || lockRef.current || target === currentIndex % TOTAL) return;
       lock();
       setAnimate(true);
       setCurrentIndex(target);
     },
-    [currentIndex, lock]
+    [currentIndex, lock, TOTAL]
   );
 
   /* After sliding onto the cloned cards, silently jump back to the real ones */
   const handleTransitionEnd = (event) => {
-    if (event.target !== trackRef.current) return;
+    if (event.target !== trackRef.current || TOTAL === 0) return;
 
     if (currentIndex >= TOTAL) {
       setAnimate(false);
@@ -307,10 +294,10 @@ const Aboutclientfeedback = () => {
   const autoplayPaused = isPaused || tabHidden || reducedMotion;
 
   useEffect(() => {
-    if (!isVisible || autoplayPaused) return undefined;
+    if (!isVisible || autoplayPaused || TOTAL === 0) return undefined;
     const timer = setTimeout(goToNext, AUTOPLAY_DELAY);
     return () => clearTimeout(timer);
-  }, [currentIndex, isVisible, autoplayPaused, goToNext]);
+  }, [currentIndex, isVisible, autoplayPaused, goToNext, TOTAL]);
 
   /* Swipe on touch screens */
   const handleTouchStart = (event) => {
@@ -336,8 +323,8 @@ const Aboutclientfeedback = () => {
     if (event.key === "ArrowLeft") goToPrevious();
   };
 
-  const activeDot = currentIndex % TOTAL;
-  const clones = testimonials.slice(0, MAX_PER_VIEW);
+  const activeDot = TOTAL > 0 ? currentIndex % TOTAL : 0;
+  const clones = TOTAL > 0 ? testimonials.slice(0, Math.min(TOTAL, MAX_PER_VIEW)) : [];
 
   return (
     <section
@@ -379,99 +366,122 @@ const Aboutclientfeedback = () => {
           </p>
         </div>
 
-        {/* Testimonial Carousel */}
-        <div
-          className="about-feedback-carousel"
-          role="region"
-          aria-roledescription="carousel"
-          aria-label="Client testimonials"
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onFocusCapture={() => setIsPaused(true)}
-          onBlurCapture={(event) => {
-            if (!event.currentTarget.contains(event.relatedTarget)) {
-              setIsPaused(false);
-            }
-          }}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          <ArrowButton
-            direction="prev"
-            onClick={goToPrevious}
-            className="about-feedback-arrow-side about-feedback-arrow-prev"
-          />
-
-          {/* Carousel Viewport */}
-          <div className="about-feedback-viewport">
+        {/* Dynamic content rendering */}
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: "48px 16px", color: "#4d6088" }}>
+            <p>Loading client feedback...</p>
+          </div>
+        ) : error && TOTAL === 0 ? (
+          <div style={{ textAlign: "center", padding: "48px 16px", color: "#e11d48" }}>
+            <p>{error}</p>
+          </div>
+        ) : TOTAL === 0 ? (
+          <div style={{ textAlign: "center", padding: "48px 16px", color: "#4d6088" }}>
+            <p>No verified customer reviews published yet.</p>
+          </div>
+        ) : (
+          <>
+            {/* Testimonial Carousel */}
             <div
-              ref={trackRef}
-              className="about-feedback-grid"
-              style={{
-                "--about-feedback-per-view": visibleCards,
-                transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
-                transition: animate ? undefined : "none",
+              className="about-feedback-carousel"
+              role="region"
+              aria-roledescription="carousel"
+              aria-label="Client testimonials"
+              tabIndex={0}
+              onKeyDown={handleKeyDown}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+              onFocusCapture={() => setIsPaused(true)}
+              onBlurCapture={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                  setIsPaused(false);
+                }
               }}
-              onTransitionEnd={handleTransitionEnd}
-              aria-live={autoplayPaused ? "polite" : "off"}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
             >
-              {testimonials.map((testimonial) => (
-                <div className="about-feedback-slide" key={testimonial.id}>
-                  <FeedbackCard testimonial={testimonial} />
-                </div>
-              ))}
-
-              {clones.map((testimonial) => (
-                <div className="about-feedback-slide" key={`clone-${testimonial.id}`}>
-                  <FeedbackCard testimonial={testimonial} hidden />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <ArrowButton
-            direction="next"
-            onClick={goToNext}
-            className="about-feedback-arrow-side about-feedback-arrow-next"
-          />
-        </div>
-
-        {/* Pagination Dots */}
-        <div className="about-feedback-pagination">
-          <ArrowButton
-            direction="prev"
-            onClick={goToPrevious}
-            className="about-feedback-arrow-bottom"
-          />
-
-          <div
-            className="about-feedback-dots"
-            role="tablist"
-            aria-label="Choose testimonial"
-          >
-            {testimonials.map((testimonial, index) => (
-              <button
-                type="button"
-                key={testimonial.id}
-                role="tab"
-                aria-selected={activeDot === index}
-                aria-label={`Show testimonial ${index + 1}`}
-                className={`about-feedback-dot ${
-                  activeDot === index ? "active" : ""
-                }`}
-                onClick={() => goToPosition(index)}
+              <ArrowButton
+                direction="prev"
+                onClick={goToPrevious}
+                className="about-feedback-arrow-side about-feedback-arrow-prev"
               />
-            ))}
-          </div>
 
-          <ArrowButton
-            direction="next"
-            onClick={goToNext}
-            className="about-feedback-arrow-bottom"
-          />
-        </div>
+              {/* Carousel Viewport */}
+              <div className="about-feedback-viewport">
+                <div
+                  ref={trackRef}
+                  className="about-feedback-grid"
+                  style={{
+                    "--about-feedback-per-view": visibleCards,
+                    transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
+                    transition: animate ? undefined : "none",
+                  }}
+                  onTransitionEnd={handleTransitionEnd}
+                  aria-live={autoplayPaused ? "polite" : "off"}
+                >
+                  {testimonials.map((testimonial, idx) => (
+                    <div
+                      className="about-feedback-slide"
+                      key={testimonial._id || testimonial.id || `feedback-${idx}`}
+                    >
+                      <FeedbackCard testimonial={testimonial} />
+                    </div>
+                  ))}
+
+                  {clones.map((testimonial, idx) => (
+                    <div
+                      className="about-feedback-slide"
+                      key={`clone-${testimonial._id || testimonial.id || idx}`}
+                    >
+                      <FeedbackCard testimonial={testimonial} hidden />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <ArrowButton
+                direction="next"
+                onClick={goToNext}
+                className="about-feedback-arrow-side about-feedback-arrow-next"
+              />
+            </div>
+
+            {/* Pagination Dots */}
+            <div className="about-feedback-pagination">
+              <ArrowButton
+                direction="prev"
+                onClick={goToPrevious}
+                className="about-feedback-arrow-bottom"
+              />
+
+              <div
+                className="about-feedback-dots"
+                role="tablist"
+                aria-label="Choose testimonial"
+              >
+                {testimonials.map((testimonial, index) => (
+                  <button
+                    type="button"
+                    key={testimonial._id || testimonial.id || `dot-${index}`}
+                    role="tab"
+                    aria-selected={activeDot === index}
+                    aria-label={`Show testimonial ${index + 1}`}
+                    className={`about-feedback-dot ${
+                      activeDot === index ? "active" : ""
+                    }`}
+                    onClick={() => goToPosition(index)}
+                  />
+                ))}
+              </div>
+
+              <ArrowButton
+                direction="next"
+                onClick={goToNext}
+                className="about-feedback-arrow-bottom"
+              />
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

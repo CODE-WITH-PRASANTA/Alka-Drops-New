@@ -769,3 +769,361 @@
     transition: none;
   }
 }
+
+
+/* =========================================================
+   SUBSCRIPTION BOOKING MODAL (POPUP ON ORDER NOW)
+========================================================= */
+
+.SubModal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: subModalFadeIn 0.22s ease-out;
+}
+
+@keyframes subModalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.SubModal-container {
+  background: #ffffff;
+  border-radius: 24px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px -10px rgba(0, 78, 168, 0.35);
+  position: relative;
+  padding: 32px 28px 28px;
+  border: 1px solid #e2e8f0;
+  animation: subModalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes subModalSlideUp {
+  from { transform: translateY(24px) scale(0.96); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.SubModal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 10;
+}
+.SubModal-close-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #fca5a5;
+}
+
+.SubModal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 22px;
+}
+
+.SubModal-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #004ea8;
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.SubModal-header h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.SubModal-plan-badge {
+  text-align: right;
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  padding: 8px 16px;
+  border-radius: 12px;
+}
+.SubModal-plan-price {
+  font-size: 22px;
+  font-weight: 800;
+  color: #004ea8;
+}
+.SubModal-plan-period {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.SubModal-alert-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Dates Box (Start Date & End Date) */
+.SubModal-dates-box {
+  background: linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%);
+  border: 1.5px solid #bfdbfe;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.SubModal-dates-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.SubModal-dates-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #004ea8;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.SubModal-duration-pill {
+  font-size: 12px;
+  font-weight: 700;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 4px 12px;
+  border-radius: 9999px;
+}
+
+.SubModal-dates-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Form Fields */
+.SubModal-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.SubModal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.SubModal-field.full-width {
+  grid-column: span 2;
+}
+
+.SubModal-field label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.SubModal-field label span {
+  color: #ef4444;
+}
+
+.SubModal-field input,
+.SubModal-field select {
+  padding: 11px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  background: #ffffff;
+  color: #0f172a;
+  transition: all 0.15s ease;
+}
+
+.SubModal-field input:focus,
+.SubModal-field select:focus {
+  border-color: #004ea8;
+  box-shadow: 0 0 0 3px rgba(0, 78, 168, 0.15);
+}
+
+/* Actions */
+.SubModal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.SubModal-btn-primary {
+  padding: 12px 26px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #004ea8 0%, #0284c7 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 78, 168, 0.28);
+  transition: all 0.15s ease;
+}
+.SubModal-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 78, 168, 0.38);
+}
+.SubModal-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.SubModal-btn-secondary {
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.SubModal-btn-secondary:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* Success View */
+.SubModal-success-view {
+  text-align: center;
+  padding: 20px 10px 10px;
+}
+.SubModal-success-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #ecfdf5;
+  color: #059669;
+  font-size: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.2);
+}
+.SubModal-success-view h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+}
+.SubModal-order-badge {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #004ea8;
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  padding: 4px 14px;
+  border-radius: 9999px;
+  margin-bottom: 12px;
+}
+.SubModal-success-desc {
+  margin: 0 0 24px;
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.SubModal-success-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px 20px;
+  text-align: left;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.SubModal-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13.5px;
+  color: #475569;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.SubModal-summary-row strong {
+  color: #0f172a;
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .SubModal-container {
+    padding: 24px 18px 20px;
+  }
+  .SubModal-dates-row {
+    grid-template-columns: 1fr;
+  }
+  .SubModal-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .SubModal-field.full-width {
+    grid-column: span 1;
+  }
+  .SubModal-actions {
+    flex-direction: column-reverse;
+  }
+  .SubModal-btn-primary,
+  .SubModal-btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}

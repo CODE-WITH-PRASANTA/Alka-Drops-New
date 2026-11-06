@@ -300,8 +300,12 @@ const ShopCards = () => {
 
                     <div className="ShopCards-quickActions">
                       <button
+                        type="button"
                         className={`ShopCards-iconButton ${inWishlist ? "selected in-wishlist" : ""}`}
-                        onClick={() => toggleWishlist(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWishlist(product);
+                        }}
                         title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
                         aria-label="Wishlist"
                       >

@@ -7,10 +7,10 @@ const {
   getOrderById,
   updateOrderStatus,
 } = require("../controllers/orderController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, optionalAuth } = require("../middleware/authMiddleware");
 
 // Public/User routes
-router.post("/", createOrder);
+router.post("/", optionalAuth, createOrder);
 router.get("/my-orders", protect, getMyOrders);
 router.get("/:id", getOrderById);
 

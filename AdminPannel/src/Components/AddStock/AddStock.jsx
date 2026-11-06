@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   PlusCircle,
   Table as TableIcon,
@@ -53,6 +54,11 @@ const DEFAULT_IMAGE =
   "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=700&auto=format&fit=crop&q=85";
 
 const AddStock = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const editId = searchParams.get("edit") || searchParams.get("id");
+  const [isFetchingEdit, setIsFetchingEdit] = useState(false);
+
   // Navigation View: 'form' | 'table'
   const [activeView, setActiveView] = useState("form");
 
@@ -118,6 +124,56 @@ const AddStock = () => {
   useEffect(() => {
     fetchStocks();
   }, []);
+
+  // Fetch specific product data when opened with ?edit=<id>
+  useEffect(() => {
+    if (editId) {
+      setActiveView("form");
+      const loadProductForEdit = async () => {
+        try {
+          setIsFetchingEdit(true);
+          const res = await API.get(`/products/${editId}`);
+          if (res.data?.success && res.data?.product) {
+            const p = res.data.product;
+            setFormData({
+              title: p.title || p.name || "",
+              category: p.category || "Alkaline Water",
+              liter: p.liter || p.size || "1 Litre",
+              price: p.price !== undefined ? String(p.price) : "",
+              discount: String(p.discount || "0"),
+              badge: p.badge || "None",
+              quantity: p.quantity !== undefined ? String(p.quantity) : "",
+              description: p.description || "",
+              image: p.image || null,
+            });
+            setImagePreview(p.image || null);
+            setSelectedFile(null);
+            if (editorRef.current) {
+              editorRef.current.innerHTML = p.description || "";
+            }
+          } else {
+            showToast("Product not found in database.", "error");
+          }
+        } catch (err) {
+          console.error("Failed to load product details for edit:", err);
+          showToast(
+            err.response?.data?.message || "Failed to load product for editing.",
+            "error"
+          );
+        } finally {
+          setIsFetchingEdit(false);
+        }
+      };
+      loadProductForEdit();
+    }
+  }, [editId]);
+
+  // Keep editor content in sync when editorRef mounts
+  useEffect(() => {
+    if (editorRef.current && formData.description && !editorRef.current.innerHTML) {
+      editorRef.current.innerHTML = formData.description;
+    }
+  }, [formData.description, activeView]);
 
   // Text Editor Toolbar Commands
   const executeEditorCommand = (command, value = null) => {
@@ -196,6 +252,25 @@ const AddStock = () => {
         image: uploadedImageUrl || DEFAULT_IMAGE,
       };
 
+      if (editId) {
+        const res = await API.put(`/products/${editId}`, payload);
+
+        if (res.data?.success) {
+          showToast(`Product "${payload.title}" updated successfully in database!`);
+          setFormData(initialFormState);
+          setSelectedFile(null);
+          setImagePreview(null);
+          if (editorRef.current) editorRef.current.innerHTML = "";
+          await fetchStocks();
+          setTimeout(() => {
+            navigate("/admin/shop/manage");
+          }, 1100);
+        } else {
+          showToast(res.data?.message || "Failed to update product.", "error");
+        }
+        return;
+      }
+
       const res = await API.post("/products", payload);
 
       if (res.data?.success) {
@@ -218,6 +293,15 @@ const AddStock = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Cancel edit mode and navigate back to shop manage
+  const handleCancelEdit = () => {
+    setFormData(initialFormState);
+    setSelectedFile(null);
+    setImagePreview(null);
+    if (editorRef.current) editorRef.current.innerHTML = "";
+    navigate("/admin/shop/manage");
   };
 
   // Edit Submission Handler (PUT /api/products/:id)
@@ -376,13 +460,45 @@ const AddStock = () => {
           <div className="AddStock-card">
             <div className="AddStock-card-header">
               <div className="AddStock-card-title-group">
-                <Sparkles size={18} className="AddStock-accent-icon" />
-                <h2>Add New Bottle Stock</h2>
+                {editId ? (
+                  <Edit2 size={18} className="AddStock-accent-icon edit" />
+                ) : (
+                  <Sparkles size={18} className="AddStock-accent-icon" />
+                )}
+                <div>
+                  <h2>{editId ? "Edit Product & Stock" : "Add New Bottle Stock"}</h2>
+                  {editId && (
+                    <span className="AddStock-editing-sub">
+                      Editing database record ID: <code>{editId}</code>
+                    </span>
+                  )}
+                </div>
               </div>
-              <span className="AddStock-live-pill">Live Database Sync</span>
+
+              <div className="AddStock-header-badges">
+                <span className={`AddStock-live-pill ${editId ? "edit-mode" : ""}`}>
+                  {editId ? "Edit Mode (Live Sync)" : "Live Database Sync"}
+                </span>
+                {editId && (
+                  <button
+                    type="button"
+                    className="AddStock-cancel-edit-btn"
+                    onClick={handleCancelEdit}
+                    title="Cancel edit and return to shop inventory"
+                  >
+                    <X size={14} /> <span>Cancel Edit</span>
+                  </button>
+                )}
+              </div>
             </div>
 
-            <form onSubmit={handleFormSubmit} className="AddStock-form-full">
+            {isFetchingEdit ? (
+              <div className="AddStock-edit-loading">
+                <Loader2 size={32} className="spin" />
+                <span>Fetching product details from MongoDB...</span>
+              </div>
+            ) : (
+              <form onSubmit={handleFormSubmit} className="AddStock-form-full">
               <div className="AddStock-form-columns">
                 {/* Left Column: Media & Specifications */}
                 <div className="AddStock-col-left">
@@ -627,18 +743,39 @@ const AddStock = () => {
                   </div>
 
                   <div className="AddStock-submit-wrap">
+                    {editId && (
+                      <button
+                        type="button"
+                        className="AddStock-cancel-btn"
+                        onClick={handleCancelEdit}
+                        disabled={isSubmitting}
+                      >
+                        Cancel
+                      </button>
+                    )}
                     <button
                       type="submit"
-                      className="AddStock-save-btn"
+                      className={`AddStock-save-btn ${editId ? "edit-mode" : ""}`}
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
                         <>
-                          <Loader2 size={18} className="spin" /> Saving to Database...
+                          <Loader2 size={18} className="spin" />{" "}
+                          <span>
+                            {editId
+                              ? "Updating in Database..."
+                              : "Saving to Database..."}
+                          </span>
+                        </>
+                      ) : editId ? (
+                        <>
+                          <Edit2 size={18} />{" "}
+                          <span>Update Product in Database</span>
                         </>
                       ) : (
                         <>
-                          <PlusCircle size={18} /> Confirm & Add to Inventory
+                          <PlusCircle size={18} />{" "}
+                          <span>Confirm &amp; Add to Inventory</span>
                         </>
                       )}
                     </button>
@@ -646,6 +783,7 @@ const AddStock = () => {
                 </div>
               </div>
             </form>
+            )}
           </div>
         )}
 

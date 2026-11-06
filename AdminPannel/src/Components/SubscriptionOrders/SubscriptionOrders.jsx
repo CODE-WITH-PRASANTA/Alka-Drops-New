@@ -1,8 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   FiCalendar,
   FiSearch,
-  FiFilter,
   FiCheckCircle,
   FiClock,
   FiTruck,
@@ -10,77 +9,230 @@ import {
   FiMapPin,
   FiPackage,
   FiUser,
+  FiPhone,
+  FiMail,
+  FiTrash2,
+  FiAlertCircle,
+  FiCheck,
 } from "react-icons/fi";
+import API from "../../services/api";
 import "./SubscriptionOrders.css";
 
-const initialDeliveries = [
-  { id: "SUB-DLV-101", customer: "Pooja Hegde", plan: "Daily Hydration", bottles: 1, empties: 1, timeSlot: "06:30 AM", route: "Zone A - Viman Nagar", deliveryBoy: "Ramesh Pawar", status: "Delivered", address: "Flat 402, Green Acres" },
-  { id: "SUB-DLV-102", customer: "Sanjay Singhania", plan: "Office Station (Mon-Fri)", bottles: 3, empties: 3, timeSlot: "08:15 AM", route: "Zone B - Magarpatta", deliveryBoy: "Vikas Patil", status: "Delivered", address: "Tower 2, CyberCity" },
-  { id: "SUB-DLV-103", customer: "Dr. Aarti Sharma", plan: "Alternate Days", bottles: 1, empties: 1, timeSlot: "07:00 AM", route: "Zone C - Kalyani Nagar", deliveryBoy: "Sunil Shinde", status: "Out for Delivery", address: "Bungalow 7, River View" },
-  { id: "SUB-DLV-104", customer: "Anand Mahindra", plan: "Weekly Family Pack", bottles: 2, empties: 2, timeSlot: "07:45 AM", route: "Zone A - Viman Nagar", deliveryBoy: "Ramesh Pawar", status: "Pending Dispatch", address: "Villa 22, Sky Palms" },
-  { id: "SUB-DLV-105", customer: "Vikram Kirloskar", plan: "Daily Hydration", bottles: 1, empties: 1, timeSlot: "06:45 AM", route: "Zone D - Koregaon Park", deliveryBoy: "Arjun Verma", status: "Delivered", address: "Lane 5, Koregaon Park" },
-  { id: "SUB-DLV-106", customer: "Meera Nair", plan: "Alternate Days", bottles: 1, empties: 0, timeSlot: "08:00 AM", route: "Zone B - Magarpatta", deliveryBoy: "Vikas Patil", status: "Customer Paused", address: "Plot 80, Lake Town" },
-];
-
 const SubscriptionOrders = () => {
-  const [deliveries, setDeliveries] = useState(initialDeliveries);
+  const [orders, setOrders] = useState([]);
+  const [deliveryBoys, setDeliveryBoys] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successToast, setSuccessToast] = useState("");
   const [search, setSearch] = useState("");
-  const [routeFilter, setRouteFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
+  const fetchOrders = async () => {
+    try {
+      setIsLoading(true);
+      setErrorMsg("");
+      const [ordersRes, deliveryRes] = await Promise.all([
+        API.get("/subscription-orders"),
+        API.get("/delivery-boys").catch(() => ({ data: { deliveryBoys: [] } })),
+      ]);
+
+      if (ordersRes.data?.success && Array.isArray(ordersRes.data.orders)) {
+        setOrders(ordersRes.data.orders);
+      } else {
+        setOrders([]);
+      }
+
+      if (deliveryRes.data?.deliveryBoys) {
+        setDeliveryBoys(deliveryRes.data.deliveryBoys.filter((b) => b.status === "Active"));
+      }
+    } catch (err) {
+      console.error("Failed to load subscription orders:", err);
+      setErrorMsg(err.response?.data?.message || "Failed to load live subscription orders from server.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const showToast = (msg) => {
+    setSuccessToast(msg);
+    setTimeout(() => setSuccessToast(""), 4000);
+  };
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      const res = await API.patch(`/subscription-orders/${orderId}/status`, { status: newStatus });
+      if (res.data?.success) {
+        setOrders((prev) =>
+          prev.map((ord) => (ord._id === orderId ? { ...ord, status: newStatus } : ord))
+        );
+        showToast(`Status updated to ${newStatus}!`);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update status.");
+    }
+  };
+
+  const handleAssignDeliveryBoy = async (orderId, boyName, boyPhone) => {
+    try {
+      const res = await API.patch(`/subscription-orders/${orderId}/assign`, {
+        deliveryBoyName: boyName,
+        deliveryBoyPhone: boyPhone,
+      });
+      if (res.data?.success) {
+        setOrders((prev) =>
+          prev.map((ord) =>
+            ord._id === orderId
+              ? { ...ord, deliveryBoy: { name: boyName, phone: boyPhone } }
+              : ord
+          )
+        );
+        showToast(`Assigned ${boyName} to order!`);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to assign delivery partner.");
+    }
+  };
+
+  const handleDeleteOrder = async (orderId, orderNum) => {
+    if (!window.confirm(`Permanently remove subscription order #${orderNum}?`)) {
+      return;
+    }
+    try {
+      const res = await API.delete(`/subscription-orders/${orderId}`);
+      if (res.data?.success) {
+        setOrders((prev) => prev.filter((ord) => ord._id !== orderId));
+        showToast(`Order #${orderNum} deleted.`);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to delete subscription order.");
+    }
+  };
+
   const filtered = useMemo(() => {
-    return deliveries.filter((d) => {
+    return orders.filter((o) => {
+      const q = search.toLowerCase();
       const matchSearch =
-        !search ||
-        d.customer.toLowerCase().includes(search.toLowerCase()) ||
-        d.route.toLowerCase().includes(search.toLowerCase()) ||
-        d.deliveryBoy.toLowerCase().includes(search.toLowerCase());
-      const matchRoute = routeFilter === "all" || d.route.includes(routeFilter);
-      const matchStatus = statusFilter === "all" || d.status.toLowerCase() === statusFilter.toLowerCase();
-      return matchSearch && matchRoute && matchStatus;
+        !q ||
+        o.orderNumber?.toLowerCase().includes(q) ||
+        o.customerName?.toLowerCase().includes(q) ||
+        o.customerPhone?.toLowerCase().includes(q) ||
+        o.customerEmail?.toLowerCase().includes(q) ||
+        o.planTitle?.toLowerCase().includes(q) ||
+        o.deliveryAddress?.street?.toLowerCase().includes(q) ||
+        o.deliveryAddress?.city?.toLowerCase().includes(q) ||
+        o.deliveryBoy?.name?.toLowerCase().includes(q);
+
+      const matchStatus =
+        statusFilter === "all" || o.status?.toLowerCase() === statusFilter.toLowerCase();
+
+      return matchSearch && matchStatus;
     });
-  }, [deliveries, search, routeFilter, statusFilter]);
+  }, [orders, search, statusFilter]);
 
   const stats = useMemo(() => {
-    const totalBottles = deliveries.reduce((acc, d) => acc + d.bottles, 0);
-    const deliveredCount = deliveries.filter((d) => d.status === "Delivered").length;
-    const pendingCount = deliveries.filter((d) => d.status.includes("Pending") || d.status.includes("Out")).length;
-    return { totalTrips: deliveries.length, totalBottles, deliveredCount, pendingCount };
-  }, [deliveries]);
+    const totalOrders = orders.length;
+    const activeCount = orders.filter((o) => o.status === "Active").length;
+    const pausedCount = orders.filter((o) => o.status === "Paused").length;
+    const totalBottles = orders
+      .filter((o) => o.status === "Active")
+      .reduce((acc, o) => acc + (Number(o.bottlesPerDelivery) || 1), 0);
+    return { totalOrders, activeCount, pausedCount, totalBottles };
+  }, [orders]);
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "N/A";
+    return new Date(dateStr).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   return (
     <div className="SubscriptionOrders">
+      {/* Toast Alert */}
+      {successToast && (
+        <div className="SubscriptionOrders-toast">
+          <FiCheck /> {successToast}
+        </div>
+      )}
+
       <header className="SubscriptionOrders-header">
         <div className="SubscriptionOrders-heading">
           <div className="SubscriptionOrders-headingIcon">
             <FiCalendar />
           </div>
-          <h1>Subscription Orders & Daily Dispatch</h1>
+          <div>
+            <h1>Subscription Orders &amp; Validity Schedule</h1>
+            <p style={{ margin: "3px 0 0", fontSize: "13px", color: "#64748b" }}>
+              Monitor recurring water delivery passes, validity dates, and doorstep schedules in Bhubaneswar.
+            </p>
+          </div>
         </div>
+
         <div className="SubscriptionOrders-actions">
-          <button type="button" className="SubscriptionOrders-btn secondary" onClick={() => setDeliveries([...initialDeliveries])}>
-            <FiRefreshCw /> <span>Sync Schedule</span>
+          <button
+            type="button"
+            className="SubscriptionOrders-btn secondary"
+            onClick={fetchOrders}
+            disabled={isLoading}
+          >
+            <FiRefreshCw className={isLoading ? "spin" : ""} />
+            <span>{isLoading ? "Refreshing..." : "Refresh Live Orders"}</span>
           </button>
         </div>
       </header>
 
-      {/* Metrics */}
+      {errorMsg && (
+        <div className="SubscriptionOrders-alert-box error">
+          <FiAlertCircle /> {errorMsg}
+        </div>
+      )}
+
+      {/* Real Metrics Grid */}
       <div className="SubscriptionOrders-statsGrid">
         <div className="SubscriptionOrders-statCard">
-          <div className="SubscriptionOrders-statIcon trips"><FiCalendar /></div>
-          <div><span className="SubscriptionOrders-statLabel">Today's Deliveries</span><span className="SubscriptionOrders-statValue">{stats.totalTrips} Stops</span></div>
+          <div className="SubscriptionOrders-statIcon trips">
+            <FiCalendar />
+          </div>
+          <div>
+            <span className="SubscriptionOrders-statLabel">Total Bookings</span>
+            <span className="SubscriptionOrders-statValue">{stats.totalOrders} Orders</span>
+          </div>
         </div>
+
         <div className="SubscriptionOrders-statCard">
-          <div className="SubscriptionOrders-statIcon bottles"><FiPackage /></div>
-          <div><span className="SubscriptionOrders-statLabel">Jars to Dispatch</span><span className="SubscriptionOrders-statValue">{stats.totalBottles} Jars</span></div>
+          <div className="SubscriptionOrders-statIcon delivered">
+            <FiCheckCircle />
+          </div>
+          <div>
+            <span className="SubscriptionOrders-statLabel">Active Passes</span>
+            <span className="SubscriptionOrders-statValue">{stats.activeCount} Active</span>
+          </div>
         </div>
+
         <div className="SubscriptionOrders-statCard">
-          <div className="SubscriptionOrders-statIcon delivered"><FiCheckCircle /></div>
-          <div><span className="SubscriptionOrders-statLabel">Completed</span><span className="SubscriptionOrders-statValue">{stats.deliveredCount} Delivered</span></div>
+          <div className="SubscriptionOrders-statIcon bottles">
+            <FiPackage />
+          </div>
+          <div>
+            <span className="SubscriptionOrders-statLabel">Daily Cans Dispatch</span>
+            <span className="SubscriptionOrders-statValue">{stats.totalBottles} Jars</span>
+          </div>
         </div>
+
         <div className="SubscriptionOrders-statCard">
-          <div className="SubscriptionOrders-statIcon transit"><FiTruck /></div>
-          <div><span className="SubscriptionOrders-statLabel">In Transit / Pending</span><span className="SubscriptionOrders-statValue">{stats.pendingCount} Remaining</span></div>
+          <div className="SubscriptionOrders-statIcon transit">
+            <FiClock />
+          </div>
+          <div>
+            <span className="SubscriptionOrders-statLabel">Paused / On Hold</span>
+            <span className="SubscriptionOrders-statValue">{stats.pausedCount} Paused</span>
+          </div>
         </div>
       </div>
 
@@ -90,75 +242,186 @@ const SubscriptionOrders = () => {
           <FiSearch className="SubscriptionOrders-searchIcon" />
           <input
             type="text"
-            placeholder="Search customer, delivery boy, or delivery route..."
+            placeholder="Search order #, customer name, phone, address, or plan..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+
         <div className="SubscriptionOrders-filterGroup">
-          <select value={routeFilter} onChange={(e) => setRouteFilter(e.target.value)}>
-            <option value="all">All Delivery Zones</option>
-            <option value="Zone A">Zone A - Viman Nagar</option>
-            <option value="Zone B">Zone B - Magarpatta</option>
-            <option value="Zone C">Zone C - Kalyani Nagar</option>
-            <option value="Zone D">Zone D - Koregaon Park</option>
-          </select>
           <div className="SubscriptionOrders-statusTabs">
-            <button type="button" className={statusFilter === "all" ? "active" : ""} onClick={() => setStatusFilter("all")}>All</button>
-            <button type="button" className={statusFilter === "delivered" ? "active" : ""} onClick={() => setStatusFilter("delivered")}>Delivered</button>
-            <button type="button" className={statusFilter === "out for delivery" ? "active" : ""} onClick={() => setStatusFilter("out for delivery")}>In Transit</button>
+            <button
+              type="button"
+              className={statusFilter === "all" ? "active" : ""}
+              onClick={() => setStatusFilter("all")}
+            >
+              All ({orders.length})
+            </button>
+            <button
+              type="button"
+              className={statusFilter === "active" ? "active" : ""}
+              onClick={() => setStatusFilter("active")}
+            >
+              Active ({stats.activeCount})
+            </button>
+            <button
+              type="button"
+              className={statusFilter === "paused" ? "active" : ""}
+              onClick={() => setStatusFilter("paused")}
+            >
+              Paused ({stats.pausedCount})
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Orders Table */}
       <div className="SubscriptionOrders-tableCard">
-        <table className="SubscriptionOrders-table">
-          <thead>
-            <tr>
-              <th>Delivery ID / Time</th>
-              <th>Customer & Plan</th>
-              <th>Jars Delivery / Return</th>
-              <th>Zone / Address</th>
-              <th>Assigned Partner</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((item) => (
-              <tr key={item.id}>
-                <td>
-                  <strong>{item.id}</strong>
-                  <span className="SubscriptionOrders-subText"><FiClock /> {item.timeSlot}</span>
-                </td>
-                <td>
-                  <strong>{item.customer}</strong>
-                  <span className="SubscriptionOrders-subText">{item.plan}</span>
-                </td>
-                <td>
-                  <span className="SubscriptionOrders-bottlesBadge deliver">+{item.bottles} Full 20L</span>
-                  <span className="SubscriptionOrders-bottlesBadge return">-{item.empties} Empty</span>
-                </td>
-                <td>
-                  <strong>{item.route}</strong>
-                  <span className="SubscriptionOrders-subText">{item.address}</span>
-                </td>
-                <td>
-                  <span className="SubscriptionOrders-rider"><FiUser /> {item.deliveryBoy}</span>
-                </td>
-                <td>
-                  <span className={`SubscriptionOrders-statusPill ${item.status.toLowerCase().replace(/\s/g, "-")}`}>
-                    {item.status}
-                  </span>
-                </td>
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: "60px 20px", color: "#64748b" }}>
+            <FiRefreshCw className="spin" style={{ fontSize: "32px", color: "#004ea8", marginBottom: "10px" }} />
+            <p>Loading live subscription bookings from database...</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "60px 20px", color: "#64748b" }}>
+            <FiPackage style={{ fontSize: "40px", color: "#94a3b8", marginBottom: "12px" }} />
+            <h3 style={{ margin: "0 0 6px", color: "#0f172a" }}>No Subscription Orders Found</h3>
+            <p style={{ margin: 0, fontSize: "14px" }}>
+              {search || statusFilter !== "all"
+                ? "No subscriptions match your search or filter."
+                : "No customer has ordered a subscription plan yet. Bookings will appear here live."}
+            </p>
+          </div>
+        ) : (
+          <table className="SubscriptionOrders-table">
+            <thead>
+              <tr>
+                <th>Order # &amp; Plan</th>
+                <th>Customer Contact</th>
+                <th>Validity (Start &amp; End)</th>
+                <th>Schedule &amp; Quantity</th>
+                <th>Delivery Address</th>
+                <th>Delivery Partner</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((item) => (
+                <tr key={item._id}>
+                  {/* Order & Plan */}
+                  <td>
+                    <strong style={{ color: "#004ea8" }}>{item.orderNumber}</strong>
+                    <div style={{ fontWeight: 600, color: "#0f172a", marginTop: "2px" }}>
+                      {item.planTitle}
+                    </div>
+                    <span className="SubscriptionOrders-subText">
+                      ₹{item.totalAmount || item.planPrice} ({item.paymentMethod?.toUpperCase() || "COD"})
+                    </span>
+                  </td>
+
+                  {/* Customer */}
+                  <td>
+                    <strong>{item.customerName}</strong>
+                    <span className="SubscriptionOrders-subText">
+                      <FiPhone /> {item.customerPhone}
+                    </span>
+                    <span className="SubscriptionOrders-subText">
+                      <FiMail /> {item.customerEmail}
+                    </span>
+                  </td>
+
+                  {/* Start & End Dates */}
+                  <td>
+                    <div className="SubscriptionOrders-datesPill">
+                      <div>
+                        <span className="SubscriptionOrders-dateTag">START:</span>{" "}
+                        <strong>{formatDate(item.startDate)}</strong>
+                      </div>
+                      <div>
+                        <span className="SubscriptionOrders-dateTag end">END:</span>{" "}
+                        <strong>{formatDate(item.endDate)}</strong>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Schedule & Quantity */}
+                  <td>
+                    <span className="SubscriptionOrders-bottlesBadge deliver">
+                      +{item.bottlesPerDelivery || 2} Jars (20L)
+                    </span>
+                    <div className="SubscriptionOrders-subText">
+                      <FiClock /> {item.deliveryFrequency}
+                    </div>
+                    <div className="SubscriptionOrders-subText">
+                      {item.deliverySlot}
+                    </div>
+                  </td>
+
+                  {/* Address */}
+                  <td>
+                    <strong>{item.deliveryAddress?.street || "Bhubaneswar"}</strong>
+                    <span className="SubscriptionOrders-subText">
+                      <FiMapPin /> {item.deliveryAddress?.city} - {item.deliveryAddress?.postalCode}
+                    </span>
+                  </td>
+
+                  {/* Delivery Partner */}
+                  <td>
+                    <select
+                      className="SubscriptionOrders-assignSelect"
+                      value={item.deliveryBoy?.name || "Unassigned"}
+                      onChange={(e) => {
+                        const chosenBoy = deliveryBoys.find((b) => b.name === e.target.value);
+                        handleAssignDeliveryBoy(
+                          item._id,
+                          e.target.value,
+                          chosenBoy?.phone || ""
+                        );
+                      }}
+                    >
+                      <option value="Unassigned">Unassigned</option>
+                      {deliveryBoys.map((boy) => (
+                        <option key={boy._id} value={boy.name}>
+                          {boy.name} ({boy.phone})
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+
+                  {/* Status Toggle */}
+                  <td>
+                    <select
+                      className={`SubscriptionOrders-statusDropdown ${item.status?.toLowerCase()}`}
+                      value={item.status}
+                      onChange={(e) => handleStatusChange(item._id, e.target.value)}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Paused">Paused</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </td>
+
+                  {/* Actions */}
+                  <td>
+                    <button
+                      type="button"
+                      className="SubscriptionOrders-deleteBtn"
+                      onClick={() => handleDeleteOrder(item._id, item.orderNumber)}
+                      title="Delete subscription booking"
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
 };
 
 export default SubscriptionOrders;
-

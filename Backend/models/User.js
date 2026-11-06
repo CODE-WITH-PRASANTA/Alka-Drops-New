@@ -26,20 +26,38 @@ const userSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    avatar: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     role: {
       type: String,
-      enum: ["user", "admin", "Subscriber", "Retail Customer", "Corporate", "Administrator"],
+      enum: ["user", "admin", "Subscriber", "Retail Customer", "Corporate", "Administrator", "Delivery Boy", "delivery boy"],
       default: "Retail Customer",
     },
     status: {
       type: String,
-      enum: ["Active", "Blocked", "Inactive"],
+      enum: ["Active", "Deactive", "Blocked", "Inactive"],
       default: "Active",
     },
     plan: {
       type: String,
       default: "Standard Retail",
       trim: true,
+    },
+    subscription: {
+      planId: { type: String, default: "" },
+      planTitle: { type: String, default: "Daily Alkaline Water (20L Can)" },
+      status: { type: String, enum: ["Active", "Paused", "Cancelled", "None"], default: "Active" },
+      cadence: { type: String, default: "Alternate Days" },
+      bottlesPerDelivery: { type: Number, default: 2 },
+      deliveryTimeSlot: { type: String, default: "Morning (7 AM - 10 AM)" },
+      startDate: { type: Date, default: Date.now },
+      endDate: { type: Date },
+      nextDeliveryDate: { type: Date },
+      pricePerDelivery: { type: Number, default: 120 },
+      autoRenew: { type: Boolean, default: true },
     },
     address: {
       street: { type: String, default: "" },
@@ -54,6 +72,11 @@ const userSchema = new mongoose.Schema(
     totalSpend: {
       type: Number,
       default: 0,
+    },
+    refreshToken: {
+      type: String,
+      default: "",
+      select: false,
     },
   },
   {

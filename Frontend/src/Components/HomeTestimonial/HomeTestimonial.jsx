@@ -1,69 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./HomeTestimonial.css";
-
-import testimonial1 from "../../assets/testimonial-1.png";
-import testimonial2 from "../../assets/testimonial-2.jpeg";
-import testimonial3 from "../../assets/testimonial-3.png";
-import testimonial4 from "../../assets/testimonial-4.jpeg";
-import testimonial5 from "../../assets/testimonial-5.jpeg";
-import testimonial6 from "../../assets/testimonial-6.png";
+import API from "../../services/api";
 
 const AUTOPLAY_DELAY = 3000; // ms between slides
 const MAX_PER_VIEW = 3; // clones needed for a seamless loop
-
-/* Replace these with your real customer reviews */
-const testimonials = [
-  {
-    id: 1,
-    image: testimonial1,
-    name: "Priya Mohanty",
-    role: "Homemaker, Nayapalli",
-    rating: 5,
-    text: "The 20L jar arrives on time every week and the water tastes so smooth. My whole family has switched to Alka Drops.",
-  },
-  {
-    id: 2,
-    image: testimonial2,
-    name: "Rahul Sahoo",
-    role: "Gym Owner, Saheed Nagar",
-    rating: 5,
-    text: "We keep the 1L bottles stocked for our members. They love the fresh taste and the sealed, hygienic packing.",
-  },
-  {
-    id: 3,
-    image: testimonial3,
-    name: "Anita Das",
-    role: "Office Manager, Patia",
-    rating: 5,
-    text: "Free delivery and a reliable team. Ordering for the office has become one less thing to worry about.",
-  },
-  {
-    id: 4,
-    image: testimonial4,
-    name: "Suresh Patnaik",
-    role: "Restaurant Owner, Jaydev Vihar",
-    rating: 5,
-    text: "Our guests notice the difference. Clean, refreshing water and a delivery partner we can truly depend on.",
-  },
-  {
-    id: 5,
-    image: testimonial5,
-    name: "Sneha Mishra",
-    role: "Teacher, Chandrasekharpur",
-    rating: 5,
-    text: "The 5L can with the easy-carry handle is perfect for our kitchen. Quality is always consistent.",
-  },
-  {
-    id: 6,
-    image: testimonial6,
-    name: "Amit Behera",
-    role: "Software Engineer, Khandagiri",
-    rating: 5,
-    text: "I like that I can order in a minute and the pH 8.5+ water is delivered right to my door. Highly recommended.",
-  },
-];
-
-const TOTAL = testimonials.length;
+const DEFAULT_AVATAR =
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80";
 
 const getPerView = () => {
   if (typeof window === "undefined") return 3;
@@ -91,38 +33,50 @@ const Stars = ({ rating }) => (
   </div>
 );
 
-const TestimonialCard = ({ item, hidden }) => (
-  <article
-    className="home-testimonial__card"
-    aria-hidden={hidden ? "true" : undefined}
-  >
-    <span className="home-testimonial__avatar">
-      <img
-        src={item.image}
-        alt={hidden ? "" : item.name}
-        className="home-testimonial__avatar-image"
-        loading="lazy"
-        decoding="async"
-        draggable="false"
-      />
-    </span>
+const TestimonialCard = ({ item, hidden }) => {
+  const avatarSrc = item.image || item.avatar || DEFAULT_AVATAR;
+  const authorName = item.name || item.customer || "Customer";
+  const authorRole = item.role || "Verified Customer";
+  const commentText = item.text || item.comment || item.feedback || "";
+  const ratingValue = Number(item.rating) || 5;
 
-    <Stars rating={item.rating} />
+  return (
+    <article
+      className="home-testimonial__card"
+      aria-hidden={hidden ? "true" : undefined}
+    >
+      <span className="home-testimonial__avatar">
+        <img
+          src={avatarSrc}
+          alt={hidden ? "" : authorName}
+          className="home-testimonial__avatar-image"
+          loading="lazy"
+          decoding="async"
+          draggable="false"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = DEFAULT_AVATAR;
+          }}
+        />
+      </span>
 
-    <p className="home-testimonial__text">{item.text}</p>
+      <Stars rating={ratingValue} />
 
-    <div className="home-testimonial__author">
-      <h3 className="home-testimonial__name">{item.name}</h3>
-      <span className="home-testimonial__role">{item.role}</span>
-    </div>
+      <p className="home-testimonial__text">{commentText}</p>
 
-    <span className="home-testimonial__quote" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M6 17h3l2-4V7H5v6h3l-2 4zm8 0h3l2-4V7h-6v6h3l-2 4z" />
-      </svg>
-    </span>
-  </article>
-);
+      <div className="home-testimonial__author">
+        <h3 className="home-testimonial__name">{authorName}</h3>
+        <span className="home-testimonial__role">{authorRole}</span>
+      </div>
+
+      <span className="home-testimonial__quote" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 17h3l2-4V7H5v6h3l-2 4zm8 0h3l2-4V7h-6v6h3l-2 4z" />
+        </svg>
+      </span>
+    </article>
+  );
+};
 
 const HomeTestimonial = () => {
   const sectionRef = useRef(null);
@@ -130,6 +84,10 @@ const HomeTestimonial = () => {
   const lockRef = useRef(false);
   const lockTimerRef = useRef(null);
   const touchStartRef = useRef(null);
+
+  const [testimonials, setTestimonials] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [isVisible, setIsVisible] = useState(false);
   const [perView, setPerView] = useState(getPerView);
@@ -142,6 +100,44 @@ const HomeTestimonial = () => {
     typeof window !== "undefined" &&
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Fetch live published reviews from backend */
+  useEffect(() => {
+    let isMounted = true;
+    const fetchPublishedReviews = async () => {
+      try {
+        setIsLoading(true);
+        const res = await API.get("/reviews", {
+          params: { status: "Published" },
+        });
+        if (isMounted) {
+          const list = Array.isArray(res.data?.reviews)
+            ? res.data.reviews
+            : Array.isArray(res.data?.data)
+            ? res.data.data
+            : Array.isArray(res.data)
+            ? res.data
+            : [];
+          setTestimonials(list);
+          setError(null);
+        }
+      } catch (err) {
+        console.error("Error loading home testimonials:", err);
+        if (isMounted) {
+          setError("Failed to load client testimonials.");
+        }
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    fetchPublishedReviews();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const TOTAL = testimonials.length;
 
   /* Reveal on scroll */
   useEffect(() => {
@@ -198,14 +194,14 @@ const HomeTestimonial = () => {
   }, []);
 
   const next = useCallback(() => {
-    if (lockRef.current) return;
+    if (TOTAL === 0 || lockRef.current) return;
     lock();
     setAnimate(true);
     setIndex((current) => current + 1);
-  }, [lock]);
+  }, [lock, TOTAL]);
 
   const prev = useCallback(() => {
-    if (lockRef.current) return;
+    if (TOTAL === 0 || lockRef.current) return;
     lock();
 
     if (index === 0) {
@@ -222,21 +218,21 @@ const HomeTestimonial = () => {
       setAnimate(true);
       setIndex((current) => current - 1);
     }
-  }, [index, lock]);
+  }, [index, lock, TOTAL]);
 
   const goTo = useCallback(
     (target) => {
-      if (lockRef.current || target === index % TOTAL) return;
+      if (TOTAL === 0 || lockRef.current || target === index % TOTAL) return;
       lock();
       setAnimate(true);
       setIndex(target);
     },
-    [index, lock]
+    [index, lock, TOTAL]
   );
 
   /* After sliding onto the cloned cards, silently jump back to the real ones */
   const handleTransitionEnd = (event) => {
-    if (event.target !== trackRef.current) return;
+    if (event.target !== trackRef.current || TOTAL === 0) return;
 
     if (index >= TOTAL) {
       setAnimate(false);
@@ -256,10 +252,10 @@ const HomeTestimonial = () => {
   const isPaused = hoverPaused || tabHidden || reducedMotion;
 
   useEffect(() => {
-    if (isPaused || !isVisible) return undefined;
+    if (isPaused || !isVisible || TOTAL === 0) return undefined;
     const timer = setTimeout(next, AUTOPLAY_DELAY);
     return () => clearTimeout(timer);
-  }, [index, isPaused, isVisible, next]);
+  }, [index, isPaused, isVisible, next, TOTAL]);
 
   /* Swipe on touch screens */
   const handleTouchStart = (event) => {
@@ -285,8 +281,8 @@ const HomeTestimonial = () => {
     if (event.key === "ArrowLeft") prev();
   };
 
-  const activeDot = index % TOTAL;
-  const clones = testimonials.slice(0, MAX_PER_VIEW);
+  const activeDot = TOTAL > 0 ? index % TOTAL : 0;
+  const clones = TOTAL > 0 ? testimonials.slice(0, Math.min(TOTAL, MAX_PER_VIEW)) : [];
 
   return (
     <section
@@ -321,88 +317,127 @@ const HomeTestimonial = () => {
           </p>
         </div>
 
-        {/* Slider */}
-        <div
-          className="home-testimonial__slider"
-          role="region"
-          aria-roledescription="carousel"
-          aria-label="Client testimonials"
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          onMouseEnter={() => setHoverPaused(true)}
-          onMouseLeave={() => setHoverPaused(false)}
-          onFocus={() => setHoverPaused(true)}
-          onBlur={() => setHoverPaused(false)}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div className="home-testimonial__viewport">
-            <div
-              ref={trackRef}
-              className="home-testimonial__track"
-              style={{
-                "--home-testimonial-per-view": perView,
-                transform: `translateX(-${index * (100 / perView)}%)`,
-                transition: animate ? undefined : "none",
-              }}
-              onTransitionEnd={handleTransitionEnd}
-              aria-live={isPaused ? "polite" : "off"}
-            >
-              {testimonials.map((item) => (
-                <div className="home-testimonial__slide" key={item.id}>
-                  <TestimonialCard item={item} />
-                </div>
-              ))}
-
-              {clones.map((item) => (
-                <div className="home-testimonial__slide" key={`clone-${item.id}`}>
-                  <TestimonialCard item={item} hidden />
-                </div>
-              ))}
-            </div>
+        {/* Dynamic content rendering */}
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: "48px 16px", color: "var(--hts-muted)" }}>
+            <p>Loading client testimonials...</p>
           </div>
-        </div>
+        ) : error && TOTAL === 0 ? (
+          <div style={{ textAlign: "center", padding: "48px 16px", color: "#e11d48" }}>
+            <p>{error}</p>
+          </div>
+        ) : TOTAL === 0 ? (
+          <div style={{ textAlign: "center", padding: "48px 16px", color: "var(--hts-muted)" }}>
+            <p>No verified customer reviews published yet.</p>
+          </div>
+        ) : (
+          <>
+            {/* Slider */}
+            <div
+              className="home-testimonial__slider"
+              role="region"
+              aria-roledescription="carousel"
+              aria-label="Client testimonials"
+              tabIndex={0}
+              onKeyDown={handleKeyDown}
+              onMouseEnter={() => setHoverPaused(true)}
+              onMouseLeave={() => setHoverPaused(false)}
+              onFocus={() => setHoverPaused(true)}
+              onBlur={() => setHoverPaused(false)}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+              <div className="home-testimonial__viewport">
+                <div
+                  ref={trackRef}
+                  className="home-testimonial__track"
+                  style={{
+                    "--home-testimonial-per-view": perView,
+                    transform: `translateX(-${index * (100 / perView)}%)`,
+                    transition: animate ? undefined : "none",
+                  }}
+                  onTransitionEnd={handleTransitionEnd}
+                  aria-live={isPaused ? "polite" : "off"}
+                >
+                  {testimonials.map((item, idx) => (
+                    <div
+                      className="home-testimonial__slide"
+                      key={item._id || item.id || `real-${idx}`}
+                    >
+                      <TestimonialCard item={item} />
+                    </div>
+                  ))}
 
-        {/* Controls */}
-        <div className="home-testimonial__controls">
-          <button
-            type="button"
-            className="home-testimonial__arrow"
-            onClick={prev}
-            aria-label="Previous testimonial"
-          >
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+                  {clones.map((item, idx) => (
+                    <div
+                      className="home-testimonial__slide"
+                      key={`clone-${item._id || item.id || idx}`}
+                    >
+                      <TestimonialCard item={item} hidden />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-          <div className="home-testimonial__dots" role="tablist" aria-label="Choose testimonial">
-            {testimonials.map((item, i) => (
+            {/* Controls */}
+            <div className="home-testimonial__controls">
               <button
                 type="button"
-                key={item.id}
-                role="tab"
-                aria-selected={activeDot === i}
-                aria-label={`Show testimonial ${i + 1}`}
-                className={`home-testimonial__dot ${
-                  activeDot === i ? "home-testimonial__dot--active" : ""
-                }`}
-                onClick={() => goTo(i)}
-              />
-            ))}
-          </div>
+                className="home-testimonial__arrow"
+                onClick={prev}
+                aria-label="Previous testimonial"
+              >
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M19 12H5M12 19L5 12L12 5"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
 
-          <button
-            type="button"
-            className="home-testimonial__arrow"
-            onClick={next}
-            aria-label="Next testimonial"
-          >
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M5 12H19M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
+              <div
+                className="home-testimonial__dots"
+                role="tablist"
+                aria-label="Choose testimonial"
+              >
+                {testimonials.map((item, i) => (
+                  <button
+                    type="button"
+                    key={item._id || item.id || `dot-${i}`}
+                    role="tab"
+                    aria-selected={activeDot === i}
+                    aria-label={`Show testimonial ${i + 1}`}
+                    className={`home-testimonial__dot ${
+                      activeDot === i ? "home-testimonial__dot--active" : ""
+                    }`}
+                    onClick={() => goTo(i)}
+                  />
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="home-testimonial__arrow"
+                onClick={next}
+                aria-label="Next testimonial"
+              >
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M5 12H19M12 5L19 12L12 19"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

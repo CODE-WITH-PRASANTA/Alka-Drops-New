@@ -155,6 +155,31 @@
   color: var(--alka-teal-primary);
 }
 
+.AddStock-accent-icon.edit {
+  color: #0284c7;
+}
+
+.AddStock-editing-sub {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 3px;
+}
+
+.AddStock-editing-sub code {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #0284c7;
+  font-weight: 600;
+}
+
+.AddStock-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .AddStock-live-pill {
   font-size: 11.5px;
   font-weight: 600;
@@ -163,6 +188,45 @@
   padding: 5px 12px;
   border-radius: 20px;
   letter-spacing: 0.2px;
+}
+
+.AddStock-live-pill.edit-mode {
+  background: #e0f2fe;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.AddStock-cancel-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.AddStock-cancel-edit-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+.AddStock-edit-loading {
+  padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 /* Form Two-Column Grid */
@@ -413,9 +477,30 @@
 /* Submit Action Button */
 .AddStock-submit-wrap {
   margin-top: 6px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.AddStock-cancel-btn {
+  padding: 13px 20px;
+  border-radius: var(--alka-radius-md);
+  border: 1px solid var(--alka-border);
+  background: #ffffff;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.AddStock-cancel-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
 }
 
 .AddStock-save-btn {
+  flex: 1;
   width: 100%;
   background: var(--alka-teal-primary);
   color: #ffffff;
@@ -437,6 +522,16 @@
   background: var(--alka-teal-dark);
   transform: translateY(-1px);
   box-shadow: var(--alka-shadow-hover);
+}
+
+.AddStock-save-btn.edit-mode {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
+}
+
+.AddStock-save-btn.edit-mode:hover {
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35);
 }
 
 /* Table Header Meta */

@@ -22,6 +22,7 @@ import {
   FiPhone,
   FiUser,
   FiMail,
+  FiEdit2,
 } from "react-icons/fi";
 import API from "../../services/api";
 import { useShop } from "../../context/ShopContext";
@@ -129,15 +130,123 @@ const Addtocart = () => {
     notes: "",
   });
 
+  const [userProfile, setUserProfile] = useState(null);
+  const [isFetchingAddress, setIsFetchingAddress] = useState(false);
+
+  const getCurrentUser = () => {
+    try {
+      const saved = localStorage.getItem("alka_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  // Fetch live address and profile from server on mount
+  useEffect(() => {
+    let isMounted = true;
+    const fetchRemoteAddress = async () => {
+      const user = getCurrentUser();
+      if (!user) return;
+
+      if (isMounted) setUserProfile(user);
+
+      try {
+        if (isMounted) setIsFetchingAddress(true);
+        const res = await API.get("/auth/me");
+        if (isMounted && res.data?.success && res.data.user) {
+          const freshUser = res.data.user;
+          setUserProfile(freshUser);
+          localStorage.setItem("alka_user", JSON.stringify(freshUser));
+
+          setShippingForm((prev) => ({
+            ...prev,
+            fullName: freshUser.name || prev.fullName || "",
+            email: freshUser.email || prev.email || "",
+            phone: freshUser.phone || prev.phone || "",
+            addressLine1: freshUser.address?.street || prev.addressLine1 || "",
+            city: freshUser.address?.city || prev.city || "Bhubaneswar",
+            state: freshUser.address?.state || prev.state || "Odisha",
+            postalCode: freshUser.address?.postalCode || prev.postalCode || "751012",
+          }));
+        }
+      } catch (err) {
+        // Fallback to local profile
+        if (isMounted && user) {
+          setShippingForm((prev) => ({
+            ...prev,
+            fullName: user.name || prev.fullName || "",
+            email: user.email || prev.email || "",
+            phone: user.phone || prev.phone || "",
+            addressLine1: user.address?.street || prev.addressLine1 || "",
+            city: user.address?.city || prev.city || "Bhubaneswar",
+            state: user.address?.state || prev.state || "Odisha",
+            postalCode: user.address?.postalCode || prev.postalCode || "751012",
+          }));
+        }
+      } finally {
+        if (isMounted) setIsFetchingAddress(false);
+      }
+    };
+
+    fetchRemoteAddress();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const handleCheckout = () => {
     if (!cart.length) {
-      showToast("Your cart is empty!", "error");
+      showToast("Your cart is empty! Please add products first.", "error");
       return;
     }
+
+    const user = getCurrentUser();
+    if (!user) {
+      showToast("Please log in to proceed with checkout. Your cart items are saved!", "info");
+      navigate("/login?redirect=/cart&checkout=true");
+      return;
+    }
+
+    setShippingForm((prev) => ({
+      ...prev,
+      fullName: prev.fullName || user.name || "",
+      email: prev.email || user.email || "",
+      phone: prev.phone || user.phone || "",
+      addressLine1: prev.addressLine1 || user.address?.street || "",
+      city: prev.city || user.address?.city || "Bhubaneswar",
+      state: prev.state || user.address?.state || "Odisha",
+      postalCode: prev.postalCode || user.address?.postalCode || "751012",
+    }));
+
     setCheckoutError("");
     setPlacedOrder(null);
     setIsCheckoutOpen(true);
   };
+
+  // Automatically reopen checkout if user was redirected from login with checkout intent
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") === "true") {
+      const user = getCurrentUser();
+      if (user && cart.length > 0) {
+        setShippingForm((prev) => ({
+          ...prev,
+          fullName: prev.fullName || user.name || "",
+          email: prev.email || user.email || "",
+          phone: prev.phone || user.phone || "",
+          addressLine1: prev.addressLine1 || user.address?.street || "",
+          city: prev.city || user.address?.city || "Bhubaneswar",
+          state: prev.state || user.address?.state || "Odisha",
+          postalCode: prev.postalCode || user.address?.postalCode || "751012",
+        }));
+        setCheckoutError("");
+        setPlacedOrder(null);
+        setIsCheckoutOpen(true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [cart.length]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -209,6 +318,26 @@ const Addtocart = () => {
         setPlacedOrder(res.data.order);
         clearCart();
         showToast(`Order #${res.data.order.orderNumber} placed successfully!`, "success");
+
+        // Sync updated address & phone back to user profile in MongoDB
+        if (getCurrentUser()) {
+          API.put("/auth/profile", {
+            phone: cleanPhone,
+            address: {
+              street: shippingForm.addressLine1.trim(),
+              city: shippingForm.city.trim(),
+              state: shippingForm.state || "Odisha",
+              postalCode: shippingForm.postalCode?.trim() || "751012",
+            },
+          })
+            .then((pRes) => {
+              if (pRes.data?.user) {
+                localStorage.setItem("alka_user", JSON.stringify(pRes.data.user));
+                setUserProfile(pRes.data.user);
+              }
+            })
+            .catch((e) => console.log("Profile auto-sync skipped:", e.message));
+        }
       } else {
         throw new Error(res.data?.message || "Failed to place order.");
       }
@@ -242,41 +371,6 @@ const Addtocart = () => {
       </div>
 
       <div className="Addtocart-container">
-        {/* PAGE HEADER */}
-        <header className="Addtocart-page-header">
-          <nav className="Addtocart-breadcrumb" aria-label="Breadcrumb">
-            <button type="button" onClick={handleReturnToShop}>
-              Shop
-            </button>
-            <FiArrowRight />
-            <span>Shopping Cart</span>
-          </nav>
-
-          <div className="Addtocart-header-content">
-            <div className="Addtocart-header-text">
-              <span className="Addtocart-eyebrow">
-                <i className="Addtocart-eyebrow-dot" />
-                YOUR ALKA DROPS ORDER
-              </span>
-
-              <h1>
-                Shopping <span>Cart</span>
-              </h1>
-
-              <p>
-                Review your selected alkaline bottles and water cans.
-                Pure pH 8.5+ mineral water, delivered straight to your door with care.
-              </p>
-            </div>
-
-            <div className="Addtocart-header-badge" aria-hidden="true">
-              <FiShoppingBag />
-              <strong>{cartCount}</strong>
-              <em>{cartCount === 1 ? "ITEM" : "ITEMS"}</em>
-            </div>
-          </div>
-        </header>
-
         {/* EMPTY CART */}
         {cart.length === 0 ? (
           <div className="Addtocart-empty">
@@ -313,81 +407,30 @@ const Addtocart = () => {
                 Explore Products
                 <FiArrowRight />
               </button>
-
-              <button
-                type="button"
-                className="Addtocart-demo-button"
-                onClick={restoreDemoProducts}
-              >
-                <FiRefreshCw />
-                Load Sample Products
-              </button>
             </div>
           </div>
         ) : (
           /* ACTIVE CART */
           <div className="Addtocart-active">
-            {/* TOP BAR */}
-            <div className="Addtocart-cart-topbar">
-              <div>
-                <span className="Addtocart-cart-label">
-                  <i className="Addtocart-eyebrow-dot" />
-                  SHOPPING BAG
-                </span>
-
-                <h2 className="Addtocart-cart-title">
-                  Your Cart
-                  <span className="Addtocart-item-count">
-                    {cartCount} {cartCount === 1 ? "Item" : "Items"}
-                  </span>
-                </h2>
-              </div>
-
-              <button
-                type="button"
-                className="Addtocart-clear-button"
-                onClick={clearCart}
-              >
-                <FiTrash2 />
-                Clear All
-              </button>
-            </div>
-
-            {/* PROGRESS */}
-            <div className="Addtocart-progress" aria-label="Checkout progress">
-              <div className="Addtocart-progress-step active">
-                <span>
-                  <FiShoppingCart />
-                </span>
-                <p>Shopping Cart</p>
-              </div>
-
-              <div className="Addtocart-progress-line active" />
-
-              <div className="Addtocart-progress-step">
-                <span>
-                  <FiTruck />
-                </span>
-                <p>Delivery</p>
-              </div>
-
-              <div className="Addtocart-progress-line" />
-
-              <div className="Addtocart-progress-step">
-                <span>
-                  <FiShield />
-                </span>
-                <p>Checkout</p>
-              </div>
-            </div>
-
             {/* MAIN GRID */}
             <div className="Addtocart-main-grid">
               {/* LEFT: PRODUCTS */}
               <div className="Addtocart-products-section">
                 <div className="Addtocart-products-heading">
-                  <h3>Cart Items</h3>
-                  <span>{cart.length} Different Products</span>
+                  <div>
+                    <h3>Cart Items</h3>
+                    <span>{cartCount} {cartCount === 1 ? "Item" : "Items"} ({cart.length} Different Products)</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="Addtocart-clear-button"
+                    onClick={clearCart}
+                    title="Remove all items from cart"
+                  >
+                    <FiTrash2 />
+                    Clear All
+                  </button>
                 </div>
 
                 <div className="Addtocart-products-list">
@@ -590,6 +633,64 @@ const Addtocart = () => {
                         <span>Total Amount</span>
                         <strong>{formatPrice(cartTotal)}</strong>
                       </div>
+                    </div>
+
+                    {/* LIVE DELIVERY DESTINATION */}
+                    <div className="Addtocart-delivery-destination">
+                      <div className="Addtocart-destination-header">
+                        <div className="Addtocart-destination-title">
+                          <FiMapPin className="Addtocart-pin-icon" />
+                          <div>
+                            <span className="Addtocart-destination-label">Deliver To</span>
+                            <strong>
+                              {shippingForm.fullName
+                                ? `${shippingForm.fullName}${shippingForm.city ? `, ${shippingForm.city}` : ""}`
+                                : userProfile?.name
+                                ? `${userProfile.name}${shippingForm.city ? `, ${shippingForm.city}` : ""}`
+                                : "Delivery Address"}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {userProfile ? (
+                          <button
+                            type="button"
+                            className="Addtocart-destination-change-btn"
+                            onClick={handleCheckout}
+                            title="Edit delivery address"
+                          >
+                            <FiEdit2 /> {shippingForm.addressLine1 ? "Change" : "+ Add"}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="Addtocart-destination-change-btn"
+                            onClick={() => navigate("/login?redirect=/cart&checkout=true")}
+                          >
+                            Login to Set
+                          </button>
+                        )}
+                      </div>
+
+                      <p className="Addtocart-destination-address">
+                        {isFetchingAddress ? (
+                          <span>Fetching saved address...</span>
+                        ) : shippingForm.addressLine1 ? (
+                          <>
+                            <span>{shippingForm.addressLine1}</span>
+                            {shippingForm.addressLine2 && <span>, {shippingForm.addressLine2}</span>}
+                            {shippingForm.city && <span>, {shippingForm.city}</span>}
+                            {shippingForm.state && <span>, {shippingForm.state}</span>}
+                            {shippingForm.postalCode && <span> - {shippingForm.postalCode}</span>}
+                          </>
+                        ) : userProfile ? (
+                          <span style={{ color: "#f59e0b" }}>
+                            No street address saved. Click &ldquo;+ Add&rdquo; to set delivery address.
+                          </span>
+                        ) : (
+                          <span>Login to view your saved addresses for fast doorstep delivery.</span>
+                        )}
+                      </p>
                     </div>
 
                     {/* CHECKOUT */}

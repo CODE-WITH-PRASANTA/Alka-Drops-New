@@ -509,15 +509,30 @@
 }
 
 .ShopCards-iconButton.in-wishlist {
-  background: #fee2e2;
-  color: #ef4444;
-  border-color: #fca5a5;
+  background: #fef2f2 !important;
+  color: #ef4444 !important;
+  border: 1px solid #fecaca;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.22);
+}
+
+.ShopCards-iconButton.in-wishlist:hover {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: #f87171;
+  transform: scale(1.12);
 }
 
 .ShopCards-modalWishlist.in-wishlist {
   background: #fef2f2;
   color: #ef4444;
   border-color: #fca5a5;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.15);
+}
+
+.ShopCards-modalWishlist.in-wishlist:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #f87171;
 }
 
 /* =========================================

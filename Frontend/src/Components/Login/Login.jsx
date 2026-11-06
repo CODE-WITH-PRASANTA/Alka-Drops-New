@@ -282,8 +282,15 @@ const Login = ({ defaultMode = "login" }) => {
         message: res.data?.message || "Login successful! Redirecting...",
       });
 
+      const params = new URLSearchParams(window.location.search);
+      const redirectTarget = params.get("redirect") || "/";
+      const hasCheckout = params.get("checkout") === "true";
+      const finalDest = hasCheckout
+        ? `${redirectTarget}${redirectTarget.includes("?") ? "&" : "?"}checkout=true`
+        : redirectTarget;
+
       window.setTimeout(() => {
-        if (mounted.current) navigate("/");
+        if (mounted.current) navigate(finalDest);
       }, 900);
     } catch (err) {
       if (mounted.current) {
@@ -586,8 +593,16 @@ const Login = ({ defaultMode = "login" }) => {
               {mode !== "forgot" ? (
                 <div className="Login-panel" key="login-panel">
                   <div className="Login-heading">
-                    <h2>Login to Your Account</h2>
-                    <p>Access your orders, subscriptions, and more.</p>
+                    <h2>
+                      {new URLSearchParams(window.location.search).get("checkout") === "true"
+                        ? "Login to Complete Your Order"
+                        : "Login to Your Account"}
+                    </h2>
+                    <p>
+                      {new URLSearchParams(window.location.search).get("checkout") === "true"
+                        ? "Your cart items are safely preserved. Log in to finish checkout."
+                        : "Access your orders, subscriptions, and more."}
+                    </p>
                   </div>
 
                   <form className="Login-form" onSubmit={handleLoginSubmit} noValidate>

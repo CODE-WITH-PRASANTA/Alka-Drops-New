@@ -508,6 +508,87 @@
   color: #ffffff;
 }
 
+/* Interactive Stepper (+ and -) when item is in cart */
+.ShopCards-qtyControls {
+  width: 100%;
+  height: 48px;
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 14px;
+  background: #f0fdf4;
+  border: 1.5px solid #10b981;
+  padding: 4px 6px;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.18);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+.ShopCards-qtyControls:hover {
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.26);
+  border-color: #059669;
+}
+
+.ShopCards-qtyBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.ShopCards-qtyBtn.minus {
+  background: #ffffff;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.ShopCards-qtyBtn.minus:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+  transform: scale(1.08);
+}
+
+.ShopCards-qtyBtn.minus:active {
+  transform: scale(0.95);
+}
+
+.ShopCards-qtyBtn.plus {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.32);
+}
+
+.ShopCards-qtyBtn.plus:hover {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+  transform: scale(1.08);
+}
+
+.ShopCards-qtyBtn.plus:active {
+  transform: scale(0.95);
+}
+
+.ShopCards-qtyValue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 800;
+  color: #064e3b;
+  letter-spacing: -0.2px;
+  user-select: none;
+  min-width: 30px;
+  text-align: center;
+}
+
 .ShopCards-iconButton.in-wishlist {
   background: #fef2f2 !important;
   color: #ef4444 !important;
@@ -1145,6 +1226,16 @@
     height: 42px;
     font-size: 12.5px;
     border-radius: 12px;
+  }
+
+  .ShopCards-qtyControls {
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .ShopCards-qtyBtn {
+    width: 34px;
+    height: 34px;
   }
 
   .ShopCards-pagination {

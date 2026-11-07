@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
   FiTruck,
   FiSearch,
@@ -17,38 +18,13 @@ import {
   FiTrash2,
   FiX,
   FiAlertCircle,
+  FiCheck,
+  FiLayers,
+  FiActivity,
+  FiBox,
 } from "react-icons/fi";
 import API from "../../services/api";
 import "./DeliveryBoyId.css";
-
-const initialFormState = {
-  name: "",
-  email: "",
-  phone: "",
-  password: "AlkaDelivery@2026",
-  aadharNumber: "",
-  panNumber: "",
-  presentAddress: {
-    street: "",
-    city: "Bhubaneswar",
-    state: "Odisha",
-    postalCode: "751012",
-  },
-  permanentAddress: {
-    street: "",
-    city: "Bhubaneswar",
-    state: "Odisha",
-    postalCode: "751012",
-  },
-  sameAsPresent: true,
-  vehicleType: "Electric Loader Van",
-  vehicleNumber: "",
-  route: "Zone A - Nayapalli / IRC Village / Jaydev Vihar",
-  dailyQuota: "120 Jars",
-  status: "On Duty",
-  badgeColor: "#0d9488",
-  avatar: "",
-};
 
 const DeliveryBoyId = () => {
   const [riders, setRiders] = useState([]);
@@ -58,17 +34,15 @@ const DeliveryBoyId = () => {
   const [successMsg, setSuccessMsg] = useState("");
   const [createdCredentials, setCreatedCredentials] = useState(null);
 
+  // Filters
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [routeFilter, setRouteFilter] = useState("all");
+
+  // Selected Rider for ID Card Modal
   const [selectedRider, setSelectedRider] = useState(null);
 
-  // Create Delivery Account Modal
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState(initialFormState);
-  const [formError, setFormError] = useState("");
-
-  // Fetch delivery fleet from MongoDB
+  // Fetch real delivery fleet from MongoDB
   const fetchFleet = async () => {
     try {
       setIsLoading(true);
@@ -84,7 +58,7 @@ const DeliveryBoyId = () => {
       console.error("Failed to load delivery fleet:", err);
       setError(
         err.response?.data?.message ||
-          "Failed to connect to delivery fleet database. Please ensure backend is running."
+          "Failed to connect to delivery fleet database. Please verify backend is running."
       );
     } finally {
       setIsLoading(false);
@@ -95,7 +69,16 @@ const DeliveryBoyId = () => {
     fetchFleet();
   }, []);
 
-  // Filtered riders list
+  // Distinct routes list for dynamic dropdown filter
+  const distinctRoutes = useMemo(() => {
+    const set = new Set();
+    riders.forEach((r) => {
+      if (r.route?.trim()) set.add(r.route.trim());
+    });
+    return Array.from(set);
+  }, [riders]);
+
+  // Filtered riders list with multi-criteria dynamic filtering
   const filteredRiders = useMemo(() => {
     return riders.filter((r) => {
       const s = search.toLowerCase().trim();
@@ -115,14 +98,19 @@ const DeliveryBoyId = () => {
         statusFilter === "all" ||
         r.status?.toLowerCase() === statusFilter.toLowerCase();
 
-      return matchesSearch && matchesStatus;
-    });
-  }, [riders, search, statusFilter]);
+      const matchesRoute =
+        routeFilter === "all" ||
+        r.route?.toLowerCase() === routeFilter.toLowerCase();
 
-  // Dynamic stats
+      return matchesSearch && matchesStatus && matchesRoute;
+    });
+  }, [riders, search, statusFilter, routeFilter]);
+
+  // Dynamic live stats directly from real database records
   const stats = useMemo(() => {
     const total = riders.length;
     const activeDuty = riders.filter((r) => r.status === "On Duty").length;
+    const offDuty = riders.filter((r) => r.status === "Off Duty").length;
     const totalDispatchedToday = riders.reduce(
       (acc, r) => acc + (r.activeOrders || 0),
       0
@@ -130,118 +118,14 @@ const DeliveryBoyId = () => {
     return {
       total: serverStats?.total ?? total,
       activeDuty: serverStats?.activeDuty ?? activeDuty,
+      offDuty: offDuty,
       totalDispatchedToday:
         serverStats?.totalDispatchedToday ?? totalDispatchedToday,
       verifiedRate: "100%",
     };
   }, [riders, serverStats]);
 
-  // Handle Form Change
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => {
-      const next = { ...prev, [name]: value };
-      if (name === "name" && prev.sameAsPresent) {
-        // sync if needed
-      }
-      return next;
-    });
-  };
-
-  const handlePresentAddressChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => {
-      const nextPresent = { ...prev.presentAddress, [name]: value };
-      return {
-        ...prev,
-        presentAddress: nextPresent,
-        permanentAddress: prev.sameAsPresent
-          ? { ...nextPresent }
-          : prev.permanentAddress,
-      };
-    });
-  };
-
-  const handlePermanentAddressChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      permanentAddress: { ...prev.permanentAddress, [name]: value },
-    }));
-  };
-
-  const handleSameAsPresentToggle = (e) => {
-    const checked = e.target.checked;
-    setFormData((prev) => ({
-      ...prev,
-      sameAsPresent: checked,
-      permanentAddress: checked ? { ...prev.presentAddress } : prev.permanentAddress,
-    }));
-  };
-
-  // Create Delivery Account (Assign Role: Delivery Boy)
-  const handleCreateDeliveryAccount = async (e) => {
-    e.preventDefault();
-    setFormError("");
-
-    // Validate inputs
-    if (!formData.name.trim()) return setFormError("Full name is required.");
-    if (!formData.email.trim()) return setFormError("Email is required for login.");
-    if (!formData.phone.trim()) return setFormError("Phone number is required.");
-    if (!formData.aadharNumber.trim()) return setFormError("Aadhar card number is required.");
-    if (!formData.panNumber.trim()) return setFormError("PAN card number is required.");
-    if (!formData.vehicleNumber.trim()) return setFormError("Vehicle registration number is required.");
-
-    try {
-      setIsSubmitting(true);
-      const payload = {
-        name: formData.name.trim(),
-        email: formData.email.trim().toLowerCase(),
-        phone: formData.phone.trim(),
-        password: formData.password || "AlkaDelivery@2026",
-        role: "Delivery Boy", // Explicitly assigned role
-        aadharNumber: formData.aadharNumber.trim(),
-        panNumber: formData.panNumber.trim().toUpperCase(),
-        presentAddress: formData.presentAddress,
-        permanentAddress: formData.sameAsPresent
-          ? formData.presentAddress
-          : formData.permanentAddress,
-        vehicleType: formData.vehicleType,
-        vehicleNumber: formData.vehicleNumber.trim().toUpperCase(),
-        route: formData.route,
-        dailyQuota: formData.dailyQuota,
-        status: formData.status,
-        badgeColor: formData.badgeColor,
-        avatar: formData.avatar,
-      };
-
-      const res = await API.post("/delivery-boys", payload);
-      if (res.data?.success && res.data.rider) {
-        setRiders((prev) => [res.data.rider, ...prev]);
-        setSuccessMsg(
-          `Delivery account created successfully! Role assigned: "Delivery Boy" (Partner ID: ${res.data.rider.partnerId}).`
-        );
-        setCreatedCredentials({
-          name: res.data.rider.name,
-          email: res.data.rider.email,
-          role: "Delivery Boy",
-          partnerId: res.data.rider.partnerId,
-          password: payload.password,
-        });
-
-        setIsCreateModalOpen(false);
-        setFormData(initialFormState);
-      }
-    } catch (err) {
-      setFormError(
-        err.response?.data?.message || "Failed to create delivery account."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Toggle Duty Status (On Duty / Off Duty)
+  // Toggle Duty Status (On Duty / Off Duty) with immediate MongoDB PATCH
   const handleToggleStatus = async (rider) => {
     const current = rider.status || "On Duty";
     const nextStatus = current === "On Duty" ? "Off Duty" : "On Duty";
@@ -260,7 +144,7 @@ const DeliveryBoyId = () => {
         status: nextStatus,
       });
     } catch (err) {
-      // Rollback
+      // Rollback on failure
       setRiders((prev) =>
         prev.map((r) =>
           r._id === rider._id || r.partnerId === rider.partnerId
@@ -272,11 +156,11 @@ const DeliveryBoyId = () => {
     }
   };
 
-  // Delete Delivery Partner
+  // Delete Delivery Partner & Account from MongoDB
   const handleDeletePartner = async (rider) => {
     if (
       !window.confirm(
-        `Are you sure you want to delete delivery partner "${rider.name}" (${rider.partnerId || rider.id}) and their account?`
+        `Are you sure you want to delete delivery partner "${rider.name}" (${rider.partnerId || rider.id}) and remove their portal account?`
       )
     ) {
       return;
@@ -293,17 +177,25 @@ const DeliveryBoyId = () => {
     }
   };
 
+  const activePhoto = photoPreview || formData.avatar;
+
   return (
     <div className="DeliveryBoyId">
+      {/* Page Header */}
       <header className="DeliveryBoyId-header">
         <div className="DeliveryBoyId-heading">
           <div className="DeliveryBoyId-headingIcon">
             <FiTruck />
           </div>
           <div>
-            <h1>Delivery Boy ID Generation & Fleet</h1>
-            <p style={{ margin: "2px 0 0", fontSize: "13px", color: "#64748b" }}>
-              Generate authorized delivery accounts with assigned role &ldquo;Delivery Boy&rdquo; and official ID cards.
+            <div className="DeliveryBoyId-headerBadgeRow">
+              <h1>Delivery Partner Fleet &amp; ID Generation</h1>
+              <span className="DeliveryBoyId-livePill">
+                <span className="liveDot" /> Live Database Sync
+              </span>
+            </div>
+            <p>
+              Manage real-time delivery agent fleet, toggle on-duty dispatch, generate verified credentials, and print official PVC hydration ID card passes.
             </p>
           </div>
         </div>
@@ -320,17 +212,13 @@ const DeliveryBoyId = () => {
             <span>Sync Fleet</span>
           </button>
 
-          <button
-            type="button"
+          <Link
+            to="/admin/add-delivery-boy"
             className="DeliveryBoyId-btn primary"
-            onClick={() => {
-              setFormError("");
-              setIsCreateModalOpen(true);
-            }}
           >
             <FiPlus />
-            <span>Generate Delivery Account</span>
-          </button>
+            <span>Register Delivery Agent</span>
+          </Link>
         </div>
       </header>
 
@@ -338,15 +226,41 @@ const DeliveryBoyId = () => {
       {error && (
         <div className="DeliveryBoyId-alert error">
           <span><FiAlertCircle /> {error}</span>
-          <button type="button" onClick={() => setError("")} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit" }}><FiX /></button>
+          <button
+            type="button"
+            onClick={() => setError("")}
+            className="closeAlertBtn"
+          >
+            <FiX />
+          </button>
+        </div>
+      )}
+
+      {successMsg && (
+        <div className="DeliveryBoyId-alert success">
+          <span><FiCheckCircle /> {successMsg}</span>
+          <button
+            type="button"
+            onClick={() => setSuccessMsg("")}
+            className="closeAlertBtn"
+          >
+            <FiX />
+          </button>
         </div>
       )}
 
       {createdCredentials && (
         <div className="DeliveryBoyId-credentialsBox">
-          <h4>
-            <FiCheckCircle /> New Delivery Account Successfully Generated &amp; Role Assigned!
-          </h4>
+          <div className="DeliveryBoyId-credentialsHeader">
+            <div className="credIcon">
+              <FiCheckCircle />
+            </div>
+            <div>
+              <h4>New Delivery Account Generated &amp; Role Assigned!</h4>
+              <p>The partner has been registered with system role <strong>"Delivery Boy"</strong> in MongoDB.</p>
+            </div>
+          </div>
+
           <div className="DeliveryBoyId-credentialsList">
             <div className="DeliveryBoyId-credItem">
               <span>Partner ID &amp; Name</span>
@@ -358,37 +272,29 @@ const DeliveryBoyId = () => {
             </div>
             <div className="DeliveryBoyId-credItem">
               <span>Assigned Role</span>
-              <strong style={{ color: "#0d9488" }}>{createdCredentials.role}</strong>
+              <strong className="teal">{createdCredentials.role}</strong>
             </div>
             <div className="DeliveryBoyId-credItem">
               <span>Initial Password</span>
-              <strong>{createdCredentials.password}</strong>
+              <strong className="code">{createdCredentials.password}</strong>
             </div>
-            <div className="DeliveryBoyId-credItem" style={{ gridColumn: "span 2" }}>
+            <div className="DeliveryBoyId-credItem full">
               <span>Account Status</span>
-              <strong style={{ color: "#059669" }}>Active &bull; Authorized in User Management &amp; Fleet</strong>
+              <strong className="green">Active &bull; Authorized in User Management &amp; Delivery Companion App</strong>
             </div>
           </div>
+
           <button
             type="button"
             onClick={() => setCreatedCredentials(null)}
-            style={{
-              marginTop: "10px",
-              background: "#059669",
-              color: "#fff",
-              border: "none",
-              padding: "4px 12px",
-              borderRadius: "4px",
-              fontSize: "12px",
-              cursor: "pointer",
-            }}
+            className="dismissBtn"
           >
-            Dismiss Details
+            Dismiss Credentials
           </button>
         </div>
       )}
 
-      {/* Metrics */}
+      {/* Dynamic Metrics Bar */}
       <div className="DeliveryBoyId-statsGrid">
         <div className="DeliveryBoyId-statCard">
           <div className="DeliveryBoyId-statIcon fleet"><FiTruck /></div>
@@ -397,105 +303,181 @@ const DeliveryBoyId = () => {
             <span className="DeliveryBoyId-statValue">{stats.total} Partners</span>
           </div>
         </div>
+
         <div className="DeliveryBoyId-statCard">
-          <div className="DeliveryBoyId-statIcon onduty"><FiCheckCircle /></div>
+          <div className="DeliveryBoyId-statIcon onduty">
+            <FiActivity />
+          </div>
           <div>
             <span className="DeliveryBoyId-statLabel">Currently On Duty</span>
-            <span className="DeliveryBoyId-statValue">{stats.activeDuty} Active</span>
+            <span className="DeliveryBoyId-statValue ondutyVal">
+              <span className="pulseGreen" /> {stats.activeDuty} Active
+            </span>
           </div>
         </div>
+
         <div className="DeliveryBoyId-statCard">
-          <div className="DeliveryBoyId-statIcon trips"><FiCreditCard /></div>
+          <div className="DeliveryBoyId-statIcon offduty">
+            <FiLayers />
+          </div>
           <div>
-            <span className="DeliveryBoyId-statLabel">Orders in Delivery</span>
+            <span className="DeliveryBoyId-statLabel">Standby / Off Duty</span>
+            <span className="DeliveryBoyId-statValue">{stats.offDuty} Standby</span>
+          </div>
+        </div>
+
+        <div className="DeliveryBoyId-statCard">
+          <div className="DeliveryBoyId-statIcon trips"><FiBox /></div>
+          <div>
+            <span className="DeliveryBoyId-statLabel">Active Dispatches</span>
             <span className="DeliveryBoyId-statValue">{stats.totalDispatchedToday} Jars Live</span>
           </div>
         </div>
+
         <div className="DeliveryBoyId-statCard">
           <div className="DeliveryBoyId-statIcon verified"><FiShield /></div>
           <div>
-            <span className="DeliveryBoyId-statLabel">KYC &amp; BG Check</span>
-            <span className="DeliveryBoyId-statValue">{stats.verifiedRate} Verified</span>
+            <span className="DeliveryBoyId-statLabel">KYC &amp; BG Verified</span>
+            <span className="DeliveryBoyId-statValue verifiedVal">{stats.verifiedRate} Checked</span>
           </div>
         </div>
       </div>
 
-      {/* Control Bar */}
+      {/* Control Bar (Search, Status Filter, Route Filter) */}
       <div className="DeliveryBoyId-controlBar">
         <div className="DeliveryBoyId-searchBox">
           <FiSearch className="DeliveryBoyId-searchIcon" />
           <input
             type="text"
-            placeholder="Search by Name, Partner ID, Aadhar, PAN, Route, Vehicle..."
+            placeholder="Search by Name, Partner ID (ALK-DB-...), Vehicle, Route, Phone, Aadhar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+          {search && (
+            <button
+              type="button"
+              className="clearSearchBtn"
+              onClick={() => setSearch("")}
+            >
+              <FiX />
+            </button>
+          )}
         </div>
 
-        <div className="DeliveryBoyId-filters">
-          <button
-            type="button"
-            className={`DeliveryBoyId-filterChip ${statusFilter === "all" ? "active" : ""}`}
-            onClick={() => setStatusFilter("all")}
-          >
-            All Fleet ({riders.length})
-          </button>
-          <button
-            type="button"
-            className={`DeliveryBoyId-filterChip ${statusFilter === "On Duty" ? "active" : ""}`}
-            onClick={() => setStatusFilter("On Duty")}
-          >
-            On Duty ({riders.filter((r) => r.status === "On Duty").length})
-          </button>
-          <button
-            type="button"
-            className={`DeliveryBoyId-filterChip ${statusFilter === "Off Duty" ? "active" : ""}`}
-            onClick={() => setStatusFilter("Off Duty")}
-          >
-            Off Duty ({riders.filter((r) => r.status === "Off Duty").length})
-          </button>
+        <div className="DeliveryBoyId-filtersGroup">
+          {/* Status Tabs */}
+          <div className="DeliveryBoyId-filters">
+            <button
+              type="button"
+              className={`DeliveryBoyId-filterChip ${statusFilter === "all" ? "active" : ""}`}
+              onClick={() => setStatusFilter("all")}
+            >
+              All Fleet ({riders.length})
+            </button>
+            <button
+              type="button"
+              className={`DeliveryBoyId-filterChip ${statusFilter === "On Duty" ? "active onduty" : ""}`}
+              onClick={() => setStatusFilter("On Duty")}
+            >
+              On Duty ({riders.filter((r) => r.status === "On Duty").length})
+            </button>
+            <button
+              type="button"
+              className={`DeliveryBoyId-filterChip ${statusFilter === "Off Duty" ? "active offduty" : ""}`}
+              onClick={() => setStatusFilter("Off Duty")}
+            >
+              Off Duty ({riders.filter((r) => r.status === "Off Duty").length})
+            </button>
+          </div>
+
+          {/* Route Dropdown Filter */}
+          {distinctRoutes.length > 0 && (
+            <select
+              className="DeliveryBoyId-routeSelect"
+              value={routeFilter}
+              onChange={(e) => setRouteFilter(e.target.value)}
+            >
+              <option value="all">All Delivery Zones</option>
+              {distinctRoutes.map((rt) => (
+                <option key={rt} value={rt}>
+                  {rt}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
       {/* Loading state */}
       {isLoading && riders.length === 0 && (
-        <div style={{ textAlign: "center", padding: "60px 20px", color: "#64748b" }}>
-          <FiRefreshCw className="spin" style={{ fontSize: "28px", color: "#0d9488", marginBottom: "8px" }} />
-          <p>Loading authorized delivery fleet from database...</p>
+        <div className="DeliveryBoyId-loadingState">
+          <FiRefreshCw className="spin" />
+          <p>Loading real-time delivery agent fleet from database...</p>
         </div>
       )}
 
       {/* Empty state */}
       {!isLoading && filteredRiders.length === 0 && (
-        <div style={{ textAlign: "center", padding: "60px 20px", background: "#ffffff", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
-          <FiTruck style={{ fontSize: "40px", color: "#94a3b8", marginBottom: "12px" }} />
-          <h3 style={{ margin: "0 0 6px", color: "#1e293b" }}>No delivery personnel found</h3>
-          <p style={{ color: "#64748b", margin: "0 0 16px", fontSize: "14px" }}>
-            {search ? `No delivery boys matching "${search}".` : "No delivery boys registered in this view."}
+        <div className="DeliveryBoyId-emptyCard">
+          <FiTruck className="emptyIcon" />
+          <h3>No delivery agents found</h3>
+          <p>
+            {search || statusFilter !== "all" || routeFilter !== "all"
+              ? "No delivery personnel matching the selected filters. Try clearing your search or filters."
+              : "No delivery agents registered in the database yet. Click below to add your first delivery partner."}
           </p>
-          <button
-            type="button"
-            className="DeliveryBoyId-btn primary"
-            onClick={() => setIsCreateModalOpen(true)}
-          >
-            <FiPlus /> <span>Generate First Delivery Account</span>
-          </button>
+          <div className="emptyActions">
+            {search || statusFilter !== "all" || routeFilter !== "all" ? (
+              <button
+                type="button"
+                className="DeliveryBoyId-btn secondary"
+                onClick={() => {
+                  setSearch("");
+                  setStatusFilter("all");
+                  setRouteFilter("all");
+                }}
+              >
+                Clear Filters
+              </button>
+            ) : null}
+            <Link
+              to="/admin/add-delivery-boy"
+              className="DeliveryBoyId-btn primary"
+            >
+              <FiPlus /> <span>Register First Delivery Agent</span>
+            </Link>
+          </div>
         </div>
       )}
 
-      {/* Riders Grid */}
+      {/* Dynamic Real Agent Fleet Grid */}
       <div className="DeliveryBoyId-grid">
         {filteredRiders.map((r) => {
           const partnerCode = r.partnerId || r.id || "ALK-DB-000";
           const isOnDuty = r.status === "On Duty";
+
           return (
-            <div key={r._id || partnerCode} className="DeliveryBoyId-card">
+            <div key={r._id || partnerCode} className={`DeliveryBoyId-card ${isOnDuty ? "is-onduty" : "is-offduty"}`}>
+              {/* Card Top: Avatar, Partner ID & Live Status Toggle */}
               <div className="DeliveryBoyId-cardTop">
-                <div
-                  className="DeliveryBoyId-badgeId"
-                  style={{ backgroundColor: r.badgeColor || "#0d9488" }}
-                >
-                  <FiCreditCard /> {partnerCode}
+                <div className="DeliveryBoyId-riderHeader">
+                  <div className={`DeliveryBoyId-avatarThumb ${isOnDuty ? "onduty-ring" : "offduty-ring"}`}>
+                    {r.avatar ? (
+                      <img src={r.avatar} alt={r.name} />
+                    ) : (
+                      <div className="DeliveryBoyId-avatarFallback">
+                        {r.name ? r.name.charAt(0).toUpperCase() : <FiUser />}
+                      </div>
+                    )}
+                    <span className={`statusDot ${isOnDuty ? "green" : "gray"}`} />
+                  </div>
+
+                  <div>
+                    <div className="DeliveryBoyId-badgeId">
+                      <FiCreditCard /> {partnerCode}
+                    </div>
+                    <span className="DeliveryBoyId-roleTag">Role: {r.role || "Delivery Boy"}</span>
+                  </div>
                 </div>
 
                 <button
@@ -504,49 +486,75 @@ const DeliveryBoyId = () => {
                   onClick={() => handleToggleStatus(r)}
                   title="Click to toggle duty status"
                 >
+                  <span className="dot" />
                   {r.status || "On Duty"}
                 </button>
               </div>
 
+              {/* Card Body */}
               <div className="DeliveryBoyId-cardBody">
                 <h3 className="DeliveryBoyId-name">{r.name}</h3>
-                <span className="DeliveryBoyId-roleTag">Role: {r.role || "Delivery Boy"}</span>
-                <p className="DeliveryBoyId-phone">
-                  <FiPhone /> {r.phone}
-                </p>
-                <p className="DeliveryBoyId-email">
-                  <FiMail style={{ verticalAlign: "middle", marginRight: "4px" }} />
-                  {r.email}
-                </p>
 
-                <div className="DeliveryBoyId-infoRow">
-                  <span className="label">Vehicle:</span>
-                  <span className="val">{r.vehicleNumber} ({r.vehicleType || "EV"})</span>
-                </div>
-                <div className="DeliveryBoyId-infoRow">
-                  <span className="label">Primary Route:</span>
-                  <span className="val">{r.route}</span>
-                </div>
-                <div className="DeliveryBoyId-infoRow">
-                  <span className="label">Daily Quota:</span>
-                  <span className="val">{r.dailyQuota || "120 Jars"}</span>
-                </div>
-                <div className="DeliveryBoyId-infoRow">
-                  <span className="label">KYC Verified:</span>
-                  <span className="val" style={{ color: "#059669" }}>
-                    Aadhar &amp; PAN &check;
+                <div className="DeliveryBoyId-contactRow">
+                  <a href={`tel:${r.phone}`} className="DeliveryBoyId-phone">
+                    <FiPhone /> {r.phone}
+                  </a>
+                  <span className="DeliveryBoyId-email">
+                    <FiMail /> {r.email}
                   </span>
+                </div>
+
+                <div className="DeliveryBoyId-infoList">
+                  <div className="DeliveryBoyId-infoRow">
+                    <span className="label">Vehicle:</span>
+                    <span className="val highlight">
+                      <FiTruck style={{ verticalAlign: "middle", marginRight: "4px" }} />
+                      {r.vehicleNumber} ({r.vehicleType || "EV"})
+                    </span>
+                  </div>
+
+                  <div className="DeliveryBoyId-infoRow">
+                    <span className="label">Assigned Route:</span>
+                    <span className="val routeVal">
+                      <FiMapPin style={{ verticalAlign: "middle", marginRight: "4px" }} />
+                      {r.route}
+                    </span>
+                  </div>
+
+                  <div className="DeliveryBoyId-infoRow">
+                    <span className="label">Daily Capacity:</span>
+                    <span className="val quotaVal">{r.dailyQuota || "120 Jars"}</span>
+                  </div>
+
+                  <div className="DeliveryBoyId-infoRow">
+                    <span className="label">KYC Verified:</span>
+                    <span className="val kycVal">
+                      Aadhar ({r.aadharNumber ? `**** ${r.aadharNumber.slice(-4)}` : "Verified"}) &bull; PAN ✓
+                    </span>
+                  </div>
+
+                  {r.presentAddress?.street && (
+                    <div className="DeliveryBoyId-infoRow">
+                      <span className="label">Address:</span>
+                      <span className="val addressVal">
+                        {r.presentAddress.street}, {r.presentAddress.city}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
+              {/* Card Footer: View ID Card & Delete */}
               <div className="DeliveryBoyId-cardFooter">
                 <button
                   type="button"
                   className="DeliveryBoyId-viewIdBtn"
                   onClick={() => setSelectedRider(r)}
+                  title="View Official PVC ID Card Pass"
                 >
                   <FiCreditCard /> View ID Card
                 </button>
+
                 <button
                   type="button"
                   className="DeliveryBoyId-deleteBtn"
@@ -562,7 +570,9 @@ const DeliveryBoyId = () => {
         })}
       </div>
 
-      {/* ID Card Modal */}
+      {/* =========================================================================
+          OFFICIAL ID CARD MODAL (PRINTABLE SMART PASS)
+      ========================================================================= */}
       {selectedRider && (
         <div
           className="DeliveryBoyId-modalBackdrop"
@@ -583,19 +593,24 @@ const DeliveryBoyId = () => {
                   <img
                     src={selectedRider.avatar}
                     alt={selectedRider.name}
-                    style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }}
                   />
                 ) : (
-                  <FiUser />
+                  <div className="avatarInitials">
+                    {selectedRider.name ? selectedRider.name.charAt(0).toUpperCase() : <FiUser />}
+                  </div>
                 )}
+                <span className="verifiedCheck" title="Government KYC Verified">
+                  <FiCheck />
+                </span>
               </div>
+
               <h2 className="name">{selectedRider.name}</h2>
-              <span className="roleBadge">Role: {selectedRider.role || "Delivery Boy"}</span>
+              <span className="roleBadge">ROLE: DELIVERY BOY</span>
 
               <div className="idDetails">
                 <div>
                   <span>Partner ID:</span>
-                  <strong>{selectedRider.partnerId || selectedRider.id}</strong>
+                  <strong className="teal">{selectedRider.partnerId || selectedRider.id}</strong>
                 </div>
                 <div>
                   <span>Contact Phone:</span>
@@ -619,34 +634,26 @@ const DeliveryBoyId = () => {
                 </div>
                 <div>
                   <span>Aadhar Number:</span>
-                  <strong>{selectedRider.aadharNumber || "Verified"}</strong>
+                  <strong>{selectedRider.aadharNumber ? `**** **** ${selectedRider.aadharNumber.slice(-4)}` : "Verified"}</strong>
                 </div>
                 <div>
                   <span>PAN Number:</span>
                   <strong>{selectedRider.panNumber || "Verified"}</strong>
                 </div>
                 <div>
-                  <span>Present Address:</span>
-                  <strong>
-                    {selectedRider.presentAddress?.street
-                      ? `${selectedRider.presentAddress.street}, ${selectedRider.presentAddress.city || "Bhubaneswar"}`
-                      : "Bhubaneswar, Odisha"}
-                  </strong>
-                </div>
-                {selectedRider.permanentAddress?.street && (
-                  <div>
-                    <span>Permanent Address:</span>
-                    <strong>
-                      {`${selectedRider.permanentAddress.street}, ${selectedRider.permanentAddress.city || "Bhubaneswar"}`}
-                    </strong>
-                  </div>
-                )}
-                <div>
                   <span>Duty Status:</span>
                   <strong style={{ color: selectedRider.status === "On Duty" ? "#059669" : "#64748b" }}>
                     {selectedRider.status || "On Duty"}
                   </strong>
                 </div>
+              </div>
+
+              {/* High Density Barcode Simulation */}
+              <div className="DeliveryBoyId-barcodeWrap">
+                <div className="barcodeBars" />
+                <span className="barcodeText">
+                  {selectedRider.partnerId || "ALK-DB-000"} &bull; OFFICIAL ALKA PASS &bull; VERIFIED
+                </span>
               </div>
             </div>
 
@@ -656,7 +663,7 @@ const DeliveryBoyId = () => {
                 className="printBtn"
                 onClick={() => window.print()}
               >
-                <FiPrinter /> Print ID Badge
+                <FiPrinter /> Print ID Card Pass
               </button>
               <button
                 type="button"
@@ -670,389 +677,6 @@ const DeliveryBoyId = () => {
         </div>
       )}
 
-      {/* Generate Delivery Account Modal */}
-      {isCreateModalOpen && (
-        <div
-          className="DeliveryBoyId-modalBackdrop"
-          onClick={() => !isSubmitting && setIsCreateModalOpen(false)}
-        >
-          <div
-            className="DeliveryBoyId-createModal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="DeliveryBoyId-createModalHeader">
-              <h2>
-                <FiUser /> Generate Delivery Account (Role: Delivery Boy)
-              </h2>
-              <button
-                type="button"
-                className="DeliveryBoyId-closeX"
-                onClick={() => !isSubmitting && setIsCreateModalOpen(false)}
-              >
-                <FiX />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateDeliveryAccount}>
-              <div className="DeliveryBoyId-createModalBody">
-                {formError && (
-                  <div className="DeliveryBoyId-alert error" style={{ margin: 0 }}>
-                    <span><FiAlertCircle /> {formError}</span>
-                  </div>
-                )}
-
-                {/* Account Details */}
-                <div className="DeliveryBoyId-sectionTitle">
-                  <span>1. Account &amp; Login Credentials</span>
-                  <span style={{ fontSize: "11px", color: "#64748b", textTransform: "none" }}>
-                    Role will be assigned as &ldquo;Delivery Boy&rdquo;
-                  </span>
-                </div>
-
-                <div className="DeliveryBoyId-formGrid">
-                  <div className="DeliveryBoyId-field">
-                    <label>Full Name *</label>
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="e.g. Deepak Kumar Nayak"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>Email Address (Account Login) *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="e.g. deepak.delivery@alkadrops.com"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>Phone Number *</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder="e.g. +91 98765 43210"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>Assigned System Role</label>
-                    <input
-                      type="text"
-                      value="Delivery Boy"
-                      readOnly
-                      title="Role is permanently locked to Delivery Boy"
-                    />
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>Initial Login Password *</label>
-                    <input
-                      type="text"
-                      name="password"
-                      placeholder="Enter password or keep default"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      required
-                      minLength={6}
-                    />
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>Badge Card Color</label>
-                    <select
-                      name="badgeColor"
-                      value={formData.badgeColor}
-                      onChange={handleInputChange}
-                    >
-                      <option value="#0d9488">Teal Green (#0d9488)</option>
-                      <option value="#0284c7">Sky Blue (#0284c7)</option>
-                      <option value="#10b981">Emerald Green (#10b981)</option>
-                      <option value="#6366f1">Indigo Purple (#6366f1)</option>
-                      <option value="#f59e0b">Amber Gold (#f59e0b)</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Identity & KYC */}
-                <div className="DeliveryBoyId-sectionTitle">
-                  <span>2. Identity &amp; Government KYC Documents</span>
-                </div>
-
-                <div className="DeliveryBoyId-formGrid">
-                  <div className="DeliveryBoyId-field">
-                    <label>Aadhar Card Number (12 Digits) *</label>
-                    <input
-                      type="text"
-                      name="aadharNumber"
-                      placeholder="e.g. 5621 8902 4412"
-                      value={formData.aadharNumber}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>PAN Card Number (10 Characters) *</label>
-                    <input
-                      type="text"
-                      name="panNumber"
-                      placeholder="e.g. ABCDE1234F"
-                      value={formData.panNumber}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          panNumber: e.target.value.toUpperCase(),
-                        }))
-                      }
-                      maxLength={10}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Present Address */}
-                <div className="DeliveryBoyId-sectionTitle">
-                  <span>3. Present Residential Address</span>
-                </div>
-
-                <div className="DeliveryBoyId-formGrid full">
-                  <div className="DeliveryBoyId-field">
-                    <label>Street / Flat / Colony Landmark *</label>
-                    <input
-                      type="text"
-                      name="street"
-                      placeholder="e.g. Plot No 120, Near Crown Hotel, Nayapalli"
-                      value={formData.presentAddress.street}
-                      onChange={handlePresentAddressChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="DeliveryBoyId-formGrid">
-                  <div className="DeliveryBoyId-field">
-                    <label>City</label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={formData.presentAddress.city}
-                      onChange={handlePresentAddressChange}
-                      required
-                    />
-                  </div>
-                  <div className="DeliveryBoyId-field">
-                    <label>State</label>
-                    <input
-                      type="text"
-                      name="state"
-                      value={formData.presentAddress.state}
-                      onChange={handlePresentAddressChange}
-                      required
-                    />
-                  </div>
-                  <div className="DeliveryBoyId-field">
-                    <label>Postal Code / PIN *</label>
-                    <input
-                      type="text"
-                      name="postalCode"
-                      placeholder="e.g. 751012"
-                      value={formData.presentAddress.postalCode}
-                      onChange={handlePresentAddressChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Permanent Address */}
-                <div className="DeliveryBoyId-sectionTitle">
-                  <span>4. Permanent Address</span>
-                  <label className="DeliveryBoyId-checkboxLabel">
-                    <input
-                      type="checkbox"
-                      checked={formData.sameAsPresent}
-                      onChange={handleSameAsPresentToggle}
-                    />
-                    Same as Present Address
-                  </label>
-                </div>
-
-                {!formData.sameAsPresent && (
-                  <>
-                    <div className="DeliveryBoyId-formGrid full">
-                      <div className="DeliveryBoyId-field">
-                        <label>Permanent Street / Village / Post *</label>
-                        <input
-                          type="text"
-                          name="street"
-                          placeholder="e.g. At/PO Kendrapara Town, Ward 4"
-                          value={formData.permanentAddress.street}
-                          onChange={handlePermanentAddressChange}
-                          required={!formData.sameAsPresent}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="DeliveryBoyId-formGrid">
-                      <div className="DeliveryBoyId-field">
-                        <label>City / District</label>
-                        <input
-                          type="text"
-                          name="city"
-                          value={formData.permanentAddress.city}
-                          onChange={handlePermanentAddressChange}
-                          required={!formData.sameAsPresent}
-                        />
-                      </div>
-                      <div className="DeliveryBoyId-field">
-                        <label>State</label>
-                        <input
-                          type="text"
-                          name="state"
-                          value={formData.permanentAddress.state}
-                          onChange={handlePermanentAddressChange}
-                          required={!formData.sameAsPresent}
-                        />
-                      </div>
-                      <div className="DeliveryBoyId-field">
-                        <label>Postal Code / PIN</label>
-                        <input
-                          type="text"
-                          name="postalCode"
-                          placeholder="e.g. 754211"
-                          value={formData.permanentAddress.postalCode}
-                          onChange={handlePermanentAddressChange}
-                          required={!formData.sameAsPresent}
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Vehicle & Operational Details */}
-                <div className="DeliveryBoyId-sectionTitle">
-                  <span>5. Fleet Vehicle &amp; Delivery Zone</span>
-                </div>
-
-                <div className="DeliveryBoyId-formGrid">
-                  <div className="DeliveryBoyId-field">
-                    <label>Vehicle Type</label>
-                    <select
-                      name="vehicleType"
-                      value={formData.vehicleType}
-                      onChange={handleInputChange}
-                    >
-                      <option value="Electric Loader Van">Electric Loader Van</option>
-                      <option value="Cargo E-Bike">Cargo E-Bike</option>
-                      <option value="Heavy Delivery Tempo">Heavy Delivery Tempo</option>
-                      <option value="Delivery Two-Wheeler">Delivery Two-Wheeler</option>
-                    </select>
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>Vehicle Registration Number *</label>
-                    <input
-                      type="text"
-                      name="vehicleNumber"
-                      placeholder="e.g. OD-02-EV-4421"
-                      value={formData.vehicleNumber}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          vehicleNumber: e.target.value.toUpperCase(),
-                        }))
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>Assigned Zone / Delivery Route</label>
-                    <input
-                      type="text"
-                      name="route"
-                      placeholder="e.g. Zone A - Nayapalli / IRC Village"
-                      value={formData.route}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>Daily Jar Quota</label>
-                    <input
-                      type="text"
-                      name="dailyQuota"
-                      placeholder="e.g. 120 Jars"
-                      value={formData.dailyQuota}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>Initial Duty Status</label>
-                    <select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleInputChange}
-                    >
-                      <option value="On Duty">On Duty</option>
-                      <option value="Off Duty">Off Duty</option>
-                    </select>
-                  </div>
-
-                  <div className="DeliveryBoyId-field">
-                    <label>Profile Photo URL (Optional)</label>
-                    <input
-                      type="url"
-                      name="avatar"
-                      placeholder="https://... (or leave blank for badge initials)"
-                      value={formData.avatar}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="DeliveryBoyId-createModalFooter">
-                <button
-                  type="button"
-                  className="DeliveryBoyId-btn secondary"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="DeliveryBoyId-btn primary"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <FiRefreshCw className="spin" /> Generating Account...
-                    </>
-                  ) : (
-                    <>
-                      <FiCheckCircle /> Generate Account &amp; Assign Role
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FiTrash2,
@@ -23,6 +23,7 @@ import {
   FiUser,
   FiMail,
   FiEdit2,
+  FiAlertCircle,
 } from "react-icons/fi";
 import API from "../../services/api";
 import { useShop } from "../../context/ShopContext";
@@ -123,8 +124,9 @@ const Addtocart = () => {
     email: "",
     addressLine1: "",
     addressLine2: "",
-    city: "Bhubaneswar",
-    postalCode: "751012",
+    city: "",
+    state: "",
+    postalCode: "",
     deliverySlot: "Standard (1-2 days)",
     paymentMethod: "cod",
     notes: "",
@@ -132,6 +134,21 @@ const Addtocart = () => {
 
   const [userProfile, setUserProfile] = useState(null);
   const [isFetchingAddress, setIsFetchingAddress] = useState(false);
+
+  // Address Selection & Creation Modal State
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [isAddingNewInModal, setIsAddingNewInModal] = useState(false);
+  const [newAddressForm, setNewAddressForm] = useState({
+    label: "Home",
+    recipientName: "",
+    phone: "",
+    street: "",
+    city: "Bhubaneswar",
+    state: "Odisha",
+    postalCode: "751012",
+  });
+  const [isSavingNewAddress, setIsSavingNewAddress] = useState(false);
+  const [addressModalError, setAddressModalError] = useState("");
 
   const getCurrentUser = () => {
     try {
@@ -142,6 +159,137 @@ const Addtocart = () => {
     }
   };
 
+  // Compile full list of saved addresses for the user
+  const savedAddresses = useMemo(() => {
+    const list = [];
+    if (userProfile?.address?.street && userProfile.address.street.trim()) {
+      list.push({
+        _id: "primary-addr",
+        label: "Primary Delivery Address",
+        recipientName: userProfile.name || shippingForm.fullName || "Primary Contact",
+        phone: userProfile.phone || shippingForm.phone || "",
+        street: userProfile.address.street.trim(),
+        city: userProfile.address.city || "Bhubaneswar",
+        state: userProfile.address.state || "Odisha",
+        postalCode: userProfile.address.postalCode || "751012",
+        isDefault: true,
+      });
+    }
+    if (Array.isArray(userProfile?.addresses)) {
+      userProfile.addresses.forEach((addr, idx) => {
+        if (
+          addr.street &&
+          addr.street.trim() &&
+          addr.street.trim() !== userProfile?.address?.street?.trim()
+        ) {
+          list.push({
+            _id: addr._id || `addr-${idx}`,
+            label: addr.label || "Saved Address",
+            recipientName: addr.recipientName || userProfile.name || "Contact",
+            phone: addr.phone || userProfile.phone || "",
+            street: addr.street.trim(),
+            city: addr.city || "Bhubaneswar",
+            state: addr.state || "Odisha",
+            postalCode: addr.postalCode || "751012",
+            isDefault: Boolean(addr.isDefault),
+          });
+        }
+      });
+    }
+    return list;
+  }, [userProfile, shippingForm.fullName, shippingForm.phone]);
+
+  // Handle 1-click selection of an existing saved address
+  const handleSelectSavedAddress = (addr) => {
+    setShippingForm((prev) => ({
+      ...prev,
+      fullName: addr.recipientName || prev.fullName || userProfile?.name || "",
+      phone: addr.phone || prev.phone || userProfile?.phone || "",
+      addressLine1: addr.street,
+      city: addr.city || "Bhubaneswar",
+      state: addr.state || "Odisha",
+      postalCode: addr.postalCode || "751012",
+    }));
+    setIsAddressModalOpen(false);
+    showToast(`Delivery location set to: ${addr.street}, ${addr.city}`, "success");
+  };
+
+  // Handle saving new address directly inside the cart modal
+  const handleSaveNewAddressInModal = async (e) => {
+    e.preventDefault();
+    setAddressModalError("");
+
+    if (!newAddressForm.street.trim()) {
+      setAddressModalError("Please enter your house / flat / street address.");
+      return;
+    }
+    if (!newAddressForm.recipientName.trim()) {
+      setAddressModalError("Recipient full name is required.");
+      return;
+    }
+    if (!newAddressForm.phone.trim()) {
+      setAddressModalError("Contact phone number is required.");
+      return;
+    }
+
+    try {
+      setIsSavingNewAddress(true);
+      const newAddrObj = {
+        label: newAddressForm.label || "Home",
+        recipientName: newAddressForm.recipientName.trim(),
+        phone: newAddressForm.phone.trim(),
+        street: newAddressForm.street.trim(),
+        city: newAddressForm.city.trim() || "Bhubaneswar",
+        state: newAddressForm.state.trim() || "Odisha",
+        postalCode: newAddressForm.postalCode.trim() || "751012",
+        isDefault: true,
+      };
+
+      const existingAddresses = Array.isArray(userProfile?.addresses)
+        ? [...userProfile.addresses]
+        : [];
+      existingAddresses.unshift(newAddrObj);
+
+      const payload = {
+        address: {
+          street: newAddrObj.street,
+          city: newAddrObj.city,
+          state: newAddrObj.state,
+          postalCode: newAddrObj.postalCode,
+        },
+        addresses: existingAddresses,
+      };
+
+      const res = await API.put("/auth/profile", payload);
+      if (res.data?.success && res.data.user) {
+        const fresh = res.data.user;
+        setUserProfile(fresh);
+        localStorage.setItem("alka_user", JSON.stringify(fresh));
+        window.dispatchEvent(new Event("alkaAuthUpdated"));
+
+        setShippingForm((prev) => ({
+          ...prev,
+          fullName: newAddrObj.recipientName,
+          phone: newAddrObj.phone,
+          addressLine1: newAddrObj.street,
+          city: newAddrObj.city,
+          state: newAddrObj.state,
+          postalCode: newAddrObj.postalCode,
+        }));
+
+        setIsAddressModalOpen(false);
+        setIsAddingNewInModal(false);
+        showToast("New delivery address saved and set for cart!", "success");
+      }
+    } catch (err) {
+      setAddressModalError(
+        err.response?.data?.message || "Failed to save address. Please try again."
+      );
+    } finally {
+      setIsSavingNewAddress(false);
+    }
+  };
+
   // Fetch live address and profile from server on mount
   useEffect(() => {
     let isMounted = true;
@@ -149,7 +297,14 @@ const Addtocart = () => {
       const user = getCurrentUser();
       if (!user) return;
 
-      if (isMounted) setUserProfile(user);
+      if (isMounted) {
+        setUserProfile(user);
+        setNewAddressForm((prev) => ({
+          ...prev,
+          recipientName: prev.recipientName || user.name || "",
+          phone: prev.phone || user.phone || "",
+        }));
+      }
 
       try {
         if (isMounted) setIsFetchingAddress(true);
@@ -159,29 +314,37 @@ const Addtocart = () => {
           setUserProfile(freshUser);
           localStorage.setItem("alka_user", JSON.stringify(freshUser));
 
+          const userStreet = (freshUser.address?.street || "").trim();
           setShippingForm((prev) => ({
             ...prev,
             fullName: freshUser.name || prev.fullName || "",
             email: freshUser.email || prev.email || "",
             phone: freshUser.phone || prev.phone || "",
-            addressLine1: freshUser.address?.street || prev.addressLine1 || "",
-            city: freshUser.address?.city || prev.city || "Bhubaneswar",
-            state: freshUser.address?.state || prev.state || "Odisha",
-            postalCode: freshUser.address?.postalCode || prev.postalCode || "751012",
+            addressLine1: userStreet,
+            city: userStreet ? (freshUser.address?.city || "Bhubaneswar") : "",
+            state: userStreet ? (freshUser.address?.state || "Odisha") : "",
+            postalCode: userStreet ? (freshUser.address?.postalCode || "751012") : "",
+          }));
+
+          setNewAddressForm((prev) => ({
+            ...prev,
+            recipientName: prev.recipientName || freshUser.name || "",
+            phone: prev.phone || freshUser.phone || "",
           }));
         }
       } catch (err) {
         // Fallback to local profile
         if (isMounted && user) {
+          const localStreet = (user.address?.street || "").trim();
           setShippingForm((prev) => ({
             ...prev,
             fullName: user.name || prev.fullName || "",
             email: user.email || prev.email || "",
             phone: user.phone || prev.phone || "",
-            addressLine1: user.address?.street || prev.addressLine1 || "",
-            city: user.address?.city || prev.city || "Bhubaneswar",
-            state: user.address?.state || prev.state || "Odisha",
-            postalCode: user.address?.postalCode || prev.postalCode || "751012",
+            addressLine1: localStreet,
+            city: localStreet ? (user.address?.city || "Bhubaneswar") : "",
+            state: localStreet ? (user.address?.state || "Odisha") : "",
+            postalCode: localStreet ? (user.address?.postalCode || "751012") : "",
           }));
         }
       } finally {
@@ -190,8 +353,15 @@ const Addtocart = () => {
     };
 
     fetchRemoteAddress();
+
+    const handleAuthEvent = () => {
+      fetchRemoteAddress();
+    };
+    window.addEventListener("alkaAuthUpdated", handleAuthEvent);
+
     return () => {
       isMounted = false;
+      window.removeEventListener("alkaAuthUpdated", handleAuthEvent);
     };
   }, []);
 
@@ -414,8 +584,77 @@ const Addtocart = () => {
           <div className="Addtocart-active">
             {/* MAIN GRID */}
             <div className="Addtocart-main-grid">
-              {/* LEFT: PRODUCTS */}
+              {/* LEFT: PRODUCTS & DELIVERY ADDRESS */}
               <div className="Addtocart-products-section">
+                {/* LIVE DELIVERY ADDRESS ON LEFT SIDE */}
+                <div className="Addtocart-delivery-destination-left">
+                  <div className="Addtocart-dest-left-content">
+                    <div className="Addtocart-dest-pin-badge">
+                      <FiMapPin />
+                    </div>
+
+                    <div className="Addtocart-dest-left-text">
+                      <div className="Addtocart-dest-left-meta">
+                        <span className="Addtocart-dest-badge-label">Deliver To</span>
+                        <strong className="Addtocart-dest-name">
+                          {shippingForm.fullName
+                            ? shippingForm.fullName
+                            : userProfile?.name
+                            ? userProfile.name
+                            : "Set Delivery Address"}
+                        </strong>
+                        {shippingForm.addressLine1 && shippingForm.city && (
+                          <span className="Addtocart-dest-city-pill">{shippingForm.city}</span>
+                        )}
+                      </div>
+
+                      <p className="Addtocart-dest-address-text">
+                        {isFetchingAddress ? (
+                          <span>Fetching saved address...</span>
+                        ) : shippingForm.addressLine1 ? (
+                          <>
+                            <span>{shippingForm.addressLine1}</span>
+                            {shippingForm.addressLine2 && <span>, {shippingForm.addressLine2}</span>}
+                            {shippingForm.city && <span>, {shippingForm.city}</span>}
+                            {shippingForm.state && <span>, {shippingForm.state}</span>}
+                            {shippingForm.postalCode && <span> - {shippingForm.postalCode}</span>}
+                          </>
+                        ) : userProfile ? (
+                          <span style={{ color: "#d97706", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <FiAlertCircle /> No address added yet. Click &ldquo;+ Add Address&rdquo; to choose your delivery location.
+                          </span>
+                        ) : (
+                          <span>Login to view your saved addresses for fast doorstep delivery in Bhubaneswar.</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  {userProfile ? (
+                    <button
+                      type="button"
+                      className="Addtocart-dest-action-btn"
+                      onClick={() => {
+                        setAddressModalError("");
+                        setIsAddressModalOpen(true);
+                      }}
+                      title="Choose or add delivery address"
+                    >
+                      <FiEdit2 /> {shippingForm.addressLine1 ? "Change Address" : "+ Add Address"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="Addtocart-dest-action-btn"
+                      onClick={() =>
+                        navigate("/login?redirect=" + encodeURIComponent("/cart"))
+                      }
+                    >
+                      Login to Set
+                    </button>
+                  )}
+                </div>
+
                 <div className="Addtocart-products-heading">
                   <div>
                     <h3>Cart Items</h3>
@@ -499,8 +738,8 @@ const Addtocart = () => {
                               <button
                                 type="button"
                                 onClick={() => updateQuantity(itemId, -1)}
-                                disabled={quantity <= 1}
-                                aria-label="Decrease quantity"
+                                title={quantity <= 1 ? "Remove product from cart" : "Decrease quantity (-1)"}
+                                aria-label={quantity <= 1 ? "Remove item" : "Decrease quantity"}
                               >
                                 <FiMinus />
                               </button>
@@ -633,64 +872,6 @@ const Addtocart = () => {
                         <span>Total Amount</span>
                         <strong>{formatPrice(cartTotal)}</strong>
                       </div>
-                    </div>
-
-                    {/* LIVE DELIVERY DESTINATION */}
-                    <div className="Addtocart-delivery-destination">
-                      <div className="Addtocart-destination-header">
-                        <div className="Addtocart-destination-title">
-                          <FiMapPin className="Addtocart-pin-icon" />
-                          <div>
-                            <span className="Addtocart-destination-label">Deliver To</span>
-                            <strong>
-                              {shippingForm.fullName
-                                ? `${shippingForm.fullName}${shippingForm.city ? `, ${shippingForm.city}` : ""}`
-                                : userProfile?.name
-                                ? `${userProfile.name}${shippingForm.city ? `, ${shippingForm.city}` : ""}`
-                                : "Delivery Address"}
-                            </strong>
-                          </div>
-                        </div>
-
-                        {userProfile ? (
-                          <button
-                            type="button"
-                            className="Addtocart-destination-change-btn"
-                            onClick={handleCheckout}
-                            title="Edit delivery address"
-                          >
-                            <FiEdit2 /> {shippingForm.addressLine1 ? "Change" : "+ Add"}
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="Addtocart-destination-change-btn"
-                            onClick={() => navigate("/login?redirect=/cart&checkout=true")}
-                          >
-                            Login to Set
-                          </button>
-                        )}
-                      </div>
-
-                      <p className="Addtocart-destination-address">
-                        {isFetchingAddress ? (
-                          <span>Fetching saved address...</span>
-                        ) : shippingForm.addressLine1 ? (
-                          <>
-                            <span>{shippingForm.addressLine1}</span>
-                            {shippingForm.addressLine2 && <span>, {shippingForm.addressLine2}</span>}
-                            {shippingForm.city && <span>, {shippingForm.city}</span>}
-                            {shippingForm.state && <span>, {shippingForm.state}</span>}
-                            {shippingForm.postalCode && <span> - {shippingForm.postalCode}</span>}
-                          </>
-                        ) : userProfile ? (
-                          <span style={{ color: "#f59e0b" }}>
-                            No street address saved. Click &ldquo;+ Add&rdquo; to set delivery address.
-                          </span>
-                        ) : (
-                          <span>Login to view your saved addresses for fast doorstep delivery.</span>
-                        )}
-                      </p>
                     </div>
 
                     {/* CHECKOUT */}
@@ -1014,6 +1195,231 @@ const Addtocart = () => {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          CHOOSE / ADD DELIVERY ADDRESS MODAL (IN CART - NO REDIRECT)
+      ========================================================================= */}
+      {isAddressModalOpen && (
+        <div
+          className="Addtocart-addressModalBackdrop"
+          onClick={() => !isSavingNewAddress && setIsAddressModalOpen(false)}
+        >
+          <div
+            className="Addtocart-addressModal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="Addtocart-addressModalHeader">
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div className="Addtocart-addressModalIcon">
+                  <FiMapPin />
+                </div>
+                <div>
+                  <h3>Select Delivery Address</h3>
+                  <p>Choose where you want your water delivered in Bhubaneswar</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="Addtocart-closeModalBtn"
+                onClick={() => !isSavingNewAddress && setIsAddressModalOpen(false)}
+              >
+                <FiX />
+              </button>
+            </div>
+
+            <div className="Addtocart-addressModalBody">
+              {addressModalError && (
+                <div className="Addtocart-alert error" style={{ marginBottom: "16px" }}>
+                  <FiAlertCircle /> {addressModalError}
+                </div>
+              )}
+
+              {/* LIST OF SAVED ADDRESSES */}
+              {savedAddresses.length > 0 && !isAddingNewInModal && (
+                <div className="Addtocart-savedAddressesList">
+                  <div className="Addtocart-savedAddressesHeader">
+                    <span>SAVED ADDRESSES ({savedAddresses.length})</span>
+                    <button
+                      type="button"
+                      className="Addtocart-addNewLink"
+                      onClick={() => {
+                        setIsAddingNewInModal(true);
+                        setAddressModalError("");
+                      }}
+                    >
+                      <FiPlus /> + Add New Address
+                    </button>
+                  </div>
+
+                  {savedAddresses.map((addr) => {
+                    const isSelected = shippingForm.addressLine1 === addr.street;
+                    return (
+                      <div
+                        key={addr._id}
+                        className={`Addtocart-addressCard ${isSelected ? "selected" : ""}`}
+                        onClick={() => handleSelectSavedAddress(addr)}
+                      >
+                        <div className="cardRadio">
+                          <input
+                            type="radio"
+                            name="selectedAddress"
+                            checked={isSelected}
+                            onChange={() => handleSelectSavedAddress(addr)}
+                          />
+                        </div>
+                        <div className="cardContent">
+                          <div className="cardHead">
+                            <span className="addrLabel">{addr.label || "Home"}</span>
+                            {addr.isDefault && <span className="defaultTag">Default</span>}
+                            {isSelected && <span className="selectedTag"><FiCheckCircle /> Selected</span>}
+                          </div>
+                          <strong className="recipient">{addr.recipientName} {addr.phone && `• ${addr.phone}`}</strong>
+                          <p className="street">
+                            {addr.street}, {addr.city}, {addr.state} - {addr.postalCode}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          className="selectBtn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectSavedAddress(addr);
+                          }}
+                        >
+                          {isSelected ? "Delivering Here" : "Deliver Here"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* ADD NEW ADDRESS FORM (when no saved addresses OR when user clicked + Add New Address) */}
+              {(isAddingNewInModal || savedAddresses.length === 0) && (
+                <form onSubmit={handleSaveNewAddressInModal} className="Addtocart-newAddressForm">
+                  {savedAddresses.length > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                      <strong style={{ fontSize: "15px", color: "#0f172a" }}>Add New Delivery Address</strong>
+                      <button
+                        type="button"
+                        className="Addtocart-cancelNewLink"
+                        onClick={() => setIsAddingNewInModal(false)}
+                      >
+                        &larr; Back to Saved Addresses
+                      </button>
+                    </div>
+                  )}
+
+                  {savedAddresses.length === 0 && (
+                    <div style={{ background: "#f8fafc", padding: "12px 14px", borderRadius: "10px", marginBottom: "14px", fontSize: "13px", color: "#475569" }}>
+                      You haven't saved any delivery address yet. Please add your address below to proceed with doorstep water delivery.
+                    </div>
+                  )}
+
+                  <div className="Addtocart-formGrid">
+                    <div className="field">
+                      <label>Recipient Full Name *</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Deepak Kumar Nayak"
+                        value={newAddressForm.recipientName}
+                        onChange={(e) => setNewAddressForm({ ...newAddressForm, recipientName: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="field">
+                      <label>Contact Phone Number *</label>
+                      <input
+                        type="tel"
+                        placeholder="10-digit mobile number"
+                        value={newAddressForm.phone}
+                        onChange={(e) => setNewAddressForm({ ...newAddressForm, phone: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="field full">
+                      <label>House / Flat / Street / Landmark *</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Plot No 120, Near Crown Hotel, IRC Village, Nayapalli"
+                        value={newAddressForm.street}
+                        onChange={(e) => setNewAddressForm({ ...newAddressForm, street: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="field">
+                      <label>City *</label>
+                      <input
+                        type="text"
+                        value={newAddressForm.city}
+                        onChange={(e) => setNewAddressForm({ ...newAddressForm, city: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="field">
+                      <label>Postal PIN Code *</label>
+                      <input
+                        type="text"
+                        value={newAddressForm.postalCode}
+                        onChange={(e) => setNewAddressForm({ ...newAddressForm, postalCode: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="field full">
+                      <label>Address Label</label>
+                      <div className="Addtocart-labelPills">
+                        {["Home", "Work", "Other"].map((lbl) => (
+                          <button
+                            type="button"
+                            key={lbl}
+                            className={`labelPill ${newAddressForm.label === lbl ? "active" : ""}`}
+                            onClick={() => setNewAddressForm({ ...newAddressForm, label: lbl })}
+                          >
+                            {lbl}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="Addtocart-modalFooterActions">
+                    {savedAddresses.length > 0 && (
+                      <button
+                        type="button"
+                        className="Addtocart-btnSecondary"
+                        onClick={() => setIsAddingNewInModal(false)}
+                        disabled={isSavingNewAddress}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      className="Addtocart-btnPrimary"
+                      disabled={isSavingNewAddress}
+                    >
+                      {isSavingNewAddress ? (
+                        <>
+                          <FiRefreshCw className="spin" /> Saving Address...
+                        </>
+                      ) : (
+                        <>
+                          <FiCheckCircle /> Save &amp; Deliver Here
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       )}

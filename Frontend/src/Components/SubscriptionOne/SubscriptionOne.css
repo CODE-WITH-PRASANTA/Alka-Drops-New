@@ -772,250 +772,543 @@
 
 
 /* =========================================================
-   SUBSCRIPTION BOOKING MODAL (POPUP ON ORDER NOW)
+   SUBSCRIPTION BOOKING MODAL (PREMIUM & ATTRACTIVE DESIGN)
 ========================================================= */
 
 .SubModal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(8px);
+  background: rgba(6, 26, 92, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  animation: subModalFadeIn 0.22s ease-out;
+  padding: 20px 16px;
+  animation: subModalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes subModalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .SubModal-container {
-  background: #ffffff;
-  border-radius: 24px;
-  max-width: 680px;
+  background:
+    radial-gradient(800px 300px at 100% 0%, rgba(30, 167, 232, 0.08), transparent 70%),
+    radial-gradient(700px 300px at 0% 100%, rgba(10, 83, 193, 0.05), transparent 70%),
+    #ffffff;
+  border-radius: 28px;
+  max-width: 740px;
   width: 100%;
-  max-height: 92vh;
+  max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 25px 60px -10px rgba(0, 78, 168, 0.35);
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+  box-shadow:
+    0 35px 85px -15px rgba(6, 26, 92, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
   position: relative;
-  padding: 32px 28px 28px;
-  border: 1px solid #e2e8f0;
-  animation: subModalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 34px 34px 28px;
+  border: 1.5px solid rgba(219, 234, 254, 0.85);
+  animation: subModalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.SubModal-container::-webkit-scrollbar {
+  width: 6px;
+}
+.SubModal-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.SubModal-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+.SubModal-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 @keyframes subModalSlideUp {
-  from { transform: translateY(24px) scale(0.96); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+  from {
+    transform: translateY(30px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .SubModal-close-btn {
   position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 36px;
-  height: 36px;
+  top: 20px;
+  right: 20px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
   color: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 19px;
   cursor: pointer;
-  transition: all 0.15s ease;
-  z-index: 10;
+  transition: all 0.22s ease;
+  z-index: 20;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
 }
+
 .SubModal-close-btn:hover {
   background: #fee2e2;
   color: #ef4444;
   border-color: #fca5a5;
+  transform: rotate(90deg) scale(1.08);
 }
 
+/* =========================================
+   HEADER SECTION
+========================================= */
 .SubModal-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #f1f5f9;
+  gap: 18px;
+  padding-bottom: 22px;
+  border-bottom: 1.5px solid #f1f5f9;
   margin-bottom: 22px;
+  flex-wrap: wrap;
 }
 
 .SubModal-eyebrow {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
   font-weight: 800;
-  color: #004ea8;
-  background: #f0f7ff;
+  color: #0a53c1;
+  background: linear-gradient(135deg, rgba(10, 83, 193, 0.08) 0%, rgba(30, 167, 232, 0.15) 100%);
   border: 1px solid #bfdbfe;
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: 9999px;
   letter-spacing: 0.05em;
-  margin-bottom: 6px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
 
 .SubModal-header h3 {
+  margin: 0 0 4px;
+  font-size: 25px;
+  font-weight: 850;
+  color: #061a5c;
+  letter-spacing: -0.4px;
+}
+
+.SubModal-header-sub {
   margin: 0;
-  font-size: 22px;
-  font-weight: 800;
-  color: #0f172a;
+  font-size: 13.5px;
+  color: #64748b;
+  line-height: 1.45;
 }
 
 .SubModal-plan-badge {
   text-align: right;
-  background: #f0f7ff;
-  border: 1px solid #bfdbfe;
-  padding: 8px 16px;
-  border-radius: 12px;
-}
-.SubModal-plan-price {
-  font-size: 22px;
-  font-weight: 800;
-  color: #004ea8;
-}
-.SubModal-plan-period {
-  font-size: 13px;
-  color: #64748b;
-  font-weight: 600;
+  background: linear-gradient(135deg, #0a2a8a 0%, #0a53c1 100%);
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(10, 83, 193, 0.28);
+  flex-shrink: 0;
 }
 
+.SubModal-plan-label {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  opacity: 0.85;
+  color: #bae6fd;
+}
+
+.SubModal-plan-price-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.SubModal-plan-price {
+  font-size: 24px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.SubModal-plan-period {
+  font-size: 12.5px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.SubModal-plan-perk {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-top: 2px;
+}
+
+/* =========================================
+   ALERT ERROR
+========================================= */
 .SubModal-alert-error {
   background: #fef2f2;
   color: #b91c1c;
   border: 1px solid #fecaca;
-  padding: 12px 16px;
-  border-radius: 10px;
+  padding: 12px 18px;
+  border-radius: 14px;
   font-size: 13.5px;
-  margin-bottom: 18px;
+  font-weight: 500;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.08);
 }
 
-/* Dates Box (Start Date & End Date) */
+/* =========================================
+   SECTION CARDS
+========================================= */
+.SubModal-section-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(10, 83, 193, 0.03);
+  transition: all 0.25s ease;
+}
+
+.SubModal-section-card:hover {
+  border-color: #cbd5e1;
+}
+
+.SubModal-section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.SubModal-section-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0a53c1 0%, #1ea7e8 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(10, 83, 193, 0.25);
+}
+
+.SubModal-section-title h4 {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.SubModal-section-title span {
+  display: block;
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+/* =========================================
+   DATES VALIDITY BOX (BOARDING-PASS STYLE)
+========================================= */
 .SubModal-dates-box {
   background: linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%);
   border: 1.5px solid #bfdbfe;
-  border-radius: 16px;
-  padding: 18px 20px;
-  margin-bottom: 20px;
 }
 
 .SubModal-dates-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.SubModal-dates-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #004ea8;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+.SubModal-dates-header .SubModal-section-title {
+  margin-bottom: 0;
 }
 
 .SubModal-duration-pill {
   font-size: 12px;
-  font-weight: 700;
-  color: #059669;
+  font-weight: 750;
+  color: #065f46;
   background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  padding: 4px 12px;
+  border: 1.5px solid #a7f3d0;
+  padding: 5px 14px;
   border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.1);
+}
+
+.SubModal-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  display: inline-block;
+  animation: pulseDot 1.8s infinite;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
 .SubModal-dates-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-/* Form Fields */
+.SubModal-date-card {
+  flex: 1;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.SubModal-date-card:focus-within {
+  border-color: #0a53c1;
+  box-shadow: 0 0 0 3px rgba(10, 83, 193, 0.12);
+}
+
+.SubModal-date-tag {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #0a53c1;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+
+.SubModal-date-card input[type="date"] {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.SubModal-date-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15);
+}
+
+.SubModal-dates-summary-strip {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  font-size: 12.5px;
+  color: #065f46;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.SubModal-dates-summary-strip strong {
+  color: #064e3b;
+}
+
+/* =========================================
+   FORM GRID & INPUTS
+========================================= */
 .SubModal-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin-bottom: 24px;
 }
 
 .SubModal-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
+
 .SubModal-field.full-width {
   grid-column: span 2;
 }
 
 .SubModal-field label {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 750;
   color: #334155;
   display: flex;
   align-items: center;
   gap: 6px;
+  letter-spacing: 0.2px;
 }
+
 .SubModal-field label span {
   color: #ef4444;
 }
 
+.SubModal-field label svg {
+  color: #0a53c1;
+  font-size: 14px;
+}
+
 .SubModal-field input,
 .SubModal-field select {
-  padding: 11px 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  padding: 12px 15px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
   font-size: 14px;
   outline: none;
   font-family: inherit;
-  background: #ffffff;
+  background: #f8fafc;
   color: #0f172a;
-  transition: all 0.15s ease;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.SubModal-field input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
 }
 
 .SubModal-field input:focus,
 .SubModal-field select:focus {
-  border-color: #004ea8;
-  box-shadow: 0 0 0 3px rgba(0, 78, 168, 0.15);
+  background: #ffffff;
+  border-color: #0a53c1;
+  box-shadow: 0 0 0 3.5px rgba(10, 83, 193, 0.12);
 }
 
-/* Actions */
+.SubModal-field select {
+  cursor: pointer;
+}
+
+/* =========================================
+   STICKY / ELEVATED FOOTER BAR
+========================================= */
+.SubModal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 22px;
+  border-top: 1.5px solid #f1f5f9;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.SubModal-footer-summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.SubModal-footer-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.SubModal-footer-priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.SubModal-footer-priceRow strong {
+  font-size: 26px;
+  font-weight: 900;
+  color: #0a53c1;
+  letter-spacing: -0.5px;
+}
+
+.SubModal-footer-priceRow span {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.SubModal-footer-perk {
+  font-size: 11.5px;
+  color: #059669;
+  font-weight: 600;
+}
+
 .SubModal-actions {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
   gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid #f1f5f9;
 }
 
 .SubModal-btn-primary {
-  padding: 12px 26px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #004ea8 0%, #0284c7 100%);
+  padding: 13px 28px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0a53c1 0%, #1ea7e8 100%);
   color: #ffffff;
   border: none;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 14.5px;
+  font-weight: 750;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 14px rgba(0, 78, 168, 0.28);
-  transition: all 0.15s ease;
+  box-shadow: 0 6px 22px rgba(10, 83, 193, 0.32);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .SubModal-btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0, 78, 168, 0.38);
+  transform: translateY(-2px);
+  box-shadow: 0 9px 28px rgba(10, 83, 193, 0.45);
 }
+
 .SubModal-btn-primary:disabled {
   opacity: 0.65;
   cursor: not-allowed;
@@ -1023,94 +1316,129 @@
 }
 
 .SubModal-btn-secondary {
-  padding: 12px 20px;
-  border-radius: 12px;
+  padding: 13px 22px;
+  border-radius: 14px;
   background: #ffffff;
   color: #475569;
-  border: 1px solid #cbd5e1;
+  border: 1.5px solid #cbd5e1;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 }
+
 .SubModal-btn-secondary:hover {
   background: #f8fafc;
+  border-color: #94a3b8;
   color: #0f172a;
 }
 
-/* Success View */
+/* =========================================
+   SUCCESS CONFIRMATION VIEW
+========================================= */
 .SubModal-success-view {
   text-align: center;
-  padding: 20px 10px 10px;
+  padding: 24px 12px 12px;
 }
+
 .SubModal-success-icon {
-  width: 70px;
-  height: 70px;
+  width: 78px;
+  height: 78px;
   border-radius: 50%;
-  background: #ecfdf5;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
   color: #059669;
-  font-size: 38px;
+  font-size: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px;
-  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.2);
+  margin: 0 auto 18px;
+  box-shadow: 0 8px 24px rgba(5, 150, 105, 0.22);
 }
+
 .SubModal-success-view h2 {
-  margin: 0 0 6px;
-  font-size: 24px;
-  font-weight: 800;
-  color: #0f172a;
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: 850;
+  color: #061a5c;
+  letter-spacing: -0.4px;
 }
+
 .SubModal-order-badge {
   display: inline-block;
-  font-size: 13px;
-  font-weight: 700;
-  color: #004ea8;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0a53c1;
   background: #f0f7ff;
-  border: 1px solid #bfdbfe;
-  padding: 4px 14px;
+  border: 1.5px solid #bfdbfe;
+  padding: 5px 16px;
   border-radius: 9999px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
+
 .SubModal-success-desc {
-  margin: 0 0 24px;
-  font-size: 14px;
-  color: #64748b;
-  line-height: 1.5;
+  margin: 0 0 26px;
+  font-size: 14.5px;
+  color: #5d6b8c;
+  line-height: 1.55;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .SubModal-success-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 18px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 22px 24px;
   text-align: left;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
 }
+
 .SubModal-summary-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13.5px;
+  font-size: 14px;
   color: #475569;
   flex-wrap: wrap;
   gap: 6px;
 }
+
 .SubModal-summary-row strong {
   color: #0f172a;
   text-align: right;
+  font-weight: 750;
 }
 
-@media (max-width: 600px) {
+/* =========================================
+   RESPONSIVE MODAL BREAKPOINTS
+========================================= */
+@media (max-width: 680px) {
   .SubModal-container {
-    padding: 24px 18px 20px;
+    padding: 24px 20px 22px;
+    border-radius: 22px;
+  }
+  .SubModal-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .SubModal-plan-badge {
+    text-align: left;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
   .SubModal-dates-row {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+  .SubModal-date-arrow {
+    transform: rotate(90deg);
+    margin: 0 auto;
   }
   .SubModal-form-grid {
     grid-template-columns: 1fr;
@@ -1118,7 +1446,12 @@
   .SubModal-field.full-width {
     grid-column: span 1;
   }
+  .SubModal-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   .SubModal-actions {
+    width: 100%;
     flex-direction: column-reverse;
   }
   .SubModal-btn-primary,

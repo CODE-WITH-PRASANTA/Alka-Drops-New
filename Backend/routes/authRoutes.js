@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   registerUser,
   loginUser,
+  googleAuth,
   refreshAccessToken,
   logoutUser,
   getMe,
@@ -20,6 +21,7 @@ const upload = require("../middleware/uploadMiddleware");
 // Authentication
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/google", googleAuth);
 router.post("/refresh", refreshAccessToken);
 router.post("/logout", logoutUser);
 router.post("/forgot-password", forgotPassword);

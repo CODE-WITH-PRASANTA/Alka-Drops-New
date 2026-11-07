@@ -4,6 +4,8 @@ const {
   createSubscriptionOrder,
   getAllSubscriptionOrders,
   getMySubscriptionOrders,
+  toggleMySubscriptionStatus,
+  updateMySubscriptionSchedule,
   updateSubscriptionOrderStatus,
   assignDeliveryPartner,
   deleteSubscriptionOrder,
@@ -13,6 +15,8 @@ const { protect, optionalAuth } = require("../middleware/authMiddleware");
 // Public / Customer Endpoints
 router.post("/", optionalAuth, createSubscriptionOrder);
 router.get("/my-subscriptions", protect, getMySubscriptionOrders);
+router.patch("/my-subscriptions/toggle-status", protect, toggleMySubscriptionStatus);
+router.patch("/my-subscriptions/update-schedule", protect, updateMySubscriptionSchedule);
 
 // Admin Endpoints
 router.get("/", getAllSubscriptionOrders);

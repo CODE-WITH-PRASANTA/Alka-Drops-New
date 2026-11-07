@@ -620,12 +620,21 @@ const SubscriptionOne = () => {
               <form onSubmit={handleSubscriptionSubmit} className="SubModal-form">
                 <div className="SubModal-header">
                   <div>
-                    <span className="SubModal-eyebrow">DOORSTEP HYDRATION PASS</span>
+                    <span className="SubModal-eyebrow">
+                      ✨ DOORSTEP HYDRATION PASS · VIP MEMBERSHIP
+                    </span>
                     <h3>Subscribe to {selectedPlan?.title}</h3>
+                    <p className="SubModal-header-sub">
+                      Fresh pH 8.5+ alkaline water delivered right to your doorstep in Bhubaneswar.
+                    </p>
                   </div>
                   <div className="SubModal-plan-badge">
-                    <span className="SubModal-plan-price">₹{selectedPlan?.price}</span>
-                    <span className="SubModal-plan-period">/{selectedPlan?.period?.toLowerCase()}</span>
+                    <span className="SubModal-plan-label">PLAN FEE</span>
+                    <div className="SubModal-plan-price-wrap">
+                      <span className="SubModal-plan-price">₹{selectedPlan?.price}</span>
+                      <span className="SubModal-plan-period">/{selectedPlan?.period?.toLowerCase()}</span>
+                    </div>
+                    <span className="SubModal-plan-perk">Unlimited Refills</span>
                   </div>
                 </div>
 
@@ -636,22 +645,29 @@ const SubscriptionOne = () => {
                 )}
 
                 {/* DATES ROW (START DATE & END DATE) */}
-                <div className="SubModal-dates-box">
+                <div className="SubModal-section-card SubModal-dates-box">
                   <div className="SubModal-dates-header">
-                    <span className="SubModal-dates-label">
-                      <FiCalendar /> Subscription Validity Period
-                    </span>
+                    <div className="SubModal-section-title">
+                      <div className="SubModal-section-icon-wrap">
+                        <FiCalendar />
+                      </div>
+                      <div>
+                        <h4>Subscription Validity Period</h4>
+                        <span>Scheduled refills during this duration</span>
+                      </div>
+                    </div>
                     {daysDuration && (
                       <span className="SubModal-duration-pill">
+                        <span className="SubModal-pulse-dot" />
                         {daysDuration} Days Plan Duration
                       </span>
                     )}
                   </div>
 
                   <div className="SubModal-dates-row">
-                    <div className="SubModal-field">
+                    <div className="SubModal-date-card">
                       <label>
-                        Start Date <span>*</span>
+                        <span className="SubModal-date-tag">ACTIVATION START *</span>
                       </label>
                       <input
                         type="date"
@@ -670,9 +686,13 @@ const SubscriptionOne = () => {
                       />
                     </div>
 
-                    <div className="SubModal-field">
+                    <div className="SubModal-date-arrow">
+                      <FiArrowRight />
+                    </div>
+
+                    <div className="SubModal-date-card">
                       <label>
-                        End Date <span>*</span>
+                        <span className="SubModal-date-tag">VALIDITY END *</span>
                       </label>
                       <input
                         type="date"
@@ -686,164 +706,249 @@ const SubscriptionOne = () => {
                       />
                     </div>
                   </div>
+
+                  {subForm.startDate && subForm.endDate && (
+                    <div className="SubModal-dates-summary-strip">
+                      <FiCheckCircle /> Refills active from{" "}
+                      <strong>
+                        {new Date(subForm.startDate).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </strong>{" "}
+                      to{" "}
+                      <strong>
+                        {new Date(subForm.endDate).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </strong>
+                    </div>
+                  )}
                 </div>
 
-                {/* CUSTOMER & DELIVERY GRID */}
-                <div className="SubModal-form-grid">
-                  <div className="SubModal-field">
-                    <label>
-                      <FiUser /> Full Name <span>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Ramesh Patel"
-                      value={subForm.customerName}
-                      onChange={(e) => setSubForm({ ...subForm, customerName: e.target.value })}
-                      required
-                    />
+                {/* SECTION 1: DELIVERY LOCATION & CONTACT */}
+                <div className="SubModal-section-card">
+                  <div className="SubModal-section-title">
+                    <div className="SubModal-section-icon-wrap">
+                      <FiMapPin />
+                    </div>
+                    <div>
+                      <h4>Delivery Location &amp; Contact</h4>
+                      <span>Doorstep address in Bhubaneswar</span>
+                    </div>
                   </div>
 
-                  <div className="SubModal-field">
-                    <label>
-                      <FiPhone /> Contact Number <span>*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder="10-digit mobile number"
-                      value={subForm.customerPhone}
-                      onChange={(e) => setSubForm({ ...subForm, customerPhone: e.target.value })}
-                      required
-                    />
-                  </div>
+                  <div className="SubModal-form-grid">
+                    <div className="SubModal-field">
+                      <label>
+                        <FiUser /> Full Name <span>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Ramesh Patel"
+                        value={subForm.customerName}
+                        onChange={(e) =>
+                          setSubForm({ ...subForm, customerName: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
 
-                  <div className="SubModal-field full-width">
-                    <label>
-                      <FiMail /> Email Address <span>*</span>
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="your.email@example.com"
-                      value={subForm.customerEmail}
-                      onChange={(e) => setSubForm({ ...subForm, customerEmail: e.target.value })}
-                      required
-                    />
-                  </div>
+                    <div className="SubModal-field">
+                      <label>
+                        <FiPhone /> Contact Number <span>*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        placeholder="10-digit mobile number"
+                        value={subForm.customerPhone}
+                        onChange={(e) =>
+                          setSubForm({ ...subForm, customerPhone: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
 
-                  <div className="SubModal-field full-width">
-                    <label>
-                      <FiMapPin /> Delivery Address (Plot / Flat / Street / Landmark) <span>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Plot No N5/22, IRC Village, Nayapalli"
-                      value={subForm.street}
-                      onChange={(e) => setSubForm({ ...subForm, street: e.target.value })}
-                      required
-                    />
-                  </div>
+                    <div className="SubModal-field full-width">
+                      <label>
+                        <FiMail /> Email Address <span>*</span>
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="your.email@example.com"
+                        value={subForm.customerEmail}
+                        onChange={(e) =>
+                          setSubForm({ ...subForm, customerEmail: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
 
-                  <div className="SubModal-field">
-                    <label>City</label>
-                    <input
-                      type="text"
-                      value={subForm.city}
-                      onChange={(e) => setSubForm({ ...subForm, city: e.target.value })}
-                      required
-                    />
-                  </div>
+                    <div className="SubModal-field full-width">
+                      <label>
+                        <FiMapPin /> Street Address (Plot / Flat / Landmark) <span>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Plot No N5/22, IRC Village, Nayapalli"
+                        value={subForm.street}
+                        onChange={(e) =>
+                          setSubForm({ ...subForm, street: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
 
-                  <div className="SubModal-field">
-                    <label>PIN Code</label>
-                    <input
-                      type="text"
-                      value={subForm.postalCode}
-                      onChange={(e) => setSubForm({ ...subForm, postalCode: e.target.value })}
-                      required
-                    />
-                  </div>
+                    <div className="SubModal-field">
+                      <label>City</label>
+                      <input
+                        type="text"
+                        value={subForm.city}
+                        onChange={(e) =>
+                          setSubForm({ ...subForm, city: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
 
-                  <div className="SubModal-field">
-                    <label>
-                      <FiRefreshCw /> Delivery Cadence
-                    </label>
-                    <select
-                      value={subForm.deliveryFrequency}
-                      onChange={(e) => setSubForm({ ...subForm, deliveryFrequency: e.target.value })}
-                    >
-                      <option value="Daily">Daily (Every 24 Hours)</option>
-                      <option value="Alternate Days">Alternate Days (Every 48 Hours)</option>
-                      <option value="Twice a Week">Twice a Week (Mon &amp; Thu)</option>
-                      <option value="Weekly">Weekly (1x Every Week)</option>
-                    </select>
-                  </div>
-
-                  <div className="SubModal-field">
-                    <label>
-                      <FiClock /> Delivery Time Slot
-                    </label>
-                    <select
-                      value={subForm.deliverySlot}
-                      onChange={(e) => setSubForm({ ...subForm, deliverySlot: e.target.value })}
-                    >
-                      <option value="Morning (7 AM - 10 AM)">Morning (7 AM - 10 AM)</option>
-                      <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
-                      <option value="Evening (5 PM - 8 PM)">Evening (5 PM - 8 PM)</option>
-                    </select>
-                  </div>
-
-                  <div className="SubModal-field">
-                    <label>
-                      <FiPackage /> Jars per Delivery
-                    </label>
-                    <select
-                      value={subForm.bottlesPerDelivery}
-                      onChange={(e) =>
-                        setSubForm({ ...subForm, bottlesPerDelivery: Number(e.target.value) })
-                      }
-                    >
-                      <option value={1}>1 Can (20 Litres)</option>
-                      <option value={2}>2 Cans (40 Litres) - Recommended</option>
-                      <option value={3}>3 Cans (60 Litres)</option>
-                      <option value={4}>4 Cans (80 Litres)</option>
-                    </select>
-                  </div>
-
-                  <div className="SubModal-field">
-                    <label>Payment Method</label>
-                    <select
-                      value={subForm.paymentMethod}
-                      onChange={(e) => setSubForm({ ...subForm, paymentMethod: e.target.value })}
-                    >
-                      <option value="cod">Cash on Delivery (Pay on 1st drop)</option>
-                      <option value="upi">UPI / QR Code on Delivery</option>
-                    </select>
+                    <div className="SubModal-field">
+                      <label>PIN Code</label>
+                      <input
+                        type="text"
+                        value={subForm.postalCode}
+                        onChange={(e) =>
+                          setSubForm({ ...subForm, postalCode: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="SubModal-actions">
-                  <button
-                    type="button"
-                    className="SubModal-btn-secondary"
-                    onClick={() => setIsModalOpen(false)}
-                    disabled={isSubmitting}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="SubModal-btn-primary"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <FiRefreshCw className="spin" /> Activating...
-                      </>
-                    ) : (
-                      <>
-                        Confirm &amp; Activate Plan <FiArrowRight />
-                      </>
-                    )}
-                  </button>
+                {/* SECTION 2: DROP SCHEDULE & PREFERENCES */}
+                <div className="SubModal-section-card">
+                  <div className="SubModal-section-title">
+                    <div className="SubModal-section-icon-wrap">
+                      <FiTruck />
+                    </div>
+                    <div>
+                      <h4>Drop Schedule &amp; Preferences</h4>
+                      <span>Configure your water drop cycle</span>
+                    </div>
+                  </div>
+
+                  <div className="SubModal-form-grid">
+                    <div className="SubModal-field">
+                      <label>
+                        <FiRefreshCw /> Delivery Frequency
+                      </label>
+                      <select
+                        value={subForm.deliveryFrequency}
+                        onChange={(e) =>
+                          setSubForm({ ...subForm, deliveryFrequency: e.target.value })
+                        }
+                      >
+                        <option value="Daily">Daily (Every 24 Hours)</option>
+                        <option value="Alternate Days">Alternate Days (Every 48 Hours)</option>
+                        <option value="Twice a Week">Twice a Week (Mon &amp; Thu)</option>
+                        <option value="Weekly">Weekly (1x Every Week)</option>
+                      </select>
+                    </div>
+
+                    <div className="SubModal-field">
+                      <label>
+                        <FiClock /> Delivery Time Slot
+                      </label>
+                      <select
+                        value={subForm.deliverySlot}
+                        onChange={(e) =>
+                          setSubForm({ ...subForm, deliverySlot: e.target.value })
+                        }
+                      >
+                        <option value="Morning (7 AM - 10 AM)">Morning (7 AM - 10 AM)</option>
+                        <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+                        <option value="Evening (5 PM - 8 PM)">Evening (5 PM - 8 PM)</option>
+                      </select>
+                    </div>
+
+                    <div className="SubModal-field">
+                      <label>
+                        <FiPackage /> Jars per Delivery
+                      </label>
+                      <select
+                        value={subForm.bottlesPerDelivery}
+                        onChange={(e) =>
+                          setSubForm({
+                            ...subForm,
+                            bottlesPerDelivery: Number(e.target.value),
+                          })
+                        }
+                      >
+                        <option value={1}>1 Can (20 Litres)</option>
+                        <option value={2}>2 Cans (40 Litres) · Recommended</option>
+                        <option value={3}>3 Cans (60 Litres)</option>
+                        <option value={4}>4 Cans (80 Litres)</option>
+                      </select>
+                    </div>
+
+                    <div className="SubModal-field">
+                      <label>
+                        <FiShield /> Payment Method
+                      </label>
+                      <select
+                        value={subForm.paymentMethod}
+                        onChange={(e) =>
+                          setSubForm({ ...subForm, paymentMethod: e.target.value })
+                        }
+                      >
+                        <option value="cod">Cash on Delivery (Pay on 1st drop)</option>
+                        <option value="upi">UPI / QR Code on Delivery</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* FOOTER BAR */}
+                <div className="SubModal-footer">
+                  <div className="SubModal-footer-summary">
+                    <span className="SubModal-footer-label">TOTAL AMOUNT PAYABLE</span>
+                    <div className="SubModal-footer-priceRow">
+                      <strong>₹{selectedPlan?.price}</strong>
+                      <span>/{selectedPlan?.period?.toLowerCase()}</span>
+                    </div>
+                    <span className="SubModal-footer-perk">
+                      ✓ Free Doorstep Delivery &amp; Fresh Sanitized Jars
+                    </span>
+                  </div>
+
+                  <div className="SubModal-actions">
+                    <button
+                      type="button"
+                      className="SubModal-btn-secondary"
+                      onClick={() => setIsModalOpen(false)}
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="SubModal-btn-primary"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <FiRefreshCw className="spin" /> Activating Plan...
+                        </>
+                      ) : (
+                        <>
+                          Confirm &amp; Activate Plan <FiArrowRight />
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </form>
             )}

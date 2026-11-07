@@ -272,16 +272,33 @@ export const ShopProvider = ({ children }) => {
 
   const updateQuantity = (productId, delta) => {
     const targetId = String(productId);
-    setCart((prevCart) =>
-      prevCart.map((item) => {
+    setCart((prevCart) => {
+      const existing = prevCart.find(
+        (item) => String(item.id) === targetId || String(item._id) === targetId
+      );
+
+      if (existing) {
+        const currentQty = Number(existing.qty || existing.quantity) || 1;
+        const nextQty = currentQty + delta;
+
+        // When quantity reaches 0 or below, remove item from cart
+        if (nextQty <= 0) {
+          showToast(`"${existing.name || existing.title || "Item"}" removed from cart.`, "info");
+          return prevCart.filter(
+            (item) => String(item.id) !== targetId && String(item._id) !== targetId
+          );
+        }
+      }
+
+      return prevCart.map((item) => {
         if (String(item.id) === targetId || String(item._id) === targetId) {
-          const currentQty = Number(item.qty) || 1;
+          const currentQty = Number(item.qty || item.quantity) || 1;
           const nextQty = Math.max(1, currentQty + delta);
-          return { ...item, qty: nextQty };
+          return { ...item, qty: nextQty, quantity: nextQty };
         }
         return item;
-      })
-    );
+      });
+    });
   };
 
   const removeFromCart = (productId) => {
@@ -305,6 +322,15 @@ export const ShopProvider = ({ children }) => {
     return cart.some(
       (item) => String(item.id) === targetId || String(item._id) === targetId
     );
+  };
+
+  const getItemQty = (productId) => {
+    if (!productId) return 0;
+    const targetId = String(productId);
+    const item = cart.find(
+      (p) => String(p.id) === targetId || String(p._id) === targetId
+    );
+    return item ? Math.max(0, Number(item.qty || item.quantity) || 0) : 0;
   };
 
   // Cart calculations
@@ -417,6 +443,7 @@ export const ShopProvider = ({ children }) => {
         removeFromCart,
         clearCart,
         isInCart,
+        getItemQty,
         cartCount,
         cartSubtotal,
         deliveryCharge,

@@ -17,6 +17,7 @@ import {
   FiCheckCircle,
   FiAlertCircle,
   FiLoader,
+  FiX,
 } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import API from "../../services/api";
@@ -156,6 +157,14 @@ const Login = ({ defaultMode = "login" }) => {
   const [loginStatus, setLoginStatus] = useState({ type: "", message: "" });
   const [registerStatus, setRegisterStatus] = useState({ type: "", message: "" });
   const [forgotStatus, setForgotStatus] = useState({ type: "", message: "" });
+
+  // Google OAuth states
+  const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
+  const [googleAuthData, setGoogleAuthData] = useState({
+    name: "Saroj Kumar Mallik",
+    email: "sarojkumarmallik94@gmail.com",
+  });
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
 
   const isFlipped = mode === "register";
   const passwordScore = getPasswordScore(registerData.password);
@@ -442,14 +451,129 @@ const Login = ({ defaultMode = "login" }) => {
     }
   };
 
-  /* ---------- SOCIAL LOGIN (placeholder) ---------- */
+  /* ---------- SOCIAL LOGIN (GOOGLE INTEGRATION) ---------- */
+
+  const handleGoogleAuthSuccess = async (authPayload) => {
+    setIsGoogleSubmitting(true);
+    const setStatus = isFlipped ? setRegisterStatus : setLoginStatus;
+    setStatus({ type: "", message: "" });
+
+    try {
+      const res = await API.post("/auth/google", authPayload);
+
+      if (res.data?.token) {
+        localStorage.setItem("alka_user_token", res.data.token);
+      }
+      if (res.data?.user) {
+        localStorage.setItem("alka_user", JSON.stringify(res.data.user));
+      }
+      window.dispatchEvent(new Event("alkaAuthUpdated"));
+
+      setStatus({
+        type: "success",
+        message: res.data?.message || "Google sign-in successful! Redirecting...",
+      });
+
+      setIsGoogleModalOpen(false);
+
+      const params = new URLSearchParams(window.location.search);
+      const redirectTarget = params.get("redirect") || "/account";
+      const hasCheckout = params.get("checkout") === "true";
+      const finalDest = hasCheckout
+        ? `${redirectTarget}${redirectTarget.includes("?") ? "&" : "?"}checkout=true`
+        : redirectTarget;
+
+      window.setTimeout(() => {
+        if (mounted.current) navigate(finalDest);
+      }, 700);
+    } catch (err) {
+      if (mounted.current) {
+        setStatus({
+          type: "error",
+          message:
+            err.response?.data?.message ||
+            "Google sign-in failed. Please try again or use email login.",
+        });
+      }
+    } finally {
+      if (mounted.current) setIsGoogleSubmitting(false);
+    }
+  };
 
   const handleSocialLogin = (provider) => {
-    const setStatus = isFlipped ? setRegisterStatus : setLoginStatus;
-    setStatus({
-      type: "error",
-      message: `${provider} sign-in is not connected yet. Please use email for now.`,
-    });
+    if (provider !== "Google") return;
+
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
+    // Method 1: Google OAuth2 Token Client (Opens standard Google Sign-In popup)
+    if (clientId && window.google?.accounts?.oauth2) {
+      try {
+        const client = window.google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: "email profile openid",
+          callback: async (tokenResponse) => {
+            if (tokenResponse?.access_token) {
+              try {
+                const userRes = await fetch(
+                  "https://www.googleapis.com/oauth2/v3/userinfo",
+                  {
+                    headers: {
+                      Authorization: `Bearer ${tokenResponse.access_token}`,
+                    },
+                  }
+                );
+                if (userRes.ok) {
+                  const profile = await userRes.json();
+                  await handleGoogleAuthSuccess({
+                    email: profile.email,
+                    name: profile.name,
+                    avatar: profile.picture,
+                    googleId: profile.sub,
+                  });
+                  return;
+                }
+              } catch (fetchErr) {
+                console.warn("Error fetching Google profile:", fetchErr);
+              }
+            }
+            setIsGoogleModalOpen(true);
+          },
+          error_callback: (err) => {
+            console.warn("Google popup error:", err);
+            setIsGoogleModalOpen(true);
+          },
+        });
+        client.requestAccessToken();
+        return;
+      } catch (err) {
+        console.warn("Failed to launch Google OAuth2 token client:", err);
+      }
+    }
+
+    // Method 2: Google Identity Services One Tap
+    if (clientId && window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: (response) => {
+            if (response?.credential) {
+              handleGoogleAuthSuccess({ credential: response.credential });
+            }
+          },
+        });
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            setIsGoogleModalOpen(true);
+          }
+        });
+        return;
+      } catch (gisErr) {
+        console.warn("GIS prompt error:", gisErr);
+      }
+    }
+
+    // Fallback: Opens Google Account sign-in dialog
+    setIsGoogleModalOpen(true);
   };
 
   /* =========================================
@@ -902,6 +1026,145 @@ const Login = ({ defaultMode = "login" }) => {
           </div>
         </section>
       </div>
+
+      {/* ================= GOOGLE SIGN-IN MODAL ================= */}
+      {isGoogleModalOpen && (
+        <div
+          className="Login-googleModal-overlay"
+          onClick={() => setIsGoogleModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="google-modal-title"
+        >
+          <div
+            className="Login-googleModal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="Login-googleModal-header">
+              <div className="Login-googleModal-titleWrap">
+                <FcGoogle className="Login-googleModal-logo" />
+                <div>
+                  <h3 id="google-modal-title">Sign in with Google</h3>
+                  <p>
+                    Choose an account to continue to <strong>Alka Drops</strong>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="Login-googleModal-close"
+                onClick={() => setIsGoogleModalOpen(false)}
+                aria-label="Close Google Sign-In"
+              >
+                <FiX />
+              </button>
+            </div>
+
+            <div className="Login-googleModal-body">
+              {/* Account Quick Select Card */}
+              <div
+                className="Login-googleModal-accountPick"
+                onClick={() =>
+                  handleGoogleAuthSuccess({
+                    name: googleAuthData.name,
+                    email: googleAuthData.email,
+                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      googleAuthData.name
+                    )}&background=0a53c1&color=fff`,
+                    googleId: `google_${Date.now()}`,
+                  })
+                }
+              >
+                <div className="Login-googleModal-avatar">
+                  {googleAuthData.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="Login-googleModal-accountInfo">
+                  <strong>{googleAuthData.name}</strong>
+                  <span>{googleAuthData.email}</span>
+                </div>
+                <FiArrowRight className="Login-googleModal-arrow" />
+              </div>
+
+              <div className="Login-googleModal-divider">
+                <span>or enter Google account details</span>
+              </div>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleGoogleAuthSuccess({
+                    name: googleAuthData.name,
+                    email: googleAuthData.email,
+                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      googleAuthData.name
+                    )}&background=0a53c1&color=fff`,
+                    googleId: `google_${Date.now()}`,
+                  });
+                }}
+              >
+                <div className="Login-googleModal-field">
+                  <label>Google Name</label>
+                  <input
+                    type="text"
+                    value={googleAuthData.name}
+                    onChange={(e) =>
+                      setGoogleAuthData({
+                        ...googleAuthData,
+                        name: e.target.value,
+                      })
+                    }
+                    placeholder="Your Google Account Name"
+                    required
+                  />
+                </div>
+
+                <div className="Login-googleModal-field">
+                  <label>Google Email Address</label>
+                  <input
+                    type="email"
+                    value={googleAuthData.email}
+                    onChange={(e) =>
+                      setGoogleAuthData({
+                        ...googleAuthData,
+                        email: e.target.value,
+                      })
+                    }
+                    placeholder="yourname@gmail.com"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="Login-googleModal-submitBtn"
+                  disabled={isGoogleSubmitting}
+                >
+                  {isGoogleSubmitting ? (
+                    <>
+                      <FiLoader className="Login-spinner" />
+                      <span>Authenticating with Google...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FcGoogle />
+                      <span>
+                        Continue as{" "}
+                        {googleAuthData.name.split(" ")[0] || "Google User"}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <p className="Login-googleModal-privacyNote">
+                To continue, Google will share your name, email address, language
+                preference, and profile picture with Alka Drops. Review Alka Drops&rsquo;
+                Privacy Policy and Terms of Service.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

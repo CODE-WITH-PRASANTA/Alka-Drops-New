@@ -23,6 +23,7 @@ import {
   PackageCheck,
   Tag,
   MessageSquare,
+  UserPlus,
 } from "lucide-react";
 
 import { NavLink, useLocation } from "react-router-dom";
@@ -99,6 +100,11 @@ const menuItems = [
     title: "Delivery Boy Management",
     icon: Truck,
     children: [
+      {
+        title: "Register Delivery Boy",
+        path: "/admin/add-delivery-boy",
+        icon: UserPlus,
+      },
       {
         title: "Delivery Boy ID Generation",
         path: "/admin/delivery-boy-id",

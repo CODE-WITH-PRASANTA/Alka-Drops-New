@@ -198,6 +198,7 @@ const createDeliveryBoy = async (req, res) => {
       phone: phone.trim(),
       role: "Delivery Boy",
       status: "Active",
+      avatar: avatar?.trim() || "",
       address: {
         street: presentAddress?.street || "",
         city: presentAddress?.city || "Bhubaneswar",

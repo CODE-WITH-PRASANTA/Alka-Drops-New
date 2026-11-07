@@ -31,6 +31,16 @@ const userSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    googleId: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
     role: {
       type: String,
       enum: ["user", "admin", "Subscriber", "Retail Customer", "Corporate", "Administrator", "Delivery Boy", "delivery boy"],
@@ -65,6 +75,18 @@ const userSchema = new mongoose.Schema(
       state: { type: String, default: "Odisha" },
       postalCode: { type: String, default: "751012" },
     },
+    addresses: [
+      {
+        label: { type: String, default: "Home" },
+        recipientName: { type: String, default: "" },
+        phone: { type: String, default: "" },
+        street: { type: String, default: "" },
+        city: { type: String, default: "Bhubaneswar" },
+        state: { type: String, default: "Odisha" },
+        postalCode: { type: String, default: "751012" },
+        isDefault: { type: Boolean, default: false },
+      },
+    ],
     ordersCount: {
       type: Number,
       default: 0,

@@ -39,7 +39,14 @@ const discountPercent = (price, oldPrice) => {
 };
 
 const ShopCards = () => {
-  const { addToCart, isInCart, toggleWishlist, isInWishlist } = useShop();
+  const {
+    addToCart,
+    isInCart,
+    getItemQty,
+    updateQuantity,
+    toggleWishlist,
+    isInWishlist,
+  } = useShop();
 
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -278,6 +285,7 @@ const ShopCards = () => {
 
               const inWishlist = isInWishlist(pId);
               const inCart = isInCart(pId);
+              const itemQty = getItemQty(pId);
 
               return (
                 <article className="ShopCards-card" key={pId}>
@@ -370,15 +378,41 @@ const ShopCards = () => {
                       </div>
                     </div>
 
-                    {/* Developer-Engineered Add to Cart Button */}
-                    <button
-                      type="button"
-                      className={`ShopCards-addButton ${inCart ? "ShopCards-inCart" : ""}`}
-                      onClick={() => addToCart(product, 1)}
-                    >
-                      <ShoppingCart size={17} />
-                      {inCart ? "In Cart (+1)" : "Add to Cart"}
-                    </button>
+                    {/* Add to Cart or Interactive Increment/Decrement Stepper */}
+                    {itemQty > 0 ? (
+                      <div className="ShopCards-qtyControls">
+                        <button
+                          type="button"
+                          className="ShopCards-qtyBtn minus"
+                          onClick={() => updateQuantity(pId, -1)}
+                          title={itemQty === 1 ? "Remove from cart" : "Decrease quantity (-1)"}
+                          aria-label="Decrease quantity"
+                        >
+                          <Minus size={15} />
+                        </button>
+                        <span className="ShopCards-qtyValue">
+                          {itemQty}
+                        </span>
+                        <button
+                          type="button"
+                          className="ShopCards-qtyBtn plus"
+                          onClick={() => updateQuantity(pId, 1)}
+                          title="Increase quantity (+1)"
+                          aria-label="Increase quantity"
+                        >
+                          <Plus size={15} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="ShopCards-addButton"
+                        onClick={() => addToCart(product, 1)}
+                      >
+                        <ShoppingCart size={17} />
+                        Add to Cart
+                      </button>
+                    )}
                   </div>
                 </article>
               );

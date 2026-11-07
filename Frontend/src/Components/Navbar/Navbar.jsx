@@ -51,6 +51,9 @@ const Navbar = () => {
     }
   });
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [navPillImgError, setNavPillImgError] = useState(false);
+  const [navDropImgError, setNavDropImgError] = useState(false);
+  const [navMobileImgError, setNavMobileImgError] = useState(false);
 
   const profileDropdownRef = useRef(null);
 
@@ -260,10 +263,12 @@ const Navbar = () => {
                       border: "1px solid #bfdbfe",
                     }}
                   >
-                    {currentUser.avatar ? (
+                    {currentUser.avatar && !navMobileImgError ? (
                       <img
                         src={currentUser.avatar.startsWith("http") ? currentUser.avatar : `http://localhost:5000${currentUser.avatar}`}
-                        alt={currentUser.name || "User"}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                        onError={() => setNavMobileImgError(true)}
                         className="navbar-user-avatar large"
                       />
                     ) : (
@@ -405,10 +410,12 @@ const Navbar = () => {
                   aria-haspopup="true"
                   aria-label="Account Profile Menu"
                 >
-                  {currentUser.avatar ? (
+                  {currentUser.avatar && !navPillImgError ? (
                     <img
                       src={currentUser.avatar.startsWith("http") ? currentUser.avatar : `http://localhost:5000${currentUser.avatar}`}
-                      alt={currentUser.name || "User"}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                      onError={() => setNavPillImgError(true)}
                       className="navbar-user-avatar"
                     />
                   ) : (
@@ -433,10 +440,12 @@ const Navbar = () => {
                       onClick={() => openAccountTab("profile")}
                       title="View Profile Details"
                     >
-                      {currentUser.avatar ? (
+                      {currentUser.avatar && !navDropImgError ? (
                         <img
                           src={currentUser.avatar.startsWith("http") ? currentUser.avatar : `http://localhost:5000${currentUser.avatar}`}
-                          alt={currentUser.name || "User"}
+                          alt=""
+                          referrerPolicy="no-referrer"
+                          onError={() => setNavDropImgError(true)}
                           className="navbar-user-avatar large"
                         />
                       ) : (

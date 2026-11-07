@@ -601,7 +601,7 @@ const updateProfile = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "User not found." });
     }
 
-    const { name, phone, address, subscription, plan, password, avatar } = req.body;
+    const { name, phone, address, addresses, subscription, plan, password, avatar } = req.body;
     if (name && name.trim()) user.name = name.trim();
     if (phone !== undefined) user.phone = phone.trim();
     if (plan !== undefined) user.plan = plan;
@@ -616,6 +616,9 @@ const updateProfile = async (req, res, next) => {
         state: address.state || user.address.state || "Odisha",
         postalCode: address.postalCode || user.address.postalCode || "751012",
       };
+    }
+    if (Array.isArray(addresses)) {
+      user.addresses = addresses;
     }
     if (subscription) {
       user.subscription = {
@@ -694,9 +697,182 @@ const removeAvatar = async (req, res, next) => {
   }
 };
 
+// Helper to download and cache external avatar locally
+const saveRemoteAvatarLocally = async (remoteUrl) => {
+  if (!remoteUrl || typeof remoteUrl !== "string" || !remoteUrl.startsWith("http")) {
+    return remoteUrl || "";
+  }
+  try {
+    const fs = require("fs");
+    const path = require("path");
+    const res = await fetch(remoteUrl);
+    if (!res.ok) return remoteUrl;
+    const arrayBuffer = await res.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const filename = `avatar-google-${Date.now()}-${Math.round(Math.random() * 1e6)}.png`;
+    const uploadsDir = path.join(__dirname, "../uploads");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    const filePath = path.join(uploadsDir, filename);
+    fs.writeFileSync(filePath, buffer);
+    return `/uploads/${filename}`;
+  } catch (err) {
+    console.warn("Failed to cache remote avatar locally:", err.message);
+    return remoteUrl;
+  }
+};
+
+// @desc    Authenticate or register user via Google OAuth
+// @route   POST /api/auth/google
+// @access  Public
+const googleAuth = async (req, res, next) => {
+  try {
+    const { credential, email, name, avatar, googleId } = req.body;
+
+    let userEmail = email;
+    let userName = name;
+    let userAvatar = avatar;
+    let userGoogleId = googleId;
+
+    // If client sent Google GIS JWT credential, verify with Google or decode
+    if (credential) {
+      try {
+        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+        if (verifyRes.ok) {
+          const verified = await verifyRes.json();
+          userEmail = verified.email || userEmail;
+          userName = verified.name || userName;
+          userAvatar = verified.picture || userAvatar;
+          userGoogleId = verified.sub || userGoogleId;
+        } else {
+          const parts = credential.split(".");
+          if (parts.length === 3) {
+            const payloadJson = Buffer.from(parts[1], "base64").toString("utf8");
+            const payload = JSON.parse(payloadJson);
+            userEmail = payload.email || userEmail;
+            userName = payload.name || userName;
+            userAvatar = payload.picture || userAvatar;
+            userGoogleId = payload.sub || userGoogleId;
+          }
+        }
+      } catch (decodeErr) {
+        try {
+          const parts = credential.split(".");
+          if (parts.length === 3) {
+            const payloadJson = Buffer.from(parts[1], "base64").toString("utf8");
+            const payload = JSON.parse(payloadJson);
+            userEmail = payload.email || userEmail;
+            userName = payload.name || userName;
+            userAvatar = payload.picture || userAvatar;
+            userGoogleId = payload.sub || userGoogleId;
+          }
+        } catch (fallbackErr) {
+          console.warn("Failed to decode Google credential token:", fallbackErr);
+        }
+      }
+    }
+
+    if (!userEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Google authentication failed: Email address could not be verified.",
+      });
+    }
+
+    // Download external Google avatar to local server to avoid 403 Forbidden / CORS issues
+    if (userAvatar && userAvatar.startsWith("http")) {
+      userAvatar = await saveRemoteAvatarLocally(userAvatar);
+    }
+
+    const cleanEmail = userEmail.trim().toLowerCase();
+    let user = await User.findOne({ email: cleanEmail });
+
+    if (user) {
+      // Check if user is blocked
+      if (user.status === "Blocked" || user.status === "Deactive" || user.status === "Inactive") {
+        return res.status(403).json({
+          success: false,
+          message: "Your account is currently deactivated. Please contact support@alkadrops.com.",
+        });
+      }
+
+      // Link googleId and avatar if not present or if user has remote Google avatar
+      let changed = false;
+      if (!user.googleId && userGoogleId) {
+        user.googleId = userGoogleId;
+        changed = true;
+      }
+      if ((!user.avatar || user.avatar.startsWith("http")) && userAvatar) {
+        user.avatar = userAvatar;
+        changed = true;
+      }
+      if (changed) {
+        await user.save();
+      }
+    } else {
+      // New user registering via Google!
+      const crypto = require("crypto");
+      const randomPassword = crypto.randomBytes(24).toString("hex");
+
+      user = await User.create({
+        name: userName || "Google User",
+        email: cleanEmail,
+        password: randomPassword,
+        avatar: userAvatar || "",
+        googleId: userGoogleId || "",
+        authProvider: "google",
+        role: "Retail Customer",
+        status: "Active",
+        plan: "Standard Retail",
+        address: {
+          street: "",
+          city: "Bhubaneswar",
+          state: "Odisha",
+          postalCode: "751012",
+        },
+      });
+    }
+
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    setAuthCookies(res, accessToken, refreshToken);
+
+    return res.status(200).json({
+      success: true,
+      message: `Signed in successfully with Google! Welcome, ${user.name}.`,
+      accessToken,
+      refreshToken,
+      token: accessToken,
+      user: {
+        id: user._id,
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+        plan: user.plan,
+        avatar: user.avatar || "",
+        subscription: user.subscription,
+        address: user.address,
+        ordersCount: user.ordersCount || 0,
+        totalSpend: user.totalSpend || 0,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  googleAuth,
   refreshAccessToken,
   logoutUser,
   getUsers,

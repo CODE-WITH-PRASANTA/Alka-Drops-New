@@ -199,11 +199,115 @@ const getMySubscriptionOrders = async (req, res, next) => {
 
     const orders = await SubscriptionOrder.find({ $or: matchQueries }).sort({ createdAt: -1 });
 
+    // Find real active or paused subscription order
+    const activeSub =
+      orders.find((o) => ["Active", "Paused"].includes(o.status)) ||
+      (orders.length > 0 ? orders[0] : null);
+
     res.json({
       success: true,
       count: orders.length,
       orders,
-      activeSubscription: orders.find((o) => o.status === "Active") || null,
+      activeSubscription: activeSub,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Toggle Pause / Resume customer's active subscription
+// @route   PATCH /api/subscription-orders/my-subscriptions/toggle-status
+// @access  Private
+const toggleMySubscriptionStatus = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+
+    const matchQueries = [{ user: userId }];
+    if (user?.email) matchQueries.push({ customerEmail: user.email.toLowerCase() });
+    if (user?.phone && user.phone.trim().length >= 8) {
+      matchQueries.push({ customerPhone: user.phone.trim() });
+    }
+
+    const order = await SubscriptionOrder.findOne({
+      $or: matchQueries,
+      status: { $in: ["Active", "Paused"] },
+    }).sort({ createdAt: -1 });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "No active or paused subscription order found to update.",
+      });
+    }
+
+    const nextStatus = order.status === "Active" ? "Paused" : "Active";
+    order.status = nextStatus;
+    await order.save();
+
+    // Synchronize with User document
+    if (user) {
+      if (!user.subscription) user.subscription = {};
+      user.subscription.status = nextStatus;
+      await user.save();
+    }
+
+    res.json({
+      success: true,
+      message: `Your subscription schedule is now ${nextStatus}.`,
+      status: nextStatus,
+      order,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update customer delivery schedule (frequency, time slot, cans quantity)
+// @route   PATCH /api/subscription-orders/my-subscriptions/update-schedule
+// @access  Private
+const updateMySubscriptionSchedule = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { deliveryFrequency, deliverySlot, bottlesPerDelivery } = req.body;
+    const user = await User.findById(userId);
+
+    const matchQueries = [{ user: userId }];
+    if (user?.email) matchQueries.push({ customerEmail: user.email.toLowerCase() });
+    if (user?.phone && user.phone.trim().length >= 8) {
+      matchQueries.push({ customerPhone: user.phone.trim() });
+    }
+
+    const order = await SubscriptionOrder.findOne({
+      $or: matchQueries,
+      status: { $in: ["Active", "Paused"] },
+    }).sort({ createdAt: -1 });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "No active subscription order found to update schedule.",
+      });
+    }
+
+    if (deliveryFrequency) order.deliveryFrequency = deliveryFrequency;
+    if (deliverySlot) order.deliverySlot = deliverySlot;
+    if (bottlesPerDelivery) order.bottlesPerDelivery = Number(bottlesPerDelivery);
+    await order.save();
+
+    // Synchronize with User document
+    if (user) {
+      if (!user.subscription) user.subscription = {};
+      if (deliveryFrequency) user.subscription.cadence = deliveryFrequency;
+      if (deliverySlot) user.subscription.deliveryTimeSlot = deliverySlot;
+      if (bottlesPerDelivery) user.subscription.bottlesPerDelivery = Number(bottlesPerDelivery);
+      await user.save();
+    }
+
+    res.json({
+      success: true,
+      message: "Subscription delivery schedule updated successfully!",
+      order,
     });
   } catch (error) {
     next(error);
@@ -302,6 +406,8 @@ module.exports = {
   createSubscriptionOrder,
   getAllSubscriptionOrders,
   getMySubscriptionOrders,
+  toggleMySubscriptionStatus,
+  updateMySubscriptionSchedule,
   updateSubscriptionOrderStatus,
   assignDeliveryPartner,
   deleteSubscriptionOrder,

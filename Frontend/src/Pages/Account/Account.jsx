@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   FiUser,
@@ -38,6 +38,10 @@ const Account = () => {
   const location = useLocation();
   const { wishlist, removeFromWishlist, moveToCart, wishlistCount } = useShop();
 
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const returnTo = searchParams.get("returnTo");
+  const isSelectForCart = searchParams.get("selectAddress") === "true" || returnTo === "/cart";
+
   // Active tab state
   const [activeTab, setActiveTab] = useState("profile");
 
@@ -54,6 +58,8 @@ const Account = () => {
   // Avatar upload state
   const fileInputRef = useRef(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarLoadError, setAvatarLoadError] = useState(false);
+  const [avatarManageError, setAvatarManageError] = useState(false);
 
   // Profile Form state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -76,27 +82,7 @@ const Account = () => {
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
 
   // Subscription state
-  const defaultSub = {
-    planTitle: "Daily Alkaline Water (20L Can)",
-    status: "Active",
-    cadence: "Alternate Days",
-    bottlesPerDelivery: 2,
-    deliveryTimeSlot: "Morning (7 AM - 10 AM)",
-    startDate: new Date().toISOString(),
-    pricePerDelivery: 120,
-    autoRenew: true,
-  };
-
-  const [subscription, setSubscription] = useState(() => {
-    try {
-      const saved = localStorage.getItem("alka_user");
-      const u = saved ? JSON.parse(saved) : null;
-      return u?.subscription || defaultSub;
-    } catch {
-      return defaultSub;
-    }
-  });
-
+  const [subscription, setSubscription] = useState(null);
   const [isUpdatingSub, setIsUpdatingSub] = useState(false);
   const [isEditingSchedule, setIsEditingSchedule] = useState(false);
   const [scheduleForm, setScheduleForm] = useState({
@@ -108,7 +94,7 @@ const Account = () => {
   const [availablePlans, setAvailablePlans] = useState([]);
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
   const [subOrders, setSubOrders] = useState([]);
-  const [isLoadingSubOrders, setIsLoadingSubOrders] = useState(false);
+  const [isLoadingSubOrders, setIsLoadingSubOrders] = useState(true);
 
   // Notifications
   const [feedbackMsg, setFeedbackMsg] = useState({ type: "", text: "" });
@@ -134,8 +120,13 @@ const Account = () => {
     const tabParam = params.get("tab");
     if (tabParam && ["profile", "subscriptions", "addresses", "orders", "security", "wishlist"].includes(tabParam)) {
       setActiveTab(tabParam);
+      if (tabParam === "addresses" && (params.get("selectAddress") === "true" || params.get("returnTo"))) {
+        if (!address.street) {
+          setIsEditingAddress(true);
+        }
+      }
     }
-  }, [location.search]);
+  }, [location.search, address.street]);
 
   // Sync user state on changes
   useEffect(() => {
@@ -224,13 +215,15 @@ const Account = () => {
     }
   }, [activeTab, currentUser]);
 
-  // Fetch subscription plans & user subscription orders when subscriptions tab is active
+  // Fetch subscription plans & user subscription orders
   useEffect(() => {
-    if (activeTab === "subscriptions") {
-      fetchPlans();
+    if (currentUser) {
       fetchMySubscriptions();
     }
-  }, [activeTab]);
+    if (activeTab === "subscriptions") {
+      fetchPlans();
+    }
+  }, [activeTab, currentUser]);
 
   const fetchMySubscriptions = async () => {
     try {
@@ -240,22 +233,22 @@ const Account = () => {
         setSubOrders(res.data.orders);
         if (res.data.activeSubscription) {
           const act = res.data.activeSubscription;
-          setSubscription((prev) => ({
-            ...prev,
-            planTitle: act.planTitle,
-            planPrice: act.planPrice,
-            status: act.status,
-            cadence: act.deliveryFrequency,
-            bottlesPerDelivery: act.bottlesPerDelivery,
-            deliveryTimeSlot: act.deliverySlot,
-            startDate: act.startDate,
-            endDate: act.endDate,
-            orderNumber: act.orderNumber,
-          }));
+          setSubscription(act);
+          setScheduleForm({
+            cadence: act.deliveryFrequency || "Alternate Days",
+            bottlesPerDelivery: act.bottlesPerDelivery || 2,
+            deliveryTimeSlot: act.deliverySlot || "Morning (7 AM - 10 AM)",
+          });
+        } else {
+          setSubscription(null);
         }
+      } else {
+        setSubOrders([]);
+        setSubscription(null);
       }
     } catch (err) {
-      // quiet fallback
+      console.warn("Could not load subscriptions from server:", err);
+      setSubscription(null);
     } finally {
       setIsLoadingSubOrders(false);
     }
@@ -294,7 +287,10 @@ const Account = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setFeedbackMsg({ type: "", text: "" });
-    navigate(`/account?tab=${tab}`, { replace: true });
+    const targetUrl = returnTo
+      ? `/account?tab=${tab}&returnTo=${encodeURIComponent(returnTo)}`
+      : `/account?tab=${tab}`;
+    navigate(targetUrl, { replace: true });
   };
 
   // Upload or Change Profile Picture
@@ -429,8 +425,16 @@ const Account = () => {
         setIsEditingAddress(false);
         setFeedbackMsg({
           type: "success",
-          text: "Primary delivery address updated successfully!",
+          text: returnTo
+            ? "Primary delivery address saved! Returning to cart..."
+            : "Primary delivery address updated successfully!",
         });
+
+        if (returnTo) {
+          setTimeout(() => {
+            navigate(returnTo);
+          }, 700);
+        }
       }
     } catch (err) {
       setFeedbackMsg({
@@ -481,6 +485,7 @@ const Account = () => {
 
   // Toggle Subscription Pause / Resume
   const handleToggleSubscriptionStatus = async () => {
+    if (!subscription) return;
     const isCurrentlyActive = subscription.status === "Active";
     const nextStatus = isCurrentlyActive ? "Paused" : "Active";
     const confirmText = isCurrentlyActive
@@ -493,21 +498,13 @@ const Account = () => {
       setIsUpdatingSub(true);
       setFeedbackMsg({ type: "", text: "" });
 
-      const updatedSubscription = {
-        ...subscription,
-        status: nextStatus,
-      };
+      const res = await API.patch("/subscription-orders/my-subscriptions/toggle-status");
 
-      const res = await API.put("/auth/profile", {
-        subscription: updatedSubscription,
-      });
-
-      if (res.data?.success && res.data.user) {
-        const fresh = res.data.user;
-        localStorage.setItem("alka_user", JSON.stringify(fresh));
-        setCurrentUser(fresh);
-        setSubscription(fresh.subscription || updatedSubscription);
-        window.dispatchEvent(new Event("alkaAuthUpdated"));
+      if (res.data?.success && res.data.order) {
+        setSubscription(res.data.order);
+        setSubOrders((prev) =>
+          prev.map((o) => (o._id === res.data.order._id ? res.data.order : o))
+        );
         setFeedbackMsg({
           type: "success",
           text: isCurrentlyActive
@@ -573,27 +570,21 @@ const Account = () => {
       setIsUpdatingSub(true);
       setFeedbackMsg({ type: "", text: "" });
 
-      const updatedSubscription = {
-        ...subscription,
-        cadence: scheduleForm.cadence,
+      const res = await API.patch("/subscription-orders/my-subscriptions/update-schedule", {
+        deliveryFrequency: scheduleForm.cadence,
         bottlesPerDelivery: Number(scheduleForm.bottlesPerDelivery) || 2,
-        deliveryTimeSlot: scheduleForm.deliveryTimeSlot,
-      };
-
-      const res = await API.put("/auth/profile", {
-        subscription: updatedSubscription,
+        deliverySlot: scheduleForm.deliveryTimeSlot,
       });
 
-      if (res.data?.success && res.data.user) {
-        const fresh = res.data.user;
-        localStorage.setItem("alka_user", JSON.stringify(fresh));
-        setCurrentUser(fresh);
-        setSubscription(fresh.subscription || updatedSubscription);
-        window.dispatchEvent(new Event("alkaAuthUpdated"));
+      if (res.data?.success && res.data.order) {
+        setSubscription(res.data.order);
+        setSubOrders((prev) =>
+          prev.map((o) => (o._id === res.data.order._id ? res.data.order : o))
+        );
         setIsEditingSchedule(false);
         setFeedbackMsg({
           type: "success",
-          text: "Delivery schedule and cadence updated successfully!",
+          text: "Delivery schedule and cadence updated successfully in database!",
         });
       }
     } catch (err) {
@@ -703,14 +694,16 @@ const Account = () => {
             {/* User Profile Card */}
             <div className="Account-userCard">
               <div className="Account-avatar-wrap">
-                {currentUser.avatar ? (
+                {currentUser.avatar && !avatarLoadError ? (
                   <img
                     src={
                       currentUser.avatar.startsWith("http")
                         ? currentUser.avatar
                         : `http://localhost:5000${currentUser.avatar}`
                     }
-                    alt={currentUser.name || "User Avatar"}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                    onError={() => setAvatarLoadError(true)}
                     className="Account-avatar Account-avatar-img"
                   />
                 ) : (
@@ -749,14 +742,6 @@ const Account = () => {
               <h3 className="Account-userName">{currentUser.name || "Valued Customer"}</h3>
               <p className="Account-userEmail">{currentUser.email}</p>
 
-              <div className="Account-userBadges">
-                <span className="Account-userRoleBadge">
-                  <FiShield /> {currentUser.role || "Retail Customer"}
-                </span>
-                <span className="Account-userHubBadge">
-                  <FiMapPin /> {address.city || "Bhubaneswar"}
-                </span>
-              </div>
             </div>
 
             {/* Sidebar Navigation Menu */}
@@ -777,13 +762,17 @@ const Account = () => {
               >
                 <FiRefreshCw />
                 <span className="Account-navText">My Subscriptions</span>
-                <span
-                  className={`Account-navBadge ${
-                    subscription?.status === "Active" ? "active" : "paused"
-                  }`}
-                >
-                  {subscription?.status === "Active" ? "Active" : "Paused"}
-                </span>
+                {subscription ? (
+                  <span
+                    className={`Account-navBadge ${
+                      subscription.status === "Active" ? "active" : "paused"
+                    }`}
+                  >
+                    {subscription.status}
+                  </span>
+                ) : subOrders.length > 0 ? (
+                  <span className="Account-navCount">{subOrders.length}</span>
+                ) : null}
               </button>
 
               <button
@@ -889,14 +878,16 @@ const Account = () => {
 
                   <div className="Account-avatarManageRow">
                     <div className="Account-avatarManagePreview">
-                      {currentUser.avatar ? (
+                      {currentUser.avatar && !avatarManageError ? (
                         <img
                           src={
                             currentUser.avatar.startsWith("http")
                               ? currentUser.avatar
                               : `http://localhost:5000${currentUser.avatar}`
                           }
-                          alt={currentUser.name}
+                          alt=""
+                          referrerPolicy="no-referrer"
+                          onError={() => setAvatarManageError(true)}
                           className="Account-avatarManageImg"
                         />
                       ) : (
@@ -1082,391 +1073,296 @@ const Account = () => {
                   </Link>
                 </div>
 
-                {/* Hero Active Subscription Card */}
-                <div className="Account-subscriptionHero">
-                  <div className="Account-subscriptionHeroHeader">
-                    <div className="Account-subPlanMeta">
-                      <span
-                        className={`Account-subStatusBadge ${
-                          subscription?.status === "Active" ? "active" : "paused"
-                        }`}
+                {isLoadingSubOrders ? (
+                  <div style={{ textAlign: "center", padding: "60px 20px", color: "#64748b" }}>
+                    <FiRefreshCw className="spin" style={{ fontSize: "28px", color: "#004ea8", marginBottom: "12px" }} />
+                    <p>Loading your active hydration passes from database...</p>
+                  </div>
+                ) : subscription ? (
+                  /* Hero Active Subscription Card - Fully Integrated Real Data */
+                  <div className="Account-subscriptionHero">
+                    <div className="Account-subscriptionHeroHeader">
+                      <div className="Account-subPlanMeta">
+                        <span
+                          className={`Account-subStatusBadge ${
+                            subscription.status === "Active" ? "active" : "paused"
+                          }`}
+                        >
+                          <span className="Account-pulseDot" />
+                          {subscription.status === "Active"
+                            ? "ACTIVE SCHEDULED DELIVERY"
+                            : "DELIVERY SCHEDULE PAUSED"}
+                        </span>
+                        <h3 className="Account-subPlanTitle">
+                          {subscription.planTitle || "Alkaline Hydration Pass"}
+                        </h3>
+                        <p className="Account-subPlanDesc">
+                          {subscription.period === "YR"
+                            ? "Official Annual VIP Doorstep Hydration Pass • 20L Food-grade cans dispatched from Bhubaneswar Hub."
+                            : "Recurring Alkaline Water Supply • Pure pH 8.5+ Natural Alkaline Water jar deliveries."}
+                        </p>
+                      </div>
+
+                      <div className="Account-subPricingBox">
+                        {subscription.orderNumber && (
+                          <span className="orderRef">#{subscription.orderNumber}</span>
+                        )}
+                        <span className="Account-subPrice">
+                          ₹{subscription.planPrice || (subscription.totalAmount ? subscription.totalAmount.toLocaleString("en-IN") : "2,999")}
+                        </span>
+                        <span className="Account-subPricePeriod">
+                          /{subscription.period ? subscription.period.toLowerCase() : (subscription.totalAmount >= 2500 ? "yr" : "mo")}
+                        </span>
+                        <span className="Account-subDiscountTag">
+                          {subscription.paymentMethod ? subscription.paymentMethod.toUpperCase() : "COD"} • {subscription.paymentStatus || "Active"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 4 Details Grid */}
+                    <div className="Account-subDetailsGrid">
+                      <div className="Account-subDetailItem">
+                        <span className="Account-subDetailIcon"><FiCalendar /></span>
+                        <div>
+                          <span className="Account-subDetailLabel">Cadence / Frequency</span>
+                          <strong>{subscription.deliveryFrequency || subscription.cadence || "Alternate Days"}</strong>
+                        </div>
+                      </div>
+
+                      <div className="Account-subDetailItem">
+                        <span className="Account-subDetailIcon"><FiDroplet /></span>
+                        <div>
+                          <span className="Account-subDetailLabel">Quantity per Delivery</span>
+                          <strong>
+                            {subscription.bottlesPerDelivery || 2} Cans ({ (subscription.bottlesPerDelivery || 2) * 20 } Litres)
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div className="Account-subDetailItem">
+                        <span className="Account-subDetailIcon"><FiClock /></span>
+                        <div>
+                          <span className="Account-subDetailLabel">Delivery Window</span>
+                          <strong>{subscription.deliverySlot || subscription.deliveryTimeSlot || "Morning (7 AM - 10 AM)"}</strong>
+                        </div>
+                      </div>
+
+                      <div className="Account-subDetailItem">
+                        <span className="Account-subDetailIcon"><FiTruck /></span>
+                        <div>
+                          <span className="Account-subDetailLabel">Delivery Partner</span>
+                          <strong style={{ color: "#004ea8" }}>
+                            {subscription.deliveryBoy?.name && subscription.deliveryBoy.name !== "Unassigned"
+                              ? `${subscription.deliveryBoy.name} (${subscription.deliveryBoy.phone || "Active"})`
+                              : "Central Hub Fleet (Bhubaneswar)"}
+                          </strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Validity Dates (Start Date & End Date) */}
+                    <div className="Account-subValidityStrip">
+                      <div className="Account-subValidityItem">
+                        <FiCalendar style={{ color: "#004ea8", fontSize: "18px" }} />
+                        <div>
+                          <span className="Account-subDetailLabel">START DATE</span>
+                          <strong>
+                            {subscription.startDate
+                              ? new Date(subscription.startDate).toLocaleDateString("en-IN", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                })
+                              : "N/A"}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div className="Account-subValidityDivider" />
+
+                      <div className="Account-subValidityItem">
+                        <FiCalendar style={{ color: "#059669", fontSize: "18px" }} />
+                        <div>
+                          <span className="Account-subDetailLabel">END DATE</span>
+                          <strong>
+                            {subscription.endDate
+                              ? new Date(subscription.endDate).toLocaleDateString("en-IN", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                })
+                              : "Ongoing"}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div className="Account-subValidityDivider" />
+
+                      <div className="Account-subValidityItem">
+                        <FiClock style={{ color: "#7c3aed", fontSize: "18px" }} />
+                        <div>
+                          <span className="Account-subDetailLabel">PASS STATUS</span>
+                          <strong style={{ color: subscription.status === "Active" ? "#059669" : "#d97706" }}>
+                            {subscription.status === "Active"
+                              ? subscription.endDate
+                                ? `${Math.max(0, Math.ceil((new Date(subscription.endDate) - new Date()) / (1000 * 60 * 60 * 24)))} Days Remaining`
+                                : "Active Pass"
+                              : "Delivery Paused"}
+                          </strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Destination Location Strip */}
+                    <div className="Account-subAddressStrip">
+                      <div className="Account-subAddressInfo">
+                        <FiMapPin className="Account-subPinIcon" />
+                        <div>
+                          <span className="Account-subAddressLabel">DELIVERY HUB DESTINATION:</span>
+                          <strong>
+                            {subscription.deliveryAddress?.street
+                              ? `${subscription.deliveryAddress.street}, ${subscription.deliveryAddress.city || "Bhubaneswar"} - ${subscription.deliveryAddress.postalCode || "751012"}`
+                              : address.street
+                              ? `${address.street}, ${address.city || "Bhubaneswar"} - ${address.postalCode || "751012"}`
+                              : "Bhubaneswar Central Zone, Odisha - 751012"}
+                          </strong>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="Account-subChangeAddressBtn"
+                        onClick={() => handleTabChange("addresses")}
                       >
-                        <span className="Account-pulseDot" />
-                        {subscription?.status === "Active"
-                          ? "ACTIVE SCHEDULED DELIVERY"
-                          : "DELIVERY SCHEDULE PAUSED"}
-                      </span>
-                      <h3 className="Account-subPlanTitle">
-                        {subscription?.planTitle || "Daily Alkaline Water (20L Can)"}
-                      </h3>
-                      <p className="Account-subPlanDesc">
-                        Pure pH 8.5+ Natural Alkaline Water jar dispatched directly from Bhubaneswar Central Hub.
-                      </p>
+                        Change Address
+                      </button>
                     </div>
 
-                    <div className="Account-subPricingBox">
-                      <span className="Account-subPrice">
-                        ₹{subscription?.pricePerDelivery || 120}
-                      </span>
-                      <span className="Account-subPricePeriod">/ drop</span>
-                      <span className="Account-subDiscountTag">15% Subscriber Savings</span>
-                    </div>
-                  </div>
+                    {/* Subscription Action Toolbar */}
+                    <div className="Account-subActionToolbar">
+                      <button
+                        type="button"
+                        className={`Account-subBtn ${
+                          subscription.status === "Active" ? "pause" : "resume"
+                        }`}
+                        onClick={handleToggleSubscriptionStatus}
+                        disabled={isUpdatingSub}
+                      >
+                        {subscription.status === "Active" ? (
+                          <>
+                            <FiPause /> Pause Delivery
+                          </>
+                        ) : (
+                          <>
+                            <FiPlay /> Resume Delivery
+                          </>
+                        )}
+                      </button>
 
-                  {/* 4 Details Grid */}
-                  <div className="Account-subDetailsGrid">
-                    <div className="Account-subDetailItem">
-                      <span className="Account-subDetailIcon"><FiCalendar /></span>
-                      <div>
-                        <span className="Account-subDetailLabel">Cadence / Frequency</span>
-                        <strong>{subscription?.cadence || "Alternate Days"}</strong>
-                      </div>
-                    </div>
-
-                    <div className="Account-subDetailItem">
-                      <span className="Account-subDetailIcon"><FiDroplet /></span>
-                      <div>
-                        <span className="Account-subDetailLabel">Quantity per Delivery</span>
-                        <strong>{subscription?.bottlesPerDelivery || 2} Cans (40 Litres)</strong>
-                      </div>
-                    </div>
-
-                    <div className="Account-subDetailItem">
-                      <span className="Account-subDetailIcon"><FiClock /></span>
-                      <div>
-                        <span className="Account-subDetailLabel">Delivery Window</span>
-                        <strong>{subscription?.deliveryTimeSlot || "Morning (7 AM - 10 AM)"}</strong>
-                      </div>
+                      <button
+                        type="button"
+                        className="Account-subBtn secondary"
+                        onClick={() => setIsEditingSchedule((prev) => !prev)}
+                      >
+                        <FiSliders /> {isEditingSchedule ? "Close Editor" : "Modify Schedule"}
+                      </button>
                     </div>
 
-                    <div className="Account-subDetailItem">
-                      <span className="Account-subDetailIcon"><FiTruck /></span>
-                      <div>
-                        <span className="Account-subDetailLabel">Next Scheduled Drop</span>
-                        <strong style={{ color: "#004ea8" }}>
-                          {subscription?.status === "Active"
-                            ? "Tomorrow, 8:00 AM"
-                            : "Paused (Resume to schedule)"}
-                        </strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Validity Dates (Start Date & End Date) */}
-                  <div className="Account-subValidityStrip">
-                    <div className="Account-subValidityItem">
-                      <FiCalendar style={{ color: "#004ea8", fontSize: "18px" }} />
-                      <div>
-                        <span className="Account-subDetailLabel">START DATE</span>
-                        <strong>
-                          {subscription?.startDate
-                            ? new Date(subscription.startDate).toLocaleDateString("en-IN", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })
-                            : "Immediate Activation"}
-                        </strong>
-                      </div>
-                    </div>
-
-                    <div className="Account-subValidityDivider" />
-
-                    <div className="Account-subValidityItem">
-                      <FiCalendar style={{ color: "#059669", fontSize: "18px" }} />
-                      <div>
-                        <span className="Account-subDetailLabel">END DATE</span>
-                        <strong>
-                          {subscription?.endDate
-                            ? new Date(subscription.endDate).toLocaleDateString("en-IN", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })
-                            : "Ongoing (Monthly Auto-Renewal)"}
-                        </strong>
-                      </div>
-                    </div>
-
-                    <div className="Account-subValidityDivider" />
-
-                    <div className="Account-subValidityItem">
-                      <FiClock style={{ color: "#7c3aed", fontSize: "18px" }} />
-                      <div>
-                        <span className="Account-subDetailLabel">PASS STATUS</span>
-                        <strong style={{ color: subscription?.status === "Active" ? "#059669" : "#d97706" }}>
-                          {subscription?.status === "Active" ? "Active Hydration Pass" : "Delivery Paused"}
-                        </strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Destination Location Strip */}
-                  <div className="Account-subAddressStrip">
-                    <div className="Account-subAddressInfo">
-                      <FiMapPin className="Account-subPinIcon" />
-                      <div>
-                        <span className="Account-subAddressLabel">DELIVERY HUB DESTINATION:</span>
-                        <strong>
-                          {address.street ? `${address.street}, ` : ""}
-                          {address.city || "Bhubaneswar"} - {address.postalCode || "751012"}
-                        </strong>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="Account-subChangeAddressBtn"
-                      onClick={() => handleTabChange("addresses")}
-                    >
-                      Change Address
-                    </button>
-                  </div>
-
-                  {/* Subscription Action Toolbar */}
-                  <div className="Account-subActionToolbar">
-                    <button
-                      type="button"
-                      className={`Account-subBtn ${
-                        subscription?.status === "Active" ? "pause" : "resume"
-                      }`}
-                      onClick={handleToggleSubscriptionStatus}
-                      disabled={isUpdatingSub}
-                    >
-                      {subscription?.status === "Active" ? (
-                        <>
-                          <FiPause /> Pause Delivery
-                        </>
-                      ) : (
-                        <>
-                          <FiPlay /> Resume Delivery
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      className="Account-subBtn secondary"
-                      onClick={handleSkipNextDelivery}
-                      disabled={isUpdatingSub || subscription?.status !== "Active"}
-                      title="Skip next scheduled delivery cycle"
-                    >
-                      <FiCalendar /> Skip Next Drop
-                    </button>
-
-                    <button
-                      type="button"
-                      className="Account-subBtn secondary"
-                      onClick={() => setIsEditingSchedule((prev) => !prev)}
-                    >
-                      <FiSliders /> {isEditingSchedule ? "Close Editor" : "Modify Schedule"}
-                    </button>
-                  </div>
-
-                  {/* Interactive Schedule Editor Drawer */}
-                  {isEditingSchedule && (
-                    <form onSubmit={handleSaveSchedule} className="Account-scheduleEditor">
-                      <div className="Account-editorHeader">
-                        <h4>
-                          <FiSliders /> Customize Delivery Schedule
-                        </h4>
-                        <p>Fine-tune how often and when your alkaline water jars arrive at your doorstep.</p>
-                      </div>
-
-                      <div className="Account-formGrid">
-                        <div className="Account-field">
-                          <label>Delivery Frequency</label>
-                          <select
-                            value={scheduleForm.cadence}
-                            onChange={(e) =>
-                              setScheduleForm({ ...scheduleForm, cadence: e.target.value })
-                            }
-                          >
-                            <option value="Daily">Daily (Every 24 Hours)</option>
-                            <option value="Alternate Days">Alternate Days (Every 48 Hours)</option>
-                            <option value="Twice a Week">Twice a Week (Mon &amp; Thu)</option>
-                            <option value="Weekly">Weekly (Every 7 Days)</option>
-                          </select>
+                    {/* Interactive Schedule Editor Drawer */}
+                    {isEditingSchedule && (
+                      <form onSubmit={handleSaveSchedule} className="Account-scheduleEditor">
+                        <div className="Account-editorHeader">
+                          <h4>
+                            <FiSliders /> Customize Delivery Schedule
+                          </h4>
+                          <p>Fine-tune how often and when your alkaline water jars arrive at your doorstep.</p>
                         </div>
 
-                        <div className="Account-field">
-                          <label>Cans Per Delivery</label>
-                          <select
-                            value={scheduleForm.bottlesPerDelivery}
-                            onChange={(e) =>
-                              setScheduleForm({
-                                ...scheduleForm,
-                                bottlesPerDelivery: Number(e.target.value),
-                              })
-                            }
-                          >
-                            <option value={1}>1 Jar (20 Litres)</option>
-                            <option value={2}>2 Jars (40 Litres) - Recommended</option>
-                            <option value={3}>3 Jars (60 Litres)</option>
-                            <option value={4}>4 Jars (80 Litres)</option>
-                          </select>
-                        </div>
-
-                        <div className="Account-field">
-                          <label>Preferred Time Slot</label>
-                          <select
-                            value={scheduleForm.deliveryTimeSlot}
-                            onChange={(e) =>
-                              setScheduleForm({
-                                ...scheduleForm,
-                                deliveryTimeSlot: e.target.value,
-                              })
-                            }
-                          >
-                            <option value="Morning (7 AM - 10 AM)">Morning (7 AM - 10 AM)</option>
-                            <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
-                            <option value="Evening (5 PM - 8 PM)">Evening (5 PM - 8 PM)</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="Account-formActions">
-                        <button
-                          type="button"
-                          className="Account-btnSecondary"
-                          onClick={() => setIsEditingSchedule(false)}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="Account-btnPrimary"
-                          disabled={isUpdatingSub}
-                        >
-                          {isUpdatingSub ? "Saving Schedule..." : "Save Delivery Schedule"}
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                </div>
-
-                {/* Subscription Perks Row */}
-                <div className="Account-perksRow">
-                  <div className="Account-perkCard">
-                    <span className="Account-perkIcon"><FiTruck /></span>
-                    <div>
-                      <strong>Free Doorstep Delivery</strong>
-                      <p>Zero delivery charges across Bhubaneswar on all subscription drops.</p>
-                    </div>
-                  </div>
-
-                  <div className="Account-perkCard">
-                    <span className="Account-perkIcon"><FiRefreshCw /></span>
-                    <div>
-                      <strong>Clean Can Swap</strong>
-                      <p>Food-grade BPA free sanitized cans exchanged seamlessly at each delivery.</p>
-                    </div>
-                  </div>
-
-                  <div className="Account-perkCard">
-                    <span className="Account-perkIcon"><FiShield /></span>
-                    <div>
-                      <strong>Priority Dispatch</strong>
-                      <p>Never run out — subscribers receive guaranteed stock during high demand.</p>
-                    </div>
-                  </div>
-
-                  <div className="Account-perkCard">
-                    <span className="Account-perkIcon"><FiClock /></span>
-                    <div>
-                      <strong>1-Click Flexibility</strong>
-                      <p>Pause, skip, or modify schedule instantly whenever you travel.</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Available Database Plans Grid */}
-                <div className="Account-cardBlock" style={{ marginTop: "24px" }}>
-                  <div className="Account-cardBlockHeader">
-                    <div>
-                      <h4>
-                        <FiStar /> Upgrade or Switch Water Plan
-                      </h4>
-                      <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#64748b" }}>
-                        Choose the hydration plan that fits your family or office requirements.
-                      </p>
-                    </div>
-                  </div>
-
-                  {isLoadingPlans ? (
-                    <div style={{ textAlign: "center", padding: "30px", color: "#64748b" }}>
-                      <FiRefreshCw className="spin" style={{ fontSize: "24px", color: "#004ea8" }} />
-                      <p style={{ marginTop: "8px" }}>Fetching subscription plans...</p>
-                    </div>
-                  ) : (
-                    <div className="Account-plansGrid">
-                      {(availablePlans.length > 0
-                        ? availablePlans
-                        : [
-                            {
-                              _id: "basic",
-                              title: "Basic Plan",
-                              price: "1,499",
-                              period: "MO",
-                              description: "Ideal for couples & small households (20L alternate days)",
-                              features: ["20L Alkaline Jars", "Free Doorstep Delivery", "Sanitized Exchange", "Standard Support"],
-                            },
-                            {
-                              _id: "advanced",
-                              title: "Advanced Plan",
-                              price: "2,199",
-                              period: "MO",
-                              description: "Best for families & daily healthy hydration requirements",
-                              features: ["Unlimited Weekly Refills", "Priority Morning Delivery", "Complimentary Dispenser", "Direct Delivery Agent"],
-                            },
-                            {
-                              _id: "premium",
-                              title: "Premium Plan",
-                              price: "2,999",
-                              period: "YR",
-                              description: "Annual Corporate & Premium Household Hydration Pass",
-                              features: ["Annual Priority Pass", "30% OFF Bottled Packs", "Free Dispenser Maintenance", "Dedicated Account Executive"],
-                            },
-                          ]
-                      ).map((plan) => {
-                        const isCurrent =
-                          subscription?.planTitle?.toLowerCase().includes(plan.title.toLowerCase());
-                        return (
-                          <div
-                            key={plan._id || plan.title}
-                            className={`Account-planCard ${isCurrent ? "active-plan" : ""}`}
-                          >
-                            {isCurrent && (
-                              <span className="Account-activePlanBadge">CURRENT PLAN</span>
-                            )}
-                            <h4 className="Account-planCardTitle">{plan.title}</h4>
-                            <p className="Account-planCardDesc">{plan.description}</p>
-                            <div className="Account-planCardPrice">
-                              <strong>₹{plan.price}</strong>
-                              <span>/{plan.period?.toLowerCase() || "mo"}</span>
-                            </div>
-
-                            <ul className="Account-planCardFeatures">
-                              {(plan.features || []).map((feat, idx) => (
-                                <li key={idx}>
-                                  <FiCheck /> {feat}
-                                </li>
-                              ))}
-                            </ul>
-
-                            <button
-                              type="button"
-                              className={`Account-planSelectBtn ${isCurrent ? "current" : ""}`}
-                              onClick={() => !isCurrent && handleSelectPlan(plan)}
-                              disabled={isCurrent || isUpdatingSub}
+                        <div className="Account-formGrid">
+                          <div className="Account-field">
+                            <label>Delivery Frequency</label>
+                            <select
+                              value={scheduleForm.cadence}
+                              onChange={(e) =>
+                                setScheduleForm({ ...scheduleForm, cadence: e.target.value })
+                              }
                             >
-                              {isCurrent ? "Currently Active" : "Switch to This Plan"}
-                            </button>
+                              <option value="Daily">Daily (Every 24 Hours)</option>
+                              <option value="Alternate Days">Alternate Days (Every 48 Hours)</option>
+                              <option value="Twice a Week">Twice a Week (Mon &amp; Thu)</option>
+                              <option value="Weekly">Weekly (Every 7 Days)</option>
+                            </select>
                           </div>
-                        );
-                      })}
+
+                          <div className="Account-field">
+                            <label>Cans Per Delivery</label>
+                            <select
+                              value={scheduleForm.bottlesPerDelivery}
+                              onChange={(e) =>
+                                setScheduleForm({
+                                  ...scheduleForm,
+                                  bottlesPerDelivery: Number(e.target.value),
+                                })
+                              }
+                            >
+                              <option value={1}>1 Jar (20 Litres)</option>
+                              <option value={2}>2 Jars (40 Litres) - Recommended</option>
+                              <option value={3}>3 Jars (60 Litres)</option>
+                              <option value={4}>4 Jars (80 Litres)</option>
+                            </select>
+                          </div>
+
+                          <div className="Account-field">
+                            <label>Preferred Time Slot</label>
+                            <select
+                              value={scheduleForm.deliveryTimeSlot}
+                              onChange={(e) =>
+                                setScheduleForm({
+                                  ...scheduleForm,
+                                  deliveryTimeSlot: e.target.value,
+                                })
+                              }
+                            >
+                              <option value="Morning (7 AM - 10 AM)">Morning (7 AM - 10 AM)</option>
+                              <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+                              <option value="Evening (5 PM - 8 PM)">Evening (5 PM - 8 PM)</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="Account-formActions">
+                          <button
+                            type="button"
+                            className="Account-btnSecondary"
+                            onClick={() => setIsEditingSchedule(false)}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="Account-btnPrimary"
+                            disabled={isUpdatingSub}
+                          >
+                            {isUpdatingSub ? "Saving Schedule..." : "Save Delivery Schedule"}
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                ) : (
+                  /* Clean Empty State when No Active Subscription */
+                  <div className="Account-noSubCard">
+                    <div className="Account-noSubIcon">
+                      <FiRefreshCw />
                     </div>
-                  )}
-                </div>
+                    <h3>No Active Water Subscription Pass</h3>
+                    <p>
+                      You don't currently have an active recurring water delivery plan. Subscribe to an automated plan to receive 20L alkaline water jars on your schedule with zero delivery fees.
+                    </p>
+                    <Link to="/pricing" className="Account-headerCtaBtn" style={{ margin: "0 auto", display: "inline-flex" }}>
+                      <FiStar /> Browse Subscription Plans &amp; Subscribe
+                    </Link>
+                  </div>
+                )}
 
                 {/* Subscription Orders History */}
                 {subOrders.length > 0 && (
@@ -1554,6 +1450,68 @@ const Account = () => {
                     <p>Manage your saved delivery locations for smooth checkout and automated drops.</p>
                   </div>
                 </div>
+
+                {returnTo && (
+                  <div
+                    style={{
+                      background: "linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%)",
+                      border: "1.5px solid #38bdf8",
+                      borderRadius: "14px",
+                      padding: "16px 20px",
+                      marginBottom: "20px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "16px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      <div
+                        style={{
+                          width: "42px",
+                          height: "42px",
+                          borderRadius: "10px",
+                          background: "#0284c7",
+                          color: "#fff",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "19px",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <FiTruck />
+                      </div>
+                      <div>
+                        <strong style={{ display: "block", color: "#0c4a6e", fontSize: "15px" }}>
+                          Choose or Add Delivery Address for Cart Checkout
+                        </strong>
+                        <p style={{ margin: "2px 0 0", color: "#0369a1", fontSize: "13px" }}>
+                          Save your address details below. Click &ldquo;Deliver to this Address&rdquo; to complete your order.
+                        </p>
+                      </div>
+                    </div>
+                    {address.street && !isEditingAddress && (
+                      <button
+                        type="button"
+                        onClick={() => navigate(returnTo)}
+                        className="Account-btnPrimary"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          padding: "10px 18px",
+                          borderRadius: "10px",
+                          fontSize: "13.5px",
+                          fontWeight: "700",
+                        }}
+                      >
+                        <FiCheck /> Use This Address &amp; Return to Cart
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 <div className="Account-cardBlock">
                   <div className="Account-cardBlockHeader">
@@ -1669,6 +1627,40 @@ const Account = () => {
                           <FiPhone /> Contact: {currentUser.phone}
                         </div>
                       )}
+
+                      <div style={{ marginTop: "18px", display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+                        <button
+                          type="button"
+                          className="Account-btnPrimary"
+                          onClick={() => navigate(returnTo || "/cart")}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            padding: "10px 18px",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          <FiCheck /> {returnTo ? "Deliver to this Address & Return to Cart" : "Use this Address for Delivery"}
+                        </button>
+                        <button
+                          type="button"
+                          className="Account-btnSecondary"
+                          onClick={() => setIsEditingAddress(true)}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            padding: "10px 16px",
+                            fontSize: "14px",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          <FiEdit2 /> Edit Address
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div style={{ color: "#64748b", padding: "10px 0" }}>

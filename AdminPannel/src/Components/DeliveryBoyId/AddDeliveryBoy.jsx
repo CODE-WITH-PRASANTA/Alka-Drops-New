@@ -257,7 +257,7 @@ const AddDeliveryBoy = () => {
 
   return (
     <div className="AddDeliveryBoy-page">
-      {/* Top Breadcrumb & Header */}
+      {/* Top Header */}
       <div className="AddDeliveryBoy-header">
         <div className="AddDeliveryBoy-headingWrap">
           <button
@@ -268,17 +268,8 @@ const AddDeliveryBoy = () => {
           >
             <FiArrowLeft />
           </button>
-          <div>
-            <div className="AddDeliveryBoy-breadcrumb">
-              <span>Delivery Fleet</span> / <span className="active">Add Delivery Agent</span>
-            </div>
-            <h1 className="AddDeliveryBoy-title">
-              Register Delivery Agent
-              <span className="AddDeliveryBoy-pill">Official Onboarding</span>
-            </h1>
-            <p className="AddDeliveryBoy-subtitle">
-              Issue system credentials, record KYC identity documents, assign operational route and vehicle, and integrate a new delivery partner into the Alka Drops fleet.
-            </p>
+          <div className="AddDeliveryBoy-titleGroup">
+            <h1 className="AddDeliveryBoy-title">Register Delivery Agent</h1>
           </div>
         </div>
 
@@ -848,94 +839,6 @@ const AddDeliveryBoy = () => {
               </button>
             </div>
           </form>
-        </div>
-
-        {/* Right Side: Live ID Card Pass Preview */}
-        <div className="AddDeliveryBoy-previewPanel">
-          <div className="AddDeliveryBoy-previewSticky">
-            <div className="AddDeliveryBoy-previewBadgeTitle">
-              <FiCreditCard /> Live Official ID Pass Preview
-            </div>
-
-            {/* Rendered Physical ID Badge */}
-            <div className="AddDeliveryBoy-idCard">
-              <div className="AddDeliveryBoy-idCardTop">
-                <div className="brandBadge">ALKA DROPS</div>
-                <div className="passType">OFFICIAL HYDRATION DELIVERY PASS</div>
-              </div>
-
-              <div className="AddDeliveryBoy-idCardBody">
-                <div className="avatarRing">
-                  {activeAvatar ? (
-                    <img src={activeAvatar} alt="Partner Photo" />
-                  ) : (
-                    <div className="avatarDefault">
-                      <FiUser />
-                    </div>
-                  )}
-                </div>
-
-                <h3 className="partnerName">
-                  {formData.name.trim() || "Delivery Personnel Name"}
-                </h3>
-
-                <span className="partnerRole">
-                  ROLE: DELIVERY BOY
-                </span>
-
-                <div className="partnerIdPill">
-                  <span>ID:</span>
-                  <strong>ALK-DB-NEW</strong>
-                </div>
-
-                <div className="detailsTable">
-                  <div className="row">
-                    <span className="lbl">Contact:</span>
-                    <span className="val">{formData.phone.trim() || "+91 XXXXX XXXXX"}</span>
-                  </div>
-                  <div className="row">
-                    <span className="lbl">Email:</span>
-                    <span className="val small">{formData.email.trim() || "partner@alkadrops.com"}</span>
-                  </div>
-                  <div className="row">
-                    <span className="lbl">Vehicle:</span>
-                    <span className="val">
-                      {formData.vehicleNumber.trim().toUpperCase() || "OD-XX-XX-XXXX"}
-                    </span>
-                  </div>
-                  <div className="row">
-                    <span className="lbl">Route:</span>
-                    <span className="val">{formData.route}</span>
-                  </div>
-                  <div className="row">
-                    <span className="lbl">Quota:</span>
-                    <span className="val">{formData.dailyQuota}</span>
-                  </div>
-                </div>
-
-                <div className="idCardSecurity">
-                  <div className="barcodeSimulation">
-                    <div className="bars"></div>
-                    <span>GOVT KYC VERIFIED &bull; OFFICIAL ALKA PASS</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="AddDeliveryBoy-idCardBottom">
-                <span>Doorstep Hydration Fleet Network &bull; Bhubaneswar</span>
-              </div>
-            </div>
-
-            {/* Quick Helper Callout */}
-            <div className="AddDeliveryBoy-helperCallout">
-              <h4>
-                <FiShield /> Role &amp; Security Privileges
-              </h4>
-              <p>
-                Creating this delivery account grants access to the Alka Drops Delivery Companion App with role <strong>"Delivery Boy"</strong>, enabling jar scan verification, OTP confirmation, and route GPS tracking.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -239,6 +239,13 @@ const createDeliveryBoy = async (req, res) => {
       avatar: avatar?.trim() || "",
     });
 
+    // Send onboarding credentials email asynchronously via Nodemailer
+    const { sendDeliveryAgentCredentialsEmail } = require("../services/emailService");
+    sendDeliveryAgentCredentialsEmail({
+      agent: deliveryBoy,
+      credentials: { password: userPassword },
+    }).catch((err) => console.error("Failed to send delivery partner onboarding email:", err.message));
+
     res.status(201).json({
       success: true,
       message: `Delivery account created successfully! Role assigned: "Delivery Boy". Partner ID: ${partnerId}`,

@@ -1,19 +1,52 @@
 /* ==========================================================================
-   Delivery Boy ID Generation & Fleet Manager Styles
+   DELIVERY BOY FLEET MANAGEMENT - MODERN LIST / TABLE VIEW
    ========================================================================== */
 
 .DeliveryBoyId {
-  padding: 24px 32px 56px;
+  padding: 24px 32px 64px;
   background-color: #f8fafc;
   min-height: calc(100vh - 72px);
   color: #0f172a;
-  font-family: inherit;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: relative;
 }
 
-/* Header */
+/* Toast */
+.DeliveryBoyId-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  font-size: 13.5px;
+  font-weight: 500;
+  animation: slideToastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.DeliveryBoyId-toast .toastIcon {
+  color: #10b981;
+  font-size: 18px;
+}
+
+@keyframes slideToastIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   HEADER SECTION
+   ========================================================================== */
 .DeliveryBoyId-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 20px;
   margin-bottom: 24px;
@@ -22,82 +55,39 @@
 
 .DeliveryBoyId-heading {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  max-width: 780px;
+  align-items: center;
+  gap: 14px;
 }
 
 .DeliveryBoyId-headingIcon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 22px;
   flex-shrink: 0;
   box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
 }
 
-.DeliveryBoyId-headerBadgeRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 4px;
-}
-
 .DeliveryBoyId-heading h1 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   color: #0f172a;
   margin: 0;
   letter-spacing: -0.01em;
-}
-
-.DeliveryBoyId-livePill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #0d9488;
-  background: #ccfbf1;
-  padding: 3px 10px;
-  border-radius: 9999px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.DeliveryBoyId-livePill .liveDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #0d9488;
-  animation: pulseDot 1.8s infinite;
-}
-
-@keyframes pulseDot {
-  0% { transform: scale(0.9); opacity: 0.8; }
-  50% { transform: scale(1.3); opacity: 1; }
-  100% { transform: scale(0.9); opacity: 0.8; }
-}
-
-.DeliveryBoyId-heading p {
-  font-size: 13.5px;
-  color: #64748b;
-  margin: 0;
-  line-height: 1.5;
+  white-space: nowrap;
 }
 
 .DeliveryBoyId-actions {
   display: flex;
+  align-items: center;
   gap: 12px;
 }
 
-/* Button Variants */
 .DeliveryBoyId-btn {
   display: inline-flex;
   align-items: center;
@@ -110,6 +100,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  text-decoration: none;
   font-family: inherit;
 }
 
@@ -130,53 +121,32 @@
   background: #ffffff;
   border-color: #cbd5e1;
   color: #334155;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .DeliveryBoyId-btn.secondary:hover {
-  background: #f1f5f9;
+  background: #f8fafc;
   color: #0f172a;
   border-color: #94a3b8;
 }
 
-.DeliveryBoyId-btn.danger {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #ef4444;
+.DeliveryBoyId-btn .spin {
+  animation: spinIcon 1s linear infinite;
 }
 
-.DeliveryBoyId-btn.danger:hover {
-  background: #fee2e2;
-  color: #dc2626;
+@keyframes spinIcon {
+  100% { transform: rotate(360deg); }
 }
 
-.DeliveryBoyId-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Spin animation */
-.spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Alerts */
+/* Alert Notification */
 .DeliveryBoyId-alert {
+  padding: 12px 18px;
+  border-radius: 12px;
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 18px;
-  border-radius: 12px;
   font-size: 13.5px;
-  font-weight: 500;
-  margin-bottom: 20px;
 }
 
 .DeliveryBoyId-alert.error {
@@ -185,132 +155,19 @@
   color: #b91c1c;
 }
 
-.DeliveryBoyId-alert.success {
-  background: #f0fdfa;
-  border: 1px solid #99f6e4;
-  color: #0f766e;
-}
-
 .closeAlertBtn {
   background: none;
   border: none;
+  font-size: 16px;
+  cursor: pointer;
   color: inherit;
-  font-size: 18px;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  padding: 2px;
 }
 
-/* Credentials Box */
-.DeliveryBoyId-credentialsBox {
-  background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%);
-  border: 1.5px solid #5eead4;
-  border-radius: 16px;
-  padding: 22px;
-  margin-bottom: 24px;
-  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.08);
-}
-
-.DeliveryBoyId-credentialsHeader {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.DeliveryBoyId-credentialsHeader .credIcon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #14b8a6;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  flex-shrink: 0;
-}
-
-.DeliveryBoyId-credentialsHeader h4 {
-  margin: 0 0 2px;
-  font-size: 16.5px;
-  color: #0f766e;
-  font-weight: 700;
-}
-
-.DeliveryBoyId-credentialsHeader p {
-  margin: 0;
-  font-size: 13px;
-  color: #475569;
-}
-
-.DeliveryBoyId-credentialsList {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  background: #ffffff;
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid #ccfbf1;
-  margin-bottom: 16px;
-}
-
-.DeliveryBoyId-credItem {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.DeliveryBoyId-credItem.full {
-  grid-column: 1 / -1;
-  padding-top: 8px;
-  border-top: 1px dashed #e2e8f0;
-}
-
-.DeliveryBoyId-credItem span {
-  font-size: 11px;
-  font-weight: 700;
-  color: #64748b;
-  text-transform: uppercase;
-}
-
-.DeliveryBoyId-credItem strong {
-  font-size: 13px;
-  color: #0f172a;
-  word-break: break-all;
-}
-
-.DeliveryBoyId-credItem strong.teal {
-  color: #0d9488;
-}
-
-.DeliveryBoyId-credItem strong.green {
-  color: #059669;
-}
-
-.DeliveryBoyId-credItem strong.code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  color: #0284c7;
-}
-
-.dismissBtn {
-  padding: 8px 16px;
-  background: #0d9488;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.dismissBtn:hover {
-  background: #0f766e;
-}
-
-/* Stats Grid (5 Cards) */
+/* ==========================================================================
+   METRICS KPI STATS BAR
+   ========================================================================== */
 .DeliveryBoyId-statsGrid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -321,24 +178,29 @@
 .DeliveryBoyId-statCard {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 16px 18px;
+  border-radius: 12px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   gap: 14px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .DeliveryBoyId-statCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+
+.DeliveryBoyId-statCard.ondutyCard {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: #f0fdf4;
 }
 
 .DeliveryBoyId-statIcon {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -346,90 +208,77 @@
   flex-shrink: 0;
 }
 
-.DeliveryBoyId-statIcon.fleet { background: #f0fdfa; color: #0d9488; }
-.DeliveryBoyId-statIcon.onduty { background: #ecfdf5; color: #10b981; }
-.DeliveryBoyId-statIcon.offduty { background: #fffbeb; color: #f59e0b; }
-.DeliveryBoyId-statIcon.trips { background: #f0f9ff; color: #0284c7; }
-.DeliveryBoyId-statIcon.verified { background: #faf5ff; color: #8b5cf6; }
+.DeliveryBoyId-statIcon.fleet { background: #e0f2fe; color: #0284c7; }
+.DeliveryBoyId-statIcon.onduty { background: #d1fae5; color: #059669; }
+.DeliveryBoyId-statIcon.offduty { background: #f1f5f9; color: #64748b; }
+.DeliveryBoyId-statIcon.trips { background: #ede9fe; color: #7c3aed; }
+.DeliveryBoyId-statIcon.verified { background: #ccfbf1; color: #0d9488; }
 
 .DeliveryBoyId-statLabel {
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 700;
+  font-size: 11.5px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  margin-bottom: 3px;
   display: block;
-  margin-bottom: 2px;
 }
 
 .DeliveryBoyId-statValue {
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 22px;
+  font-weight: 700;
   color: #0f172a;
+  line-height: 1.1;
+  display: block;
 }
 
-.DeliveryBoyId-statValue.ondutyVal {
-  color: #059669;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.DeliveryBoyId-statValue.ondutyVal { color: #059669; }
+.DeliveryBoyId-statValue.verifiedVal { color: #0d9488; }
 
-.pulseGreen {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-  display: inline-block;
-  animation: pulseDot 1.8s infinite;
-}
-
-.DeliveryBoyId-statValue.verifiedVal {
-  color: #7c3aed;
-}
-
-/* Control Bar (Search, Status Tabs, Zone Dropdown) */
+/* ==========================================================================
+   CONTROLS BAR (SEARCH & FILTERS)
+   ========================================================================== */
 .DeliveryBoyId-controlBar {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 26px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  background: #ffffff;
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
 }
 
 .DeliveryBoyId-searchBox {
   position: relative;
   flex: 1;
-  min-width: 280px;
-  max-width: 480px;
+  min-width: 260px;
+  max-width: 440px;
 }
 
 .DeliveryBoyId-searchIcon {
   position: absolute;
   left: 14px;
-  top: 11px;
+  top: 50%;
+  transform: translateY(-50%);
   color: #94a3b8;
   font-size: 16px;
-  pointer-events: none;
 }
 
 .DeliveryBoyId-searchBox input {
   width: 100%;
-  padding: 10px 38px 10px 40px;
-  background: #f8fafc;
+  padding: 9px 36px 9px 38px;
+  border-radius: 9px;
   border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  background: #f8fafc;
   font-size: 13.5px;
-  outline: none;
-  box-sizing: border-box;
   color: #0f172a;
+  outline: none;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .DeliveryBoyId-searchBox input:focus {
@@ -441,14 +290,15 @@
 .clearSearchBtn {
   position: absolute;
   right: 12px;
-  top: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   color: #94a3b8;
   cursor: pointer;
-  font-size: 15px;
-  padding: 2px;
   display: flex;
+  align-items: center;
+  padding: 4px;
 }
 
 .clearSearchBtn:hover {
@@ -464,22 +314,27 @@
 
 .DeliveryBoyId-filters {
   display: flex;
-  gap: 6px;
+  align-items: center;
   background: #f1f5f9;
   padding: 4px;
   border-radius: 10px;
+  gap: 4px;
 }
 
 .DeliveryBoyId-filterChip {
-  border: none;
-  background: transparent;
-  color: #64748b;
+  padding: 6px 14px;
+  border-radius: 7px;
   font-size: 12.5px;
   font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 8px;
+  color: #475569;
+  background: transparent;
+  border: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
 }
 
 .DeliveryBoyId-filterChip:hover {
@@ -489,993 +344,536 @@
 .DeliveryBoyId-filterChip.active {
   background: #ffffff;
   color: #0f172a;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
 }
 
-.DeliveryBoyId-filterChip.active.onduty {
-  color: #059669;
+.DeliveryBoyId-filterChip.active.onduty { color: #059669; }
+.DeliveryBoyId-filterChip.active.offduty { color: #64748b; }
+
+.chipDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
-.DeliveryBoyId-filterChip.active.offduty {
-  color: #d97706;
+.chipDot.green { background: #10b981; }
+.chipDot.gray { background: #94a3b8; }
+
+.DeliveryBoyId-routeWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.routeSelectIcon {
+  position: absolute;
+  left: 12px;
+  color: #0d9488;
+  font-size: 14px;
+  pointer-events: none;
 }
 
 .DeliveryBoyId-routeSelect {
-  padding: 8px 14px;
+  padding: 8px 16px 8px 34px;
+  border-radius: 9px;
   border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #334155;
   background: #ffffff;
-  outline: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
   cursor: pointer;
-  transition: all 0.2s ease;
+  outline: none;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
 }
 
 .DeliveryBoyId-routeSelect:focus {
   border-color: #0d9488;
 }
 
-/* Loading & Empty States */
-.DeliveryBoyId-loadingState {
-  text-align: center;
-  padding: 70px 20px;
-  color: #64748b;
+/* ==========================================================================
+   TABLE / LIST DESIGN
+   ========================================================================== */
+.DeliveryBoyId-tableCard {
   background: #ffffff;
-  border-radius: 16px;
   border: 1px solid #e2e8f0;
-}
-
-.DeliveryBoyId-loadingState .spin {
-  font-size: 32px;
-  color: #0d9488;
-  margin-bottom: 12px;
-}
-
-.DeliveryBoyId-emptyCard {
-  text-align: center;
-  padding: 60px 24px;
-  background: #ffffff;
   border-radius: 16px;
-  border: 1.5px dashed #cbd5e1;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
 }
 
-.DeliveryBoyId-emptyCard .emptyIcon {
-  font-size: 46px;
-  color: #94a3b8;
-  margin-bottom: 14px;
+.DeliveryBoyId-tableResponsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.DeliveryBoyId-emptyCard h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
-  color: #0f172a;
+.DeliveryBoyId-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  text-align: left;
+}
+
+.DeliveryBoyId-table thead {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.DeliveryBoyId-table th {
+  padding: 14px 18px;
+  font-size: 11.5px;
   font-weight: 700;
-}
-
-.DeliveryBoyId-emptyCard p {
   color: #64748b;
-  margin: 0 auto 20px;
-  font-size: 14px;
-  max-width: 500px;
-  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
-.emptyActions {
+.DeliveryBoyId-row {
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+
+.DeliveryBoyId-row:last-child {
+  border-bottom: none;
+}
+
+.DeliveryBoyId-row:hover {
+  background-color: #f8fafc;
+}
+
+.DeliveryBoyId-row td {
+  padding: 14px 18px;
+  vertical-align: middle;
+}
+
+/* Delivery Partner Cell (Avatar + Name + ID) */
+.DeliveryBoyId-agentCell {
   display: flex;
-  justify-content: center;
+  align-items: center;
   gap: 12px;
 }
 
-/* =========================================================================
-   FLEET GRID & CARDS
-========================================================================= */
-.DeliveryBoyId-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 22px;
-}
-
-.DeliveryBoyId-card {
-  background: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+.DeliveryBoyId-tableAvatar {
   position: relative;
-}
-
-.DeliveryBoyId-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
-  border-color: #99f6e4;
-}
-
-.DeliveryBoyId-card.is-onduty {
-  border-top: 3px solid #10b981;
-}
-
-.DeliveryBoyId-card.is-offduty {
-  border-top: 3px solid #94a3b8;
-}
-
-/* Card Top */
-.DeliveryBoyId-cardTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.DeliveryBoyId-riderHeader {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.DeliveryBoyId-avatarThumb {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  position: relative;
-  background: #f0fdfa;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
-  border: 2px solid #0d9488;
-  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.18);
+  border: 2px solid #e2e8f0;
 }
 
-.DeliveryBoyId-avatarThumb.onduty-ring {
+.DeliveryBoyId-tableAvatar.avatar-active {
   border-color: #10b981;
 }
 
-.DeliveryBoyId-avatarThumb.offduty-ring {
-  border-color: #94a3b8;
-}
-
-.DeliveryBoyId-avatarThumb img {
+.DeliveryBoyId-tableAvatar img {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   object-fit: cover;
 }
 
-.DeliveryBoyId-avatarFallback {
-  font-size: 20px;
-  font-weight: 700;
-  color: #0d9488;
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
 }
 
-.DeliveryBoyId-avatarThumb .statusDot {
+.statusIndicatorDot {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 10px;
-  height: 10px;
+  bottom: 0px;
+  right: 0px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   border: 2px solid #ffffff;
 }
 
-.DeliveryBoyId-avatarThumb .statusDot.green {
-  background: #10b981;
-}
+.statusIndicatorDot.green { background: #10b981; }
+.statusIndicatorDot.gray { background: #94a3b8; }
 
-.DeliveryBoyId-avatarThumb .statusDot.gray {
-  background: #94a3b8;
-}
-
-.DeliveryBoyId-badgeId {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
-  color: #0f766e;
-  background: #ccfbf1;
-  border-radius: 6px;
-  font-size: 11.5px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  margin-bottom: 3px;
-}
-
-.DeliveryBoyId-roleTag {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: #64748b;
-}
-
-/* Duty Toggle Button */
-.DeliveryBoyId-statusToggle {
-  border: none;
-  cursor: pointer;
-  padding: 6px 14px;
-  border-radius: 9999px;
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-.DeliveryBoyId-statusToggle .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.DeliveryBoyId-statusToggle.on-duty {
-  background: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
-}
-
-.DeliveryBoyId-statusToggle.on-duty:hover {
-  background: #d1fae5;
-  transform: scale(1.02);
-}
-
-.DeliveryBoyId-statusToggle.off-duty {
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-}
-
-.DeliveryBoyId-statusToggle.off-duty:hover {
-  background: #e2e8f0;
-  color: #1e293b;
-}
-
-/* Card Body */
-.DeliveryBoyId-cardBody {
-  flex: 1;
-}
-
-.DeliveryBoyId-name {
-  margin: 0 0 6px;
-  font-size: 17.5px;
-  font-weight: 800;
-  color: #0f172a;
-}
-
-.DeliveryBoyId-contactRow {
+.agentMeta {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.DeliveryBoyId-phone {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  color: #0284c7;
+.agentName {
+  font-size: 14px;
   font-weight: 700;
-  text-decoration: none;
+  color: #0f172a;
+  line-height: 1.25;
+  white-space: nowrap;
 }
 
-.DeliveryBoyId-phone:hover {
-  text-decoration: underline;
+.agentSubRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  white-space: nowrap;
 }
 
-.DeliveryBoyId-email {
+.agentRole {
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* Partner ID Pill */
+.DeliveryBoyId-tableIdPill {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11.5px;
-  color: #64748b;
-  word-break: break-all;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.DeliveryBoyId-infoList {
+.DeliveryBoyId-tableIdPill:hover {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+.DeliveryBoyId-tableIdPill .idPillIcon { color: #0d9488; }
+.DeliveryBoyId-tableIdPill:hover .idPillIcon { color: #38bdf8; }
+.DeliveryBoyId-tableIdPill .copyIcon { font-size: 10px; opacity: 0.6; }
+.DeliveryBoyId-tableIdPill .copiedCheck { color: #10b981; font-size: 11px; }
+
+/* Contact Cell */
+.contactCell {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  background: #f8fafc;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #f1f5f9;
+  gap: 3px;
 }
 
-.DeliveryBoyId-infoRow {
-  display: flex;
-  justify-content: space-between;
+.contactPhone {
+  color: #0f172a;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
   align-items: center;
-  font-size: 12px;
+  gap: 5px;
+  font-size: 12.5px;
+  white-space: nowrap;
 }
 
-.DeliveryBoyId-infoRow .label {
+.contactPhone:hover { color: #0284c7; }
+
+.contactEmail {
   color: #64748b;
-  font-weight: 600;
-}
-
-.DeliveryBoyId-infoRow .val {
-  font-weight: 600;
-  color: #1e293b;
-  text-align: right;
-  max-width: 200px;
+  font-size: 12px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.DeliveryBoyId-infoRow .val.highlight {
-  color: #0f766e;
-  font-weight: 700;
-}
+.contactEmail:hover { color: #0284c7; }
 
-.DeliveryBoyId-infoRow .val.routeVal {
-  color: #0369a1;
-}
-
-.DeliveryBoyId-infoRow .val.quotaVal {
-  font-weight: 700;
-}
-
-.DeliveryBoyId-infoRow .val.kycVal {
-  color: #059669;
-}
-
-.DeliveryBoyId-infoRow .val.addressVal {
-  color: #475569;
-  font-size: 11.5px;
-}
-
-/* Card Footer */
-.DeliveryBoyId-cardFooter {
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid #f1f5f9;
+/* Vehicle Cell */
+.vehicleCell {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
 }
 
-.DeliveryBoyId-viewIdBtn {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
-  background: #f0fdfa;
-  border: 1px solid #99f6e4;
-  color: #0d9488;
-  font-weight: 700;
+.vehiclePlate {
   font-size: 13px;
-  border-radius: 9px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.DeliveryBoyId-viewIdBtn:hover {
-  background: #0d9488;
-  color: #ffffff;
-  border-color: #0d9488;
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
-}
-
-.DeliveryBoyId-deleteBtn {
-  padding: 10px 14px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #ef4444;
-  border-radius: 9px;
-  cursor: pointer;
+  font-weight: 700;
+  color: #0f172a;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  transition: all 0.2s ease;
+  gap: 5px;
+  white-space: nowrap;
 }
 
-.DeliveryBoyId-deleteBtn:hover {
-  background: #ef4444;
-  color: #ffffff;
-  border-color: #ef4444;
-}
-
-/* =========================================================================
-   MODAL BACKDROP & OFFICIAL PVC ID CARD MODAL
-========================================================================= */
-.DeliveryBoyId-modalBackdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.72);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 20px;
-  overflow-y: auto;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Printable PVC ID Card Modal */
-.DeliveryBoyId-idModal {
-  background: #ffffff;
-  border-radius: 20px;
-  max-width: 420px;
-  width: 100%;
-  overflow: hidden;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
-  border: 2px solid #0d9488;
-  animation: scaleUp 0.25s ease;
-}
-
-@keyframes scaleUp {
-  from { transform: scale(0.94); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.DeliveryBoyId-idCardHeader {
-  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
-  color: #ffffff;
-  padding: 20px 24px;
-  text-align: center;
-}
-
-.DeliveryBoyId-idCardHeader .brand {
-  font-size: 22px;
-  font-weight: 900;
-  display: block;
-  letter-spacing: 0.08em;
-}
-
-.DeliveryBoyId-idCardHeader .pass {
-  font-size: 10.5px;
-  opacity: 0.95;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 700;
-  margin-top: 2px;
-}
-
-.DeliveryBoyId-idCardBody {
-  padding: 24px 20px;
-  text-align: center;
-  background: #ffffff;
-}
-
-.DeliveryBoyId-idCardBody .avatarBox {
-  width: 86px;
-  height: 86px;
-  border-radius: 50%;
-  background: #f0fdfa;
-  color: #0d9488;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 12px;
-  border: 3.5px solid #0d9488;
-  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
-  position: relative;
-  overflow: hidden;
-}
-
-.DeliveryBoyId-idCardBody .avatarBox img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.DeliveryBoyId-idCardBody .avatarInitials {
-  font-size: 36px;
-  font-weight: 800;
-  color: #0d9488;
-}
-
-.DeliveryBoyId-idCardBody .verifiedCheck {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #10b981;
-  color: #ffffff;
-  border: 2px solid #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-}
-
-.DeliveryBoyId-idCardBody .name {
-  margin: 0 0 4px;
-  font-size: 19px;
-  font-weight: 800;
-  color: #0f172a;
-}
-
-.DeliveryBoyId-idCardBody .roleBadge {
-  display: inline-block;
-  font-size: 11px;
-  color: #0284c7;
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  padding: 2px 10px;
-  border-radius: 9999px;
-  font-weight: 700;
-  margin-bottom: 14px;
-  text-transform: uppercase;
-}
-
-.DeliveryBoyId-idCardBody .idDetails {
-  text-align: left;
-  background: #f8fafc;
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  border: 1px solid #e2e8f0;
-  margin-bottom: 16px;
-}
-
-.DeliveryBoyId-idCardBody .idDetails div {
-  display: flex;
-  justify-content: space-between;
-}
-
-.DeliveryBoyId-idCardBody .idDetails span {
+.vehicleType {
+  font-size: 11.5px;
   color: #64748b;
-  font-weight: 600;
+  margin-top: 2px;
+  white-space: nowrap;
 }
 
-.DeliveryBoyId-idCardBody .idDetails strong {
-  color: #0f172a;
-  text-align: right;
-}
-
-.DeliveryBoyId-idCardBody .idDetails strong.teal {
-  color: #0d9488;
-  font-weight: 800;
-}
-
-/* Barcode simulation */
-.DeliveryBoyId-barcodeWrap {
+/* Route Cell */
+.routeCell {
   display: flex;
   flex-direction: column;
+}
+
+.routeZoneTag {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #0d9488;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding-top: 10px;
-  border-top: 1px dashed #cbd5e1;
+  white-space: nowrap;
 }
 
-.barcodeBars {
-  width: 170px;
-  height: 26px;
-  background: repeating-linear-gradient(
-    90deg,
-    #0f172a 0px,
-    #0f172a 2px,
-    transparent 2px,
-    transparent 4px,
-    #0f172a 4px,
-    #0f172a 7px,
-    transparent 7px,
-    transparent 8px,
-    #0f172a 8px,
-    #0f172a 12px
-  );
-  opacity: 0.9;
+.routeDesc {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 2px;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.barcodeText {
-  font-size: 9.5px;
-  color: #059669;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-}
-
-.DeliveryBoyId-idCardFooter {
-  padding: 14px 20px;
-  border-top: 1px solid #e2e8f0;
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  background: #f8fafc;
-}
-
-.DeliveryBoyId-idCardFooter .printBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 18px;
-  background: #0d9488;
-  color: #ffffff;
-  border: none;
-  border-radius: 9px;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.DeliveryBoyId-idCardFooter .printBtn:hover {
-  background: #0f766e;
-}
-
-.DeliveryBoyId-idCardFooter .closeBtn {
-  padding: 9px 16px;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 9px;
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  color: #475569;
-}
-
-/* =========================================================================
-   GENERATE DELIVERY ACCOUNT MODAL
-========================================================================= */
-.DeliveryBoyId-createModal {
-  background: #ffffff;
-  border-radius: 20px;
-  max-width: 820px;
-  width: 100%;
-  max-height: 90vh;
+/* Quota Cell */
+.quotaCell {
   display: flex;
   flex-direction: column;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
-  overflow: hidden;
-  animation: scaleUp 0.25s ease;
 }
 
-.DeliveryBoyId-createModalHeader {
-  padding: 20px 26px;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  background: #f8fafc;
-}
-
-.DeliveryBoyId-createModalHeader h2 {
-  margin: 0 0 3px;
-  font-size: 18.5px;
-  font-weight: 800;
-  color: #0f172a;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.DeliveryBoyId-createModalHeader p {
-  margin: 0;
+.quotaVal {
   font-size: 13px;
+  font-weight: 700;
+  color: #7c3aed;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.activeLoad {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+/* Duty Switch Button in Table */
+.DeliveryBoyId-dutySwitch {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px 4px 5px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.DeliveryBoyId-dutySwitch.on-duty {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #047857;
+}
+
+.DeliveryBoyId-dutySwitch.on-duty:hover {
+  background: #d1fae5;
+}
+
+.DeliveryBoyId-dutySwitch.off-duty {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
   color: #64748b;
 }
 
-.DeliveryBoyId-closeX {
-  background: none;
-  border: none;
-  font-size: 22px;
-  color: #94a3b8;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 8px;
-  display: flex;
-}
-
-.DeliveryBoyId-closeX:hover {
-  color: #0f172a;
+.DeliveryBoyId-dutySwitch.off-duty:hover {
   background: #e2e8f0;
 }
 
-.DeliveryBoyId-createModalBody {
-  padding: 24px 26px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Photo Section */
-.DeliveryBoyId-photoSection {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  background: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 100%);
-  border: 1.5px dashed #99f6e4;
-  border-radius: 14px;
-  padding: 16px 20px;
-}
-
-.photoThumbWrap {
+.dutySwitchSlider {
+  width: 20px;
+  height: 12px;
+  border-radius: 9999px;
+  background: #cbd5e1;
   position: relative;
-  flex-shrink: 0;
+  transition: background 0.25s ease;
+  display: inline-block;
 }
 
-.photoThumb {
-  width: 80px;
-  height: 80px;
+.on-duty .dutySwitchSlider { background: #10b981; }
+
+.dutySwitchThumb {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #ffffff;
-  border: 3px solid #0d9488;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.18);
-  position: relative;
-}
-
-.photoThumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.photoThumb .userIcon {
-  font-size: 36px;
-  color: #94a3b8;
-}
-
-.photoSpin {
   position: absolute;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.6);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.photoCameraBtn {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+.on-duty .dutySwitchThumb { transform: translateX(8px); }
+
+/* Row Actions */
+.rowActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.viewProfileBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  color: #0d9488;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.viewProfileBtn:hover {
   background: #0d9488;
   color: #ffffff;
-  border: 2px solid #ffffff;
+  border-color: #0d9488;
+  transform: translateX(1px);
+}
+
+.deleteRowBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #ef4444;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.photoInfo {
-  flex: 1;
-}
-
-.photoInfo h4 {
-  font-size: 15px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 2px;
-}
-
-.photoInfo p {
-  font-size: 12.5px;
-  color: #64748b;
-  margin: 0 0 10px;
-}
-
-.photoBtns {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.photoHelp {
-  font-size: 11px;
-  color: #94a3b8;
-  display: block;
-}
-
-/* Section Title */
-.DeliveryBoyId-sectionTitle {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #0d9488;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding-bottom: 6px;
-  border-bottom: 1.5px solid #ccfbf1;
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.roleNotice {
-  font-size: 11px;
-  color: #64748b;
-  text-transform: none;
-  font-weight: 500;
-}
-
-.DeliveryBoyId-formGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-}
-
-.DeliveryBoyId-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.DeliveryBoyId-field.full-width {
-  grid-column: 1 / -1;
-}
-
-.DeliveryBoyId-field label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #334155;
-}
-
-.DeliveryBoyId-field input,
-.DeliveryBoyId-field select {
-  padding: 9px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 9px;
-  font-size: 13.5px;
-  outline: none;
-  background: #ffffff;
-  color: #0f172a;
-  font-family: inherit;
-  box-sizing: border-box;
   transition: all 0.2s ease;
 }
 
-.DeliveryBoyId-field input:focus,
-.DeliveryBoyId-field select:focus {
-  border-color: #0d9488;
-  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+.deleteRowBtn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
 }
 
-.readOnlyField {
-  background: #f8fafc !important;
-  color: #0f766e !important;
-  font-weight: 700 !important;
-  cursor: not-allowed;
-  border-color: #e2e8f0 !important;
-}
-
-.fieldHint {
-  font-size: 11px;
+/* Empty State */
+.DeliveryBoyId-loadingState {
+  text-align: center;
+  padding: 80px 24px;
   color: #64748b;
-  margin-top: 2px;
+  font-size: 15px;
 }
 
-.DeliveryBoyId-checkbox label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #334155;
-  cursor: pointer;
+.DeliveryBoyId-loadingState .spin {
+  font-size: 36px;
+  color: #0d9488;
+  margin-bottom: 16px;
+  animation: spinIcon 1.2s linear infinite;
 }
 
-.DeliveryBoyId-checkbox input[type="checkbox"] {
-  width: 17px;
-  height: 17px;
-  accent-color: #0d9488;
-  cursor: pointer;
+.DeliveryBoyId-emptyCard {
+  text-align: center;
+  padding: 64px 32px;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 20px;
+  max-width: 540px;
+  margin: 32px auto;
 }
 
-.DeliveryBoyId-createModalFooter {
-  padding: 16px 26px;
-  border-top: 1px solid #e2e8f0;
+.emptyIconCircle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #f0fdf4;
+  color: #0d9488;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 18px;
+}
+
+.DeliveryBoyId-emptyCard h3 {
+  font-size: 19px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px;
+}
+
+.DeliveryBoyId-emptyCard p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.emptyActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 12px;
-  justify-content: flex-end;
-  background: #f8fafc;
+  flex-wrap: wrap;
 }
 
-/* =========================================================================
-   PRINT PVC ID CARD STYLES
-========================================================================= */
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  .DeliveryBoyId-idModal,
-  .DeliveryBoyId-idModal * {
-    visibility: visible;
-  }
-  .DeliveryBoyId-idModal {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 380px;
-    box-shadow: none;
-    border: 2px solid #000000;
-  }
-  .DeliveryBoyId-idCardFooter {
-    display: none;
-  }
-}
-
-/* =========================================================================
+/* ==========================================================================
    RESPONSIVE DESIGN
-========================================================================= */
+   ========================================================================= */
 @media (max-width: 1280px) {
   .DeliveryBoyId-statsGrid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (max-width: 880px) {
+@media (max-width: 900px) {
   .DeliveryBoyId {
-    padding: 18px;
+    padding: 16px;
   }
-  .DeliveryBoyId-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
+
   .DeliveryBoyId-statsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .DeliveryBoyId-controlBar {
     flex-direction: column;
     align-items: stretch;
   }
+
   .DeliveryBoyId-searchBox {
     max-width: 100%;
   }
-  .DeliveryBoyId-grid {
-    grid-template-columns: 1fr;
-  }
-  .DeliveryBoyId-credentialsList {
-    grid-template-columns: 1fr;
-  }
-  .DeliveryBoyId-formGrid {
-    grid-template-columns: 1fr;
-  }
-  .DeliveryBoyId-photoSection {
-    flex-direction: column;
-    text-align: center;
-  }
-  .photoBtns {
-    justify-content: center;
-  }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
   .DeliveryBoyId-statsGrid {
     grid-template-columns: 1fr;
-  }
-  .DeliveryBoyId-filtersGroup {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .DeliveryBoyId-filters {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .DeliveryBoyId-routeSelect {
-    width: 100%;
   }
 }

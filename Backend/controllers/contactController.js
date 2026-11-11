@@ -48,6 +48,24 @@ const submitContact = async (req, res, next) => {
       status: "Pending",
     });
 
+    // Send email notification asynchronously via Nodemailer
+    const { sendMail } = require("../services/emailService");
+    sendMail({
+      to: process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER,
+      subject: `New Customer Enquiry: ${contact.subject} from ${contact.name}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; color: #1e293b;">
+          <h2 style="color: #0f172a; margin-top: 0;">New Website Enquiry Received</h2>
+          <p><strong>Customer Name:</strong> ${contact.name}</p>
+          <p><strong>Customer Email:</strong> ${contact.email}</p>
+          <p><strong>Phone:</strong> ${contact.phone || "Not provided"}</p>
+          <p><strong>Subject:</strong> ${contact.subject}</p>
+          <p><strong>Message:</strong></p>
+          <blockquote style="background: #f8fafc; border-left: 4px solid #0d9488; padding: 12px 16px; margin: 0; border-radius: 4px;">${contact.message}</blockquote>
+        </div>
+      `,
+    }).catch((err) => console.error("Contact notification email error:", err.message));
+
     res.status(201).json({
       success: true,
       message: "Thank you! Your enquiry has been submitted successfully. Our team will contact you soon.",

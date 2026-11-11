@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 :root {
-  --alka-layout-sidebar-width: 330px;
+  --alka-layout-sidebar-width: 255px;
   --alka-layout-bg: #ffffff;
   --alka-layout-text: #193b38;
 
@@ -22,7 +22,7 @@
 /* Desktop sidebar visible */
 
 .MainLayout.sidebar-visible {
-  --alka-layout-sidebar-width: 330px;
+  --alka-layout-sidebar-width: 255px;
 }
 
 /* Desktop sidebar collapsed: icon rail stays visible,

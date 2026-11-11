@@ -169,6 +169,7 @@ const registerUser = async (req, res, next) => {
         avatar: user.avatar || "",
         subscription: user.subscription,
         address: user.address,
+        addresses: user.addresses || [],
       },
     });
   } catch (error) {
@@ -242,6 +243,7 @@ const loginUser = async (req, res, next) => {
         avatar: user.avatar || "",
         subscription: user.subscription,
         address: user.address,
+        addresses: user.addresses || [],
       },
     });
   } catch (error) {
@@ -330,6 +332,7 @@ const refreshAccessToken = async (req, res, next) => {
         avatar: user.avatar || "",
         subscription: user.subscription,
         address: user.address,
+        addresses: user.addresses || [],
       },
     });
   } catch (error) {
@@ -369,11 +372,13 @@ const logoutUser = async (req, res, next) => {
 // @access  Public / Admin
 const getUsers = async (req, res, next) => {
   try {
-    const { search, role, status } = req.query;
+    const { search, role, status, excludeRole } = req.query;
     const filter = {};
 
     if (role && role !== "all") {
       filter.role = new RegExp(`^${role.trim()}$`, "i");
+    } else if (excludeRole && excludeRole.trim()) {
+      filter.role = { $nin: [new RegExp(`^${excludeRole.trim()}$`, "i")] };
     }
 
     if (status && status !== "all") {
@@ -860,6 +865,7 @@ const googleAuth = async (req, res, next) => {
         avatar: user.avatar || "",
         subscription: user.subscription,
         address: user.address,
+        addresses: user.addresses || [],
         ordersCount: user.ordersCount || 0,
         totalSpend: user.totalSpend || 0,
       },

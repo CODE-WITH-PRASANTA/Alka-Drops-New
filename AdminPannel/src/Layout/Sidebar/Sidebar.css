@@ -16,8 +16,8 @@
   --alka-text: #193b38;
   --alka-muted: #78918c;
 
-  --alka-sidebar-width: 290px;
-  --alka-sidebar-collapsed-width: 78px;
+  --alka-sidebar-width: 255px;
+  --alka-sidebar-collapsed-width: 72px;
 }
 
 /* =========================================
@@ -676,7 +676,7 @@
 @media (max-width: 768px) {
 
   .alka-sidebar {
-    width: min(290px, 86vw);
+    width: min(255px, 86vw);
 
     border-radius: 0;
 
@@ -740,7 +740,7 @@
   /* Disable desktop icon rail behavior on mobile */
 
   .alka-sidebar.alka-sidebar-hidden {
-    width: min(290px, 86vw);
+    width: min(255px, 86vw);
   }
 
   .alka-sidebar.alka-sidebar-hidden .alka-sidebar-header {

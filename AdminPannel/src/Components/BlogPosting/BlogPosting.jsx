@@ -402,13 +402,7 @@ const BlogPosting = () => {
           </div>
 
           <div>
-            <span className="BlogPosting-eyebrow">CONTENT CREATION</span>
             <h1>{editingId ? "Edit Blog Post" : "Add New Blog Post"}</h1>
-            <p>
-              {editingId
-                ? "Update your blog article details and re-publish to database."
-                : "Create and publish rich alkaline water articles with TinyMCE editor."}
-            </p>
           </div>
         </div>
 

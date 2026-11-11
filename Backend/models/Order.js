@@ -42,13 +42,25 @@ const orderSchema = new mongoose.Schema(
     totalAmount: { type: Number, required: true },
     paymentMethod: {
       type: String,
-      enum: ["cod", "upi", "card", "online"],
+      enum: ["cod", "upi", "card", "online", "razorpay"],
       default: "cod",
     },
     paymentStatus: {
       type: String,
       enum: ["pending", "paid", "failed"],
       default: "pending",
+    },
+    razorpayOrderId: {
+      type: String,
+      default: "",
+    },
+    razorpayPaymentId: {
+      type: String,
+      default: "",
+    },
+    razorpaySignature: {
+      type: String,
+      default: "",
     },
     orderStatus: {
       type: String,
@@ -62,6 +74,33 @@ const orderSchema = new mongoose.Schema(
     notes: {
       type: String,
       default: "",
+    },
+    assignedDeliveryBoy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DeliveryBoy",
+      default: null,
+    },
+    deliveryBoy: {
+      id: { type: String, default: "" },
+      name: { type: String, default: "Unassigned" },
+      phone: { type: String, default: "" },
+      partnerId: { type: String, default: "" },
+      vehicleNumber: { type: String, default: "" },
+    },
+    deliveryDetails: {
+      deliveredAt: { type: Date, default: null },
+      deliveredBy: { type: String, default: "" },
+      partnerId: { type: String, default: "" },
+      emptyJarsCollected: { type: Number, default: 0 },
+      pendingEmptyJars: { type: Number, default: 0 },
+      emptyJarStatus: {
+        type: String,
+        enum: ["Collected", "Not Returned / Pending", "Partial Return", "No Empty Jars"],
+        default: "Collected",
+      },
+      emptyJarReason: { type: String, default: "" },
+      deliveryNotes: { type: String, default: "" },
+      proofReceivedBy: { type: String, default: "" },
     },
   },
   {

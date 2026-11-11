@@ -1,0 +1,1298 @@
+/* ==========================================================================
+   ALKA DROPS - OPERATIONS DELIVERY DISPATCH RUN SHEET (PREMIUM DESIGN)
+   ========================================================================== */
+
+.AlkaDispatch {
+  padding: 24px 30px 60px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 60px);
+  color: #0f172a;
+  font-family: inherit;
+}
+
+/* =========================================
+   1. SLEEK TOP BAR (SINGLE ROW)
+   ========================================= */
+
+.AlkaDispatch-topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.AlkaDispatch-topBarLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.AlkaDispatch-titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.AlkaDispatch-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.4px;
+}
+
+.AlkaDispatch-liveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.5px;
+}
+
+.AlkaDispatch-pulseDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: alkaPulse 1.8s infinite;
+}
+
+@keyframes alkaPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.AlkaDispatch-datePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.AlkaDispatch-topBarRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.AlkaDispatch-viewToggle {
+  display: inline-flex;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.AlkaDispatch-viewBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.AlkaDispatch-viewBtn.active {
+  background: #0d9488;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);
+}
+
+.AlkaDispatch-syncBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.AlkaDispatch-syncBtn:hover {
+  background: #f8fafc;
+  border-color: #0d9488;
+  color: #0d9488;
+}
+
+.AlkaDispatch-syncBtn .spin {
+  animation: alkaSpin 1s linear infinite;
+}
+
+@keyframes alkaSpin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   2. KPI OVERVIEW ROW
+   ========================================= */
+
+.AlkaDispatch-kpiRow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.AlkaDispatch-kpiCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.AlkaDispatch-kpiCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+}
+
+.AlkaDispatch-kpiIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.AlkaDispatch-kpiIcon.total {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+.AlkaDispatch-kpiIcon.transit {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.AlkaDispatch-kpiIcon.pending {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.AlkaDispatch-kpiIcon.delivered {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.AlkaDispatch-kpiIcon.empties {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.AlkaDispatch-kpiInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.AlkaDispatch-kpiLabel {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.AlkaDispatch-kpiValue {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+/* =========================================
+   3. MODERN FILTER COMMAND BAR
+   ========================================= */
+
+.AlkaDispatch-filterPanel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Row 1: Search, Partner, Slot, Date */
+.AlkaDispatch-filterRow1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.AlkaDispatch-searchWrap {
+  flex: 1.4;
+  min-width: 260px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.AlkaDispatch-searchIcon {
+  position: absolute;
+  left: 14px;
+  font-size: 16px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.AlkaDispatch-searchInput {
+  width: 100%;
+  padding: 10px 38px 10px 40px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.AlkaDispatch-searchInput:focus {
+  background: #ffffff;
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.AlkaDispatch-clearSearch {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.AlkaDispatch-clearSearch:hover {
+  color: #ef4444;
+}
+
+.AlkaDispatch-selectWrap {
+  flex: 1;
+  min-width: 210px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.AlkaDispatch-selectIcon {
+  position: absolute;
+  left: 12px;
+  font-size: 15px;
+  color: #0d9488;
+  pointer-events: none;
+}
+
+.AlkaDispatch-select {
+  width: 100%;
+  padding: 10px 14px 10px 36px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+  appearance: auto;
+  transition: all 0.2s ease;
+}
+
+.AlkaDispatch-select:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.AlkaDispatch-selectWrap.dateWrap {
+  max-width: 210px;
+}
+
+/* Row 2: Pills & Counters */
+.AlkaDispatch-filterRow2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.AlkaDispatch-pillGroup {
+  display: inline-flex;
+  align-items: center;
+  background: #f1f5f9;
+  padding: 3px;
+  border-radius: 10px;
+  gap: 2px;
+}
+
+.AlkaDispatch-pill {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+}
+
+.AlkaDispatch-pill .pillCount {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.AlkaDispatch-pill.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.AlkaDispatch-pill.active .pillCount {
+  background: #0d9488;
+  color: #ffffff;
+}
+
+.AlkaDispatch-pill.status.active.pending .pillCount { background: #f59e0b; color: #ffffff; }
+.AlkaDispatch-pill.status.active.transit .pillCount { background: #0284c7; color: #ffffff; }
+.AlkaDispatch-pill.status.active.delivered .pillCount { background: #10b981; color: #ffffff; }
+
+.AlkaDispatch-divider {
+  width: 1px;
+  height: 24px;
+  background: #e2e8f0;
+}
+
+.AlkaDispatch-emptiesChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff7ed;
+  border: 1.5px solid #fed7aa;
+  color: #c2410c;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.AlkaDispatch-emptiesChip:hover,
+.AlkaDispatch-emptiesChip.active {
+  background: #ea580c;
+  color: #ffffff;
+  border-color: #ea580c;
+  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+}
+
+.AlkaDispatch-resetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.AlkaDispatch-resetBtn:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.AlkaDispatch-matchCounter {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: #64748b;
+}
+
+.AlkaDispatch-matchCounter strong {
+  color: #0d9488;
+  font-weight: 800;
+}
+
+/* =========================================
+   4. CARDS GRID VIEW
+   ========================================= */
+
+.AlkaDispatch-cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 18px;
+}
+
+.AlkaDispatch-taskCard {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+}
+
+.AlkaDispatch-taskCard:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.AlkaDispatch-taskCard.is-delivered {
+  background: #fbfdfc;
+  border-color: #bbf7d0;
+}
+
+/* Card Header */
+.AlkaDispatch-cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.AlkaDispatch-badgeRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.AlkaDispatch-typeTag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.AlkaDispatch-typeTag.subscription {
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #ccfbf1;
+}
+
+.AlkaDispatch-typeTag.shop {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
+}
+
+.AlkaDispatch-orderNum {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.AlkaDispatch-headRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.AlkaDispatch-slotChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.AlkaDispatch-statusBadge {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.AlkaDispatch-statusBadge.pending {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.AlkaDispatch-statusBadge.transit {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.AlkaDispatch-statusBadge.delivered {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* Customer Row */
+.AlkaDispatch-custInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.AlkaDispatch-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.2);
+}
+
+.AlkaDispatch-custDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.AlkaDispatch-custName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.AlkaDispatch-phoneRow {
+  display: flex;
+  align-items: center;
+}
+
+.AlkaDispatch-phoneLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #0284c7;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  background: #f0f9ff;
+  padding: 2px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.AlkaDispatch-phoneLink:hover {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+/* Address Box */
+.AlkaDispatch-addressBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.AlkaDispatch-addressPin {
+  color: #0d9488;
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.AlkaDispatch-addressText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Drop Details Banner */
+.AlkaDispatch-quotaBanner {
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.AlkaDispatch-quotaItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.AlkaDispatch-quotaItem .qLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #0f766e;
+  text-transform: uppercase;
+}
+
+.AlkaDispatch-quotaItem .qVal {
+  font-size: 13px;
+  font-weight: 700;
+  color: #134e4a;
+}
+
+.AlkaDispatch-jarsCount {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #99f6e4;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.AlkaDispatch-jarsCount .jarsNum {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0d9488;
+  line-height: 1.1;
+}
+
+.AlkaDispatch-jarsCount .jarsTxt {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+/* Empty Banner */
+.AlkaDispatch-emptyBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.AlkaDispatch-emptyBanner.warning {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+}
+
+.AlkaDispatch-emptyBanner.balanced {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.AlkaDispatch-emptyBannerLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.AlkaDispatch-collectPill {
+  font-size: 10.5px;
+  font-weight: 700;
+  background: #ea580c;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Partner Row */
+.AlkaDispatch-partnerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #64748b;
+  padding-top: 2px;
+}
+
+.AlkaDispatch-partnerName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.AlkaDispatch-partnerName strong {
+  color: #0f766e;
+}
+
+/* Card Actions */
+.AlkaDispatch-cardActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.AlkaDispatch-actionBtn {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  transition: all 0.18s ease;
+}
+
+.AlkaDispatch-actionBtn.outForDelivery {
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  color: #b45309;
+}
+
+.AlkaDispatch-actionBtn.outForDelivery:hover {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.AlkaDispatch-actionBtn.submitDelivered {
+  background: #0d9488;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25);
+}
+
+.AlkaDispatch-actionBtn.submitDelivered:hover {
+  background: #0f766e;
+}
+
+.AlkaDispatch-doneNotice {
+  width: 100%;
+  text-align: center;
+  padding: 8px 12px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* =========================================
+   5. COMPACT RUN SHEET TABLE VIEW
+   ========================================= */
+
+.AlkaDispatch-tableCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.AlkaDispatch-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 950px;
+}
+
+.AlkaDispatch-table th {
+  padding: 13px 18px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.AlkaDispatch-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.AlkaDispatch-table tr:hover td {
+  background: #fafbfc;
+}
+
+.AlkaDispatch-table tr.is-delivered-row td {
+  background: #fbfdfc;
+}
+
+.AlkaDispatch-tblOrder {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.AlkaDispatch-typeTag.tbl {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 5px;
+  margin-top: 2px;
+  border-radius: 4px;
+}
+
+.AlkaDispatch-tblCust {
+  color: #0f172a;
+}
+
+.AlkaDispatch-tblPhone {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  color: #0284c7;
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.AlkaDispatch-tblAddr {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: 260px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.AlkaDispatch-tblSlot {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.AlkaDispatch-tblPartner {
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.AlkaDispatch-tblEmpty.warn {
+  font-size: 11px;
+  font-weight: 700;
+  background: #fff7ed;
+  color: #c2410c;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid #fed7aa;
+}
+
+.AlkaDispatch-tblEmpty.ok {
+  font-size: 11px;
+  font-weight: 600;
+  color: #15803d;
+}
+
+.AlkaDispatch-statusBadge.tbl {
+  font-size: 11px;
+}
+
+.AlkaDispatch-tblDone {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.AlkaDispatch-tblBtn {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.AlkaDispatch-tblBtn.transit {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.AlkaDispatch-tblBtn.deliver {
+  background: #0d9488;
+  color: #ffffff;
+}
+
+.AlkaDispatch-tblBtn.deliver:hover {
+  background: #0f766e;
+}
+
+/* =========================================
+   6. EMPTY STATE
+   ========================================= */
+
+.AlkaDispatch-emptyState {
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  max-width: 480px;
+  margin: 30px auto;
+}
+
+.AlkaDispatch-emptyIcon {
+  font-size: 44px;
+  color: #10b981;
+  margin-bottom: 12px;
+}
+
+.AlkaDispatch-emptyState h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.AlkaDispatch-emptyState p {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0 0 16px;
+}
+
+.AlkaDispatch-emptyResetBtn {
+  background: #0d9488;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* =========================================
+   7. SUBMIT DELIVERY MODAL
+   ========================================= */
+
+.AlkaDispatch-modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.AlkaDispatch-modalDialog {
+  background: #ffffff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.AlkaDispatch-modalHeader {
+  padding: 18px 22px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.AlkaDispatch-modalHeader h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.AlkaDispatch-closeBtn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.AlkaDispatch-closeBtn:hover {
+  color: #0f172a;
+}
+
+.AlkaDispatch-modalForm {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.AlkaDispatch-formCustBox {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.AlkaDispatch-formCustBox strong {
+  font-size: 14.5px;
+  color: #0f172a;
+  display: block;
+}
+
+.AlkaDispatch-formCustBox p {
+  font-size: 12.5px;
+  color: #475569;
+  margin: 4px 0 6px;
+}
+
+.AlkaDispatch-formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.AlkaDispatch-formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.AlkaDispatch-formGroup label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.AlkaDispatch-formGroup input,
+.AlkaDispatch-formGroup textarea {
+  padding: 9px 12px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.AlkaDispatch-formGroup input:focus,
+.AlkaDispatch-formGroup textarea:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.AlkaDispatch-emptyJarWarningBox {
+  background: #fffbeb;
+  border: 1.5px dashed #fde68a;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.AlkaDispatch-emptyJarWarnTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #b45309;
+  font-weight: 800;
+  font-size: 12.5px;
+}
+
+.AlkaDispatch-emptyJarWarnText {
+  margin: 0;
+  font-size: 12px;
+  color: #92400e;
+  line-height: 1.4;
+}
+
+.AlkaDispatch-emptyJarReasonLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  margin-top: 4px;
+}
+
+.AlkaDispatch-emptyJarReasonSelect {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 12.5px;
+  background: #ffffff;
+  font-weight: 600;
+  color: #1e293b;
+  outline: none;
+}
+
+.AlkaDispatch-modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.AlkaDispatch-cancelBtn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.AlkaDispatch-submitBtn {
+  background: #0d9488;
+  border: none;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 20px;
+  border-radius: 9px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25);
+}
+
+.AlkaDispatch-submitBtn:hover {
+  background: #0f766e;
+}
+
+/* =========================================
+   8. RESPONSIVE BREAKPOINTS
+   ========================================= */
+
+@media (max-width: 1200px) {
+  .AlkaDispatch-kpiRow {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .AlkaDispatch {
+    padding: 16px 16px 40px;
+  }
+
+  .AlkaDispatch-kpiRow {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .AlkaDispatch-cardsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .AlkaDispatch-filterRow1 {
+    flex-direction: column;
+  }
+
+  .AlkaDispatch-searchWrap,
+  .AlkaDispatch-selectWrap,
+  .AlkaDispatch-selectWrap.dateWrap {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .AlkaDispatch-formGrid {
+    grid-template-columns: 1fr;
+  }
+}

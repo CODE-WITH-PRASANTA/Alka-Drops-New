@@ -27,14 +27,18 @@ const UserManagement = () => {
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // Fetch users from real MongoDB database
+  // Fetch users from real MongoDB database (excluding Delivery Boy role)
   const fetchUsers = async () => {
     try {
       setLoading(true);
       setError("");
-      const res = await API.get("/auth/users");
+      const res = await API.get("/auth/users?excludeRole=Delivery Boy");
       if (res.data?.users && Array.isArray(res.data.users)) {
-        setUsers(res.data.users);
+        // Exclude Delivery Boy accounts as they are managed exclusively under Delivery Fleet
+        const customerAccounts = res.data.users.filter(
+          (u) => (u.role || "").toLowerCase() !== "delivery boy"
+        );
+        setUsers(customerAccounts);
       } else {
         setUsers([]);
       }
@@ -101,6 +105,9 @@ const UserManagement = () => {
 
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
+      // Exclude delivery personnel
+      if ((u.role || "").toLowerCase() === "delivery boy") return false;
+
       const matchSearch =
         !search.trim() ||
         (u.name || "").toLowerCase().includes(search.toLowerCase()) ||
@@ -139,9 +146,6 @@ const UserManagement = () => {
           </div>
           <div>
             <h1>User &amp; Customer Management</h1>
-            <span className="UserManagement-subHeading">
-              Live registered customers and accounts from database
-            </span>
           </div>
         </div>
         <div className="UserManagement-actions">
@@ -213,12 +217,11 @@ const UserManagement = () => {
 
         <div className="UserManagement-filterGroup">
           <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
-            <option value="all">All User Roles</option>
+            <option value="all">All Customer Roles</option>
             <option value="Retail Customer">Retail Customer</option>
             <option value="Subscriber">Subscriber</option>
             <option value="Corporate">Corporate</option>
             <option value="Administrator">Administrator</option>
-            <option value="Delivery Boy">Delivery Boy</option>
           </select>
 
           <div className="UserManagement-statusTabs">

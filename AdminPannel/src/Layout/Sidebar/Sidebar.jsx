@@ -101,6 +101,11 @@ const menuItems = [
     icon: Truck,
     children: [
       {
+        title: "Delivery Dispatch & Runs",
+        path: "/admin/delivery-dispatch",
+        icon: PackageCheck,
+      },
+      {
         title: "Register Delivery Boy",
         path: "/admin/add-delivery-boy",
         icon: UserPlus,
@@ -109,11 +114,6 @@ const menuItems = [
         title: "Delivery Boy ID Generation",
         path: "/admin/delivery-boy-id",
         icon: FileText,
-      },
-      {
-        title: "Assigning Bottle",
-        path: "/admin/assigning-bottle",
-        icon: ClipboardList,
       },
     ],
   },

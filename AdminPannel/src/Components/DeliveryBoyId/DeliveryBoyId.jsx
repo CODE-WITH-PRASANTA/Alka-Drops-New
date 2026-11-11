@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FiTruck,
   FiSearch,
@@ -9,12 +9,9 @@ import {
   FiPhone,
   FiMapPin,
   FiRefreshCw,
-  FiPrinter,
   FiShield,
   FiUser,
   FiMail,
-  FiKey,
-  FiFileText,
   FiTrash2,
   FiX,
   FiAlertCircle,
@@ -22,25 +19,32 @@ import {
   FiLayers,
   FiActivity,
   FiBox,
+  FiCopy,
+  FiArrowRight,
 } from "react-icons/fi";
 import API from "../../services/api";
 import "./DeliveryBoyId.css";
 
 const DeliveryBoyId = () => {
+  const navigate = useNavigate();
   const [riders, setRiders] = useState([]);
   const [serverStats, setServerStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-  const [createdCredentials, setCreatedCredentials] = useState(null);
+  const [notification, setNotification] = useState("");
+  const [copiedId, setCopiedId] = useState(null);
 
   // Filters
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [routeFilter, setRouteFilter] = useState("all");
 
-  // Selected Rider for ID Card Modal
-  const [selectedRider, setSelectedRider] = useState(null);
+  // Auto-dismiss notification after 3.5 seconds
+  useEffect(() => {
+    if (!notification) return;
+    const timer = setTimeout(() => setNotification(""), 3500);
+    return () => clearTimeout(timer);
+  }, [notification]);
 
   // Fetch real delivery fleet from MongoDB
   const fetchFleet = async () => {
@@ -121,12 +125,13 @@ const DeliveryBoyId = () => {
       offDuty: offDuty,
       totalDispatchedToday:
         serverStats?.totalDispatchedToday ?? totalDispatchedToday,
-      verifiedRate: "100%",
+      verifiedRate: total > 0 ? "100%" : "0%",
     };
   }, [riders, serverStats]);
 
   // Toggle Duty Status (On Duty / Off Duty) with immediate MongoDB PATCH
-  const handleToggleStatus = async (rider) => {
+  const handleToggleStatus = async (e, rider) => {
+    e.stopPropagation();
     const current = rider.status || "On Duty";
     const nextStatus = current === "On Duty" ? "Off Duty" : "On Duty";
 
@@ -138,6 +143,8 @@ const DeliveryBoyId = () => {
           : r
       )
     );
+
+    setNotification(`Status for ${rider.name} updated to "${nextStatus}".`);
 
     try {
       await API.patch(`/delivery-boys/${rider._id || rider.partnerId}/status`, {
@@ -152,15 +159,17 @@ const DeliveryBoyId = () => {
             : r
         )
       );
-      alert(err.response?.data?.message || "Failed to update duty status.");
+      setError(err.response?.data?.message || "Failed to update duty status.");
     }
   };
 
-  // Delete Delivery Partner & Account from MongoDB
-  const handleDeletePartner = async (rider) => {
+  // Delete Delivery Partner from MongoDB
+  const handleDeletePartner = async (e, rider) => {
+    e.stopPropagation();
+    const code = rider.partnerId || rider.id || "Driver";
     if (
       !window.confirm(
-        `Are you sure you want to delete delivery partner "${rider.name}" (${rider.partnerId || rider.id}) and remove their portal account?`
+        `Are you sure you want to remove delivery agent "${rider.name}" (${code})?\n\nThis will remove their profile and credentials from the system.`
       )
     ) {
       return;
@@ -171,33 +180,44 @@ const DeliveryBoyId = () => {
       setRiders((prev) =>
         prev.filter((r) => r._id !== rider._id && r.partnerId !== rider.partnerId)
       );
-      if (selectedRider?._id === rider._id) setSelectedRider(null);
+      setNotification(`Agent ${rider.name} successfully deleted.`);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to delete delivery partner.");
     }
   };
 
-  const activePhoto = photoPreview || formData.avatar;
+  // Copy Partner ID to clipboard
+  const handleCopyId = (e, id) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    setNotification(`Copied Partner ID: ${id}`);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  // Open individual rider page
+  const handleOpenRider = (rider) => {
+    const targetId = rider._id || rider.partnerId;
+    navigate(`/admin/delivery-boy/${targetId}`);
+  };
 
   return (
     <div className="DeliveryBoyId">
-      {/* Page Header */}
+      {/* Toast Notification */}
+      {notification && (
+        <div className="DeliveryBoyId-toast">
+          <FiCheckCircle className="toastIcon" />
+          <span>{notification}</span>
+        </div>
+      )}
+
+      {/* Page Header (One Clean Line) */}
       <header className="DeliveryBoyId-header">
         <div className="DeliveryBoyId-heading">
           <div className="DeliveryBoyId-headingIcon">
             <FiTruck />
           </div>
-          <div>
-            <div className="DeliveryBoyId-headerBadgeRow">
-              <h1>Delivery Partner Fleet &amp; ID Generation</h1>
-              <span className="DeliveryBoyId-livePill">
-                <span className="liveDot" /> Live Database Sync
-              </span>
-            </div>
-            <p>
-              Manage real-time delivery agent fleet, toggle on-duty dispatch, generate verified credentials, and print official PVC hydration ID card passes.
-            </p>
-          </div>
+          <h1>Delivery Partner Fleet</h1>
         </div>
 
         <div className="DeliveryBoyId-actions">
@@ -230,66 +250,9 @@ const DeliveryBoyId = () => {
             type="button"
             onClick={() => setError("")}
             className="closeAlertBtn"
+            aria-label="Dismiss error"
           >
             <FiX />
-          </button>
-        </div>
-      )}
-
-      {successMsg && (
-        <div className="DeliveryBoyId-alert success">
-          <span><FiCheckCircle /> {successMsg}</span>
-          <button
-            type="button"
-            onClick={() => setSuccessMsg("")}
-            className="closeAlertBtn"
-          >
-            <FiX />
-          </button>
-        </div>
-      )}
-
-      {createdCredentials && (
-        <div className="DeliveryBoyId-credentialsBox">
-          <div className="DeliveryBoyId-credentialsHeader">
-            <div className="credIcon">
-              <FiCheckCircle />
-            </div>
-            <div>
-              <h4>New Delivery Account Generated &amp; Role Assigned!</h4>
-              <p>The partner has been registered with system role <strong>"Delivery Boy"</strong> in MongoDB.</p>
-            </div>
-          </div>
-
-          <div className="DeliveryBoyId-credentialsList">
-            <div className="DeliveryBoyId-credItem">
-              <span>Partner ID &amp; Name</span>
-              <strong>{createdCredentials.partnerId} &bull; {createdCredentials.name}</strong>
-            </div>
-            <div className="DeliveryBoyId-credItem">
-              <span>Login Email</span>
-              <strong>{createdCredentials.email}</strong>
-            </div>
-            <div className="DeliveryBoyId-credItem">
-              <span>Assigned Role</span>
-              <strong className="teal">{createdCredentials.role}</strong>
-            </div>
-            <div className="DeliveryBoyId-credItem">
-              <span>Initial Password</span>
-              <strong className="code">{createdCredentials.password}</strong>
-            </div>
-            <div className="DeliveryBoyId-credItem full">
-              <span>Account Status</span>
-              <strong className="green">Active &bull; Authorized in User Management &amp; Delivery Companion App</strong>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setCreatedCredentials(null)}
-            className="dismissBtn"
-          >
-            Dismiss Credentials
           </button>
         </div>
       )}
@@ -300,19 +263,17 @@ const DeliveryBoyId = () => {
           <div className="DeliveryBoyId-statIcon fleet"><FiTruck /></div>
           <div>
             <span className="DeliveryBoyId-statLabel">Fleet Drivers</span>
-            <span className="DeliveryBoyId-statValue">{stats.total} Partners</span>
+            <span className="DeliveryBoyId-statValue">{stats.total}</span>
           </div>
         </div>
 
-        <div className="DeliveryBoyId-statCard">
+        <div className="DeliveryBoyId-statCard ondutyCard">
           <div className="DeliveryBoyId-statIcon onduty">
             <FiActivity />
           </div>
           <div>
-            <span className="DeliveryBoyId-statLabel">Currently On Duty</span>
-            <span className="DeliveryBoyId-statValue ondutyVal">
-              <span className="pulseGreen" /> {stats.activeDuty} Active
-            </span>
+            <span className="DeliveryBoyId-statLabel">On Duty</span>
+            <span className="DeliveryBoyId-statValue ondutyVal">{stats.activeDuty}</span>
           </div>
         </div>
 
@@ -321,8 +282,8 @@ const DeliveryBoyId = () => {
             <FiLayers />
           </div>
           <div>
-            <span className="DeliveryBoyId-statLabel">Standby / Off Duty</span>
-            <span className="DeliveryBoyId-statValue">{stats.offDuty} Standby</span>
+            <span className="DeliveryBoyId-statLabel">Standby Fleet</span>
+            <span className="DeliveryBoyId-statValue">{stats.offDuty}</span>
           </div>
         </div>
 
@@ -330,15 +291,15 @@ const DeliveryBoyId = () => {
           <div className="DeliveryBoyId-statIcon trips"><FiBox /></div>
           <div>
             <span className="DeliveryBoyId-statLabel">Active Dispatches</span>
-            <span className="DeliveryBoyId-statValue">{stats.totalDispatchedToday} Jars Live</span>
+            <span className="DeliveryBoyId-statValue">{stats.totalDispatchedToday} Jars</span>
           </div>
         </div>
 
         <div className="DeliveryBoyId-statCard">
           <div className="DeliveryBoyId-statIcon verified"><FiShield /></div>
           <div>
-            <span className="DeliveryBoyId-statLabel">KYC &amp; BG Verified</span>
-            <span className="DeliveryBoyId-statValue verifiedVal">{stats.verifiedRate} Checked</span>
+            <span className="DeliveryBoyId-statLabel">KYC Verified</span>
+            <span className="DeliveryBoyId-statValue verifiedVal">{stats.verifiedRate}</span>
           </div>
         </div>
       </div>
@@ -349,7 +310,7 @@ const DeliveryBoyId = () => {
           <FiSearch className="DeliveryBoyId-searchIcon" />
           <input
             type="text"
-            placeholder="Search by Name, Partner ID (ALK-DB-...), Vehicle, Route, Phone, Aadhar..."
+            placeholder="Search by agent name, partner ID, vehicle number, zone, phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -358,6 +319,7 @@ const DeliveryBoyId = () => {
               type="button"
               className="clearSearchBtn"
               onClick={() => setSearch("")}
+              title="Clear search"
             >
               <FiX />
             </button>
@@ -365,45 +327,48 @@ const DeliveryBoyId = () => {
         </div>
 
         <div className="DeliveryBoyId-filtersGroup">
-          {/* Status Tabs */}
+          {/* Status Segmented Tabs */}
           <div className="DeliveryBoyId-filters">
             <button
               type="button"
               className={`DeliveryBoyId-filterChip ${statusFilter === "all" ? "active" : ""}`}
               onClick={() => setStatusFilter("all")}
             >
-              All Fleet ({riders.length})
+              All ({riders.length})
             </button>
             <button
               type="button"
               className={`DeliveryBoyId-filterChip ${statusFilter === "On Duty" ? "active onduty" : ""}`}
               onClick={() => setStatusFilter("On Duty")}
             >
-              On Duty ({riders.filter((r) => r.status === "On Duty").length})
+              <span className="chipDot green" /> On Duty ({riders.filter((r) => r.status === "On Duty").length})
             </button>
             <button
               type="button"
               className={`DeliveryBoyId-filterChip ${statusFilter === "Off Duty" ? "active offduty" : ""}`}
               onClick={() => setStatusFilter("Off Duty")}
             >
-              Off Duty ({riders.filter((r) => r.status === "Off Duty").length})
+              <span className="chipDot gray" /> Off Duty ({riders.filter((r) => r.status === "Off Duty").length})
             </button>
           </div>
 
           {/* Route Dropdown Filter */}
           {distinctRoutes.length > 0 && (
-            <select
-              className="DeliveryBoyId-routeSelect"
-              value={routeFilter}
-              onChange={(e) => setRouteFilter(e.target.value)}
-            >
-              <option value="all">All Delivery Zones</option>
-              {distinctRoutes.map((rt) => (
-                <option key={rt} value={rt}>
-                  {rt}
-                </option>
-              ))}
-            </select>
+            <div className="DeliveryBoyId-routeWrap">
+              <FiMapPin className="routeSelectIcon" />
+              <select
+                className="DeliveryBoyId-routeSelect"
+                value={routeFilter}
+                onChange={(e) => setRouteFilter(e.target.value)}
+              >
+                <option value="all">All Operational Zones</option>
+                {distinctRoutes.map((rt) => (
+                  <option key={rt} value={rt}>
+                    {rt}
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
         </div>
       </div>
@@ -412,18 +377,20 @@ const DeliveryBoyId = () => {
       {isLoading && riders.length === 0 && (
         <div className="DeliveryBoyId-loadingState">
           <FiRefreshCw className="spin" />
-          <p>Loading real-time delivery agent fleet from database...</p>
+          <p>Connecting to database &amp; syncing fleet data...</p>
         </div>
       )}
 
       {/* Empty state */}
       {!isLoading && filteredRiders.length === 0 && (
         <div className="DeliveryBoyId-emptyCard">
-          <FiTruck className="emptyIcon" />
-          <h3>No delivery agents found</h3>
+          <div className="emptyIconCircle">
+            <FiTruck className="emptyIcon" />
+          </div>
+          <h3>No delivery agents match your criteria</h3>
           <p>
             {search || statusFilter !== "all" || routeFilter !== "all"
-              ? "No delivery personnel matching the selected filters. Try clearing your search or filters."
+              ? "No delivery personnel matching the selected filters. Clear your search or filters to see all fleet members."
               : "No delivery agents registered in the database yet. Click below to add your first delivery partner."}
           </p>
           <div className="emptyActions">
@@ -437,7 +404,7 @@ const DeliveryBoyId = () => {
                   setRouteFilter("all");
                 }}
               >
-                Clear Filters
+                Reset All Filters
               </button>
             ) : null}
             <Link
@@ -450,233 +417,180 @@ const DeliveryBoyId = () => {
         </div>
       )}
 
-      {/* Dynamic Real Agent Fleet Grid */}
-      <div className="DeliveryBoyId-grid">
-        {filteredRiders.map((r) => {
-          const partnerCode = r.partnerId || r.id || "ALK-DB-000";
-          const isOnDuty = r.status === "On Duty";
-
-          return (
-            <div key={r._id || partnerCode} className={`DeliveryBoyId-card ${isOnDuty ? "is-onduty" : "is-offduty"}`}>
-              {/* Card Top: Avatar, Partner ID & Live Status Toggle */}
-              <div className="DeliveryBoyId-cardTop">
-                <div className="DeliveryBoyId-riderHeader">
-                  <div className={`DeliveryBoyId-avatarThumb ${isOnDuty ? "onduty-ring" : "offduty-ring"}`}>
-                    {r.avatar ? (
-                      <img src={r.avatar} alt={r.name} />
-                    ) : (
-                      <div className="DeliveryBoyId-avatarFallback">
-                        {r.name ? r.name.charAt(0).toUpperCase() : <FiUser />}
-                      </div>
-                    )}
-                    <span className={`statusDot ${isOnDuty ? "green" : "gray"}`} />
-                  </div>
-
-                  <div>
-                    <div className="DeliveryBoyId-badgeId">
-                      <FiCreditCard /> {partnerCode}
-                    </div>
-                    <span className="DeliveryBoyId-roleTag">Role: {r.role || "Delivery Boy"}</span>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className={`DeliveryBoyId-statusToggle ${isOnDuty ? "on-duty" : "off-duty"}`}
-                  onClick={() => handleToggleStatus(r)}
-                  title="Click to toggle duty status"
-                >
-                  <span className="dot" />
-                  {r.status || "On Duty"}
-                </button>
-              </div>
-
-              {/* Card Body */}
-              <div className="DeliveryBoyId-cardBody">
-                <h3 className="DeliveryBoyId-name">{r.name}</h3>
-
-                <div className="DeliveryBoyId-contactRow">
-                  <a href={`tel:${r.phone}`} className="DeliveryBoyId-phone">
-                    <FiPhone /> {r.phone}
-                  </a>
-                  <span className="DeliveryBoyId-email">
-                    <FiMail /> {r.email}
-                  </span>
-                </div>
-
-                <div className="DeliveryBoyId-infoList">
-                  <div className="DeliveryBoyId-infoRow">
-                    <span className="label">Vehicle:</span>
-                    <span className="val highlight">
-                      <FiTruck style={{ verticalAlign: "middle", marginRight: "4px" }} />
-                      {r.vehicleNumber} ({r.vehicleType || "EV"})
-                    </span>
-                  </div>
-
-                  <div className="DeliveryBoyId-infoRow">
-                    <span className="label">Assigned Route:</span>
-                    <span className="val routeVal">
-                      <FiMapPin style={{ verticalAlign: "middle", marginRight: "4px" }} />
-                      {r.route}
-                    </span>
-                  </div>
-
-                  <div className="DeliveryBoyId-infoRow">
-                    <span className="label">Daily Capacity:</span>
-                    <span className="val quotaVal">{r.dailyQuota || "120 Jars"}</span>
-                  </div>
-
-                  <div className="DeliveryBoyId-infoRow">
-                    <span className="label">KYC Verified:</span>
-                    <span className="val kycVal">
-                      Aadhar ({r.aadharNumber ? `**** ${r.aadharNumber.slice(-4)}` : "Verified"}) &bull; PAN ✓
-                    </span>
-                  </div>
-
-                  {r.presentAddress?.street && (
-                    <div className="DeliveryBoyId-infoRow">
-                      <span className="label">Address:</span>
-                      <span className="val addressVal">
-                        {r.presentAddress.street}, {r.presentAddress.city}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Card Footer: View ID Card & Delete */}
-              <div className="DeliveryBoyId-cardFooter">
-                <button
-                  type="button"
-                  className="DeliveryBoyId-viewIdBtn"
-                  onClick={() => setSelectedRider(r)}
-                  title="View Official PVC ID Card Pass"
-                >
-                  <FiCreditCard /> View ID Card
-                </button>
-
-                <button
-                  type="button"
-                  className="DeliveryBoyId-deleteBtn"
-                  onClick={() => handleDeletePartner(r)}
-                  title="Delete delivery partner & account"
-                  aria-label="Delete"
-                >
-                  <FiTrash2 />
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
       {/* =========================================================================
-          OFFICIAL ID CARD MODAL (PRINTABLE SMART PASS)
+          DYNAMIC REAL AGENT FLEET TABLE / LIST VIEW
       ========================================================================= */}
-      {selectedRider && (
-        <div
-          className="DeliveryBoyId-modalBackdrop"
-          onClick={() => setSelectedRider(null)}
-        >
-          <div
-            className="DeliveryBoyId-idModal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="DeliveryBoyId-idCardHeader">
-              <span className="brand">ALKA DROPS</span>
-              <span className="pass">OFFICIAL HYDRATION DELIVERY PASS</span>
-            </div>
+      {filteredRiders.length > 0 && (
+        <div className="DeliveryBoyId-tableCard">
+          <div className="DeliveryBoyId-tableResponsive">
+            <table className="DeliveryBoyId-table">
+              <thead>
+                <tr>
+                  <th style={{ minWidth: "240px" }}>Delivery Partner</th>
+                  <th style={{ minWidth: "200px" }}>Contact Details</th>
+                  <th style={{ minWidth: "170px" }}>Assigned Vehicle</th>
+                  <th style={{ minWidth: "180px" }}>Route / Zone</th>
+                  <th style={{ minWidth: "130px" }}>Daily Quota</th>
+                  <th style={{ minWidth: "130px" }}>Duty Status</th>
+                  <th style={{ minWidth: "120px", textAlign: "right" }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredRiders.map((r) => {
+                  const partnerCode = r.partnerId || r.id || "ALK-DB-000";
+                  const isOnDuty = r.status === "On Duty";
+                  const targetId = r._id || partnerCode;
 
-            <div className="DeliveryBoyId-idCardBody">
-              <div className="avatarBox">
-                {selectedRider.avatar ? (
-                  <img
-                    src={selectedRider.avatar}
-                    alt={selectedRider.name}
-                  />
-                ) : (
-                  <div className="avatarInitials">
-                    {selectedRider.name ? selectedRider.name.charAt(0).toUpperCase() : <FiUser />}
-                  </div>
-                )}
-                <span className="verifiedCheck" title="Government KYC Verified">
-                  <FiCheck />
-                </span>
-              </div>
+                  return (
+                    <tr
+                      key={r._id || partnerCode}
+                      className={`DeliveryBoyId-row ${isOnDuty ? "row-onduty" : "row-offduty"}`}
+                      onClick={() => handleOpenRider(r)}
+                      title="Click row to open individual partner profile"
+                    >
+                      {/* Delivery Partner (Avatar + Name + ID) */}
+                      <td>
+                        <div className="DeliveryBoyId-agentCell">
+                          <div className={`DeliveryBoyId-tableAvatar ${isOnDuty ? "avatar-active" : ""}`}>
+                            {r.avatar ? (
+                              <img src={r.avatar} alt={r.name} />
+                            ) : (
+                              <div className="avatarFallback">
+                                {r.name ? r.name.charAt(0).toUpperCase() : <FiUser />}
+                              </div>
+                            )}
+                            <span
+                              className={`statusIndicatorDot ${isOnDuty ? "green" : "gray"}`}
+                            />
+                          </div>
 
-              <h2 className="name">{selectedRider.name}</h2>
-              <span className="roleBadge">ROLE: DELIVERY BOY</span>
+                          <div className="agentMeta">
+                            <strong className="agentName">{r.name}</strong>
+                            <div className="agentSubRow">
+                              <span
+                                className="DeliveryBoyId-tableIdPill"
+                                onClick={(e) => handleCopyId(e, partnerCode)}
+                                title="Click to copy Partner ID"
+                              >
+                                <FiCreditCard className="idPillIcon" />
+                                <span>{partnerCode}</span>
+                                {copiedId === partnerCode ? (
+                                  <FiCheck className="copiedCheck" />
+                                ) : (
+                                  <FiCopy className="copyIcon" />
+                                )}
+                              </span>
+                              <span className="agentRole">{r.role || "Delivery Boy"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
 
-              <div className="idDetails">
-                <div>
-                  <span>Partner ID:</span>
-                  <strong className="teal">{selectedRider.partnerId || selectedRider.id}</strong>
-                </div>
-                <div>
-                  <span>Contact Phone:</span>
-                  <strong>{selectedRider.phone}</strong>
-                </div>
-                <div>
-                  <span>Email Account:</span>
-                  <strong>{selectedRider.email}</strong>
-                </div>
-                <div>
-                  <span>Vehicle Assigned:</span>
-                  <strong>{selectedRider.vehicleNumber} ({selectedRider.vehicleType})</strong>
-                </div>
-                <div>
-                  <span>Assigned Zone:</span>
-                  <strong>{selectedRider.route}</strong>
-                </div>
-                <div>
-                  <span>Daily Capacity:</span>
-                  <strong>{selectedRider.dailyQuota || "120 Jars"}</strong>
-                </div>
-                <div>
-                  <span>Aadhar Number:</span>
-                  <strong>{selectedRider.aadharNumber ? `**** **** ${selectedRider.aadharNumber.slice(-4)}` : "Verified"}</strong>
-                </div>
-                <div>
-                  <span>PAN Number:</span>
-                  <strong>{selectedRider.panNumber || "Verified"}</strong>
-                </div>
-                <div>
-                  <span>Duty Status:</span>
-                  <strong style={{ color: selectedRider.status === "On Duty" ? "#059669" : "#64748b" }}>
-                    {selectedRider.status || "On Duty"}
-                  </strong>
-                </div>
-              </div>
+                      {/* Contact Info */}
+                      <td>
+                        <div className="contactCell">
+                          <a
+                            href={`tel:${r.phone}`}
+                            className="contactPhone"
+                            onClick={(e) => e.stopPropagation()}
+                            title="Call Partner"
+                          >
+                            <FiPhone /> {r.phone}
+                          </a>
+                          <a
+                            href={`mailto:${r.email}`}
+                            className="contactEmail"
+                            onClick={(e) => e.stopPropagation()}
+                            title={r.email}
+                          >
+                            <FiMail /> {r.email}
+                          </a>
+                        </div>
+                      </td>
 
-              {/* High Density Barcode Simulation */}
-              <div className="DeliveryBoyId-barcodeWrap">
-                <div className="barcodeBars" />
-                <span className="barcodeText">
-                  {selectedRider.partnerId || "ALK-DB-000"} &bull; OFFICIAL ALKA PASS &bull; VERIFIED
-                </span>
-              </div>
-            </div>
+                      {/* Assigned Vehicle */}
+                      <td>
+                        <div className="vehicleCell">
+                          <strong className="vehiclePlate">
+                            <FiTruck /> {r.vehicleNumber}
+                          </strong>
+                          <span className="vehicleType">{r.vehicleType || "Electric Van"}</span>
+                        </div>
+                      </td>
 
-            <div className="DeliveryBoyId-idCardFooter">
-              <button
-                type="button"
-                className="printBtn"
-                onClick={() => window.print()}
-              >
-                <FiPrinter /> Print ID Card Pass
-              </button>
-              <button
-                type="button"
-                className="closeBtn"
-                onClick={() => setSelectedRider(null)}
-              >
-                Close
-              </button>
-            </div>
+                      {/* Assigned Route / Zone */}
+                      <td>
+                        <div className="routeCell">
+                          <span className="routeZoneTag">
+                            <FiMapPin /> {r.route ? r.route.split("-")[0].trim() : "Zone A"}
+                          </span>
+                          <span className="routeDesc" title={r.route}>
+                            {r.route ? r.route.split("-")[1] || r.route : "Nayapalli"}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Daily Quota / Load */}
+                      <td>
+                        <div className="quotaCell">
+                          <strong className="quotaVal">
+                            <FiBox /> {r.dailyQuota || "120 Jars"}
+                          </strong>
+                          <span className="activeLoad">
+                            Active: {r.activeOrders || 0} Jars
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Interactive Duty Status Switch */}
+                      <td>
+                        <button
+                          type="button"
+                          className={`DeliveryBoyId-dutySwitch ${isOnDuty ? "on-duty" : "off-duty"}`}
+                          onClick={(e) => handleToggleStatus(e, r)}
+                          title={`Click to switch to ${isOnDuty ? "Off Duty" : "On Duty"}`}
+                        >
+                          <span className="dutySwitchSlider">
+                            <span className="dutySwitchThumb" />
+                          </span>
+                          <span className="dutySwitchLabel">
+                            {isOnDuty ? "On Duty" : "Off Duty"}
+                          </span>
+                        </button>
+                      </td>
+
+                      {/* Row Actions */}
+                      <td style={{ textAlign: "right" }}>
+                        <div className="rowActions">
+                          <Link
+                            to={`/admin/delivery-boy/${targetId}`}
+                            className="viewProfileBtn"
+                            onClick={(e) => e.stopPropagation()}
+                            title="Open Individual Agent Page"
+                          >
+                            <span>View Profile</span>
+                            <FiArrowRight />
+                          </Link>
+
+                          <button
+                            type="button"
+                            className="deleteRowBtn"
+                            onClick={(e) => handleDeletePartner(e, r)}
+                            title="Delete Partner"
+                            aria-label="Delete"
+                          >
+                            <FiTrash2 />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
-
     </div>
   );
 };

@@ -1251,6 +1251,66 @@
   gap: 6px;
 }
 
+/* Multi-Address Grid & Cards */
+.Account-addressGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.Account-addressCardItem {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.Account-addressCardItem:hover {
+  border-color: #0284c7;
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08);
+}
+
+.Account-addressCardItem.is-default {
+  border-color: #0284c7;
+  background: #f8fafc;
+}
+
+.Account-labelPills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.Account-labelPillBtn {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.Account-labelPillBtn:hover {
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+.Account-labelPillBtn.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+}
+
 /* =========================================================
    MY ORDERS LIST
 ========================================================= */

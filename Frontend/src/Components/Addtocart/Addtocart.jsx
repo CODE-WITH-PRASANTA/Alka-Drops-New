@@ -83,6 +83,28 @@ const demoProducts = [
 const fallbackImage =
   "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=700&auto=format&fit=crop&q=85";
 
+// Dynamically load Razorpay SDK
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+    if (existing) {
+      existing.onload = () => resolve(true);
+      existing.onerror = () => resolve(false);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 const Addtocart = () => {
   const navigate = useNavigate();
   const {
@@ -112,11 +134,10 @@ const Addtocart = () => {
     navigate("/shop");
   };
 
-  // Checkout Modal & Order State
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
+  // Payment, Address & Placed Order State
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
+  const [addressWarning, setAddressWarning] = useState(false);
 
   const [shippingForm, setShippingForm] = useState({
     fullName: "",
@@ -128,7 +149,7 @@ const Addtocart = () => {
     state: "",
     postalCode: "",
     deliverySlot: "Standard (1-2 days)",
-    paymentMethod: "cod",
+    paymentMethod: "razorpay",
     notes: "",
   });
 
@@ -211,6 +232,7 @@ const Addtocart = () => {
       postalCode: addr.postalCode || "751012",
     }));
     setIsAddressModalOpen(false);
+    setAddressWarning(false);
     showToast(`Delivery location set to: ${addr.street}, ${addr.city}`, "success");
   };
 
@@ -365,7 +387,8 @@ const Addtocart = () => {
     };
   }, []);
 
-  const handleCheckout = () => {
+  // Proceed to Checkout via Razorpay with Address Validation
+  const handleProceedToRazorpay = async () => {
     if (!cart.length) {
       showToast("Your cart is empty! Please add products first.", "error");
       return;
@@ -374,150 +397,151 @@ const Addtocart = () => {
     const user = getCurrentUser();
     if (!user) {
       showToast("Please log in to proceed with checkout. Your cart items are saved!", "info");
-      navigate("/login?redirect=/cart&checkout=true");
+      navigate("/login?redirect=" + encodeURIComponent("/cart"));
       return;
     }
 
-    setShippingForm((prev) => ({
-      ...prev,
-      fullName: prev.fullName || user.name || "",
-      email: prev.email || user.email || "",
-      phone: prev.phone || user.phone || "",
-      addressLine1: prev.addressLine1 || user.address?.street || "",
-      city: prev.city || user.address?.city || "Bhubaneswar",
-      state: prev.state || user.address?.state || "Odisha",
-      postalCode: prev.postalCode || user.address?.postalCode || "751012",
-    }));
-
-    setCheckoutError("");
-    setPlacedOrder(null);
-    setIsCheckoutOpen(true);
-  };
-
-  // Automatically reopen checkout if user was redirected from login with checkout intent
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("checkout") === "true") {
-      const user = getCurrentUser();
-      if (user && cart.length > 0) {
-        setShippingForm((prev) => ({
-          ...prev,
-          fullName: prev.fullName || user.name || "",
-          email: prev.email || user.email || "",
-          phone: prev.phone || user.phone || "",
-          addressLine1: prev.addressLine1 || user.address?.street || "",
-          city: prev.city || user.address?.city || "Bhubaneswar",
-          state: prev.state || user.address?.state || "Odisha",
-          postalCode: prev.postalCode || user.address?.postalCode || "751012",
-        }));
-        setCheckoutError("");
-        setPlacedOrder(null);
-        setIsCheckoutOpen(true);
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
+    // Strict address validation: "if address not select not proced to check that validation add"
+    const currentStreet = (shippingForm.addressLine1 || user.address?.street || userProfile?.address?.street || "").trim();
+    if (!currentStreet) {
+      setAddressWarning(true);
+      showToast("Please select or add a delivery address before proceeding to payment.", "error");
+      setAddressModalError("Please select or add a delivery address to proceed with checkout.");
+      setIsAddressModalOpen(true);
+      return;
     }
-  }, [cart.length]);
+    setAddressWarning(false);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setShippingForm((prev) => ({ ...prev, [name]: value }));
-    if (checkoutError) setCheckoutError("");
-  };
+    const recipientName = (shippingForm.fullName || user.name || userProfile?.name || "Customer").trim();
+    const cleanPhone = (shippingForm.phone || user.phone || userProfile?.phone || "").replace(/\D/g, "");
 
-  const handlePlaceOrder = async (e) => {
-    e.preventDefault();
-    if (isSubmittingOrder) return;
-
-    if (!shippingForm.fullName.trim()) {
-      setCheckoutError("Please enter your full name.");
+    if (!recipientName) {
+      showToast("Please provide recipient full name in your delivery address.", "error");
+      setIsAddressModalOpen(true);
       return;
     }
 
-    const cleanPhone = shippingForm.phone.replace(/\D/g, "");
     if (!cleanPhone || cleanPhone.length < 10) {
-      setCheckoutError("Please enter a valid 10-digit mobile number.");
+      showToast("Please provide a valid 10-digit mobile number for doorstep delivery.", "error");
+      setIsAddressModalOpen(true);
       return;
     }
 
-    if (!shippingForm.addressLine1.trim()) {
-      setCheckoutError("Please enter your delivery street address / flat details.");
+    setIsProcessingPayment(true);
+    const isScriptLoaded = await loadRazorpayScript();
+    if (!isScriptLoaded) {
+      setIsProcessingPayment(false);
+      showToast("Could not load Razorpay payment gateway. Please check your connection.", "error");
       return;
     }
-
-    if (!shippingForm.city.trim()) {
-      setCheckoutError("Please enter your city.");
-      return;
-    }
-
-    setIsSubmittingOrder(true);
-    setCheckoutError("");
 
     try {
-      const orderPayload = {
-        items: cart.map((item) => {
-          const rawId = item._id || item.id;
-          const isMongoId = rawId && String(rawId).match(/^[0-9a-fA-F]{24}$/);
-          return {
-            product: isMongoId ? rawId : null,
-            title: item.name || item.title || "Alkaline Water Bottle",
-            price: Number(item.price) || 0,
-            quantity: Math.max(1, Number(item.qty) || 1),
-            image: item.image || "",
-            size: item.size || item.liter || "1 Litre",
-          };
-        }),
-        shippingAddress: {
-          fullName: shippingForm.fullName.trim(),
-          phone: cleanPhone,
-          email: shippingForm.email?.trim() || "customer@alkadrops.com",
-          addressLine1: shippingForm.addressLine1.trim(),
-          addressLine2: shippingForm.addressLine2?.trim() || "",
-          city: shippingForm.city.trim(),
-          postalCode: shippingForm.postalCode?.trim() || "751012",
+      // 1. Create Razorpay order on backend
+      const orderRes = await API.post("/orders/razorpay/create-order", {
+        amount: cartTotal,
+        currency: "INR",
+        notes: {
+          customerName: recipientName,
+          customerPhone: cleanPhone,
         },
-        paymentMethod: shippingForm.paymentMethod,
-        deliverySlot: shippingForm.deliverySlot,
-        notes: shippingForm.notes?.trim() || "",
-        shippingCost: deliveryCharge,
-        discountAmount: totalSavings,
+      });
+
+      if (!orderRes.data?.success || !orderRes.data?.orderId) {
+        throw new Error(orderRes.data?.message || "Failed to initialize Razorpay payment order.");
+      }
+
+      const { orderId, amount, currency, keyId } = orderRes.data;
+      const razorpayKey = keyId || import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_TppGgVggUkbJv4";
+
+      // 2. Launch Razorpay Checkout popup
+      const options = {
+        key: razorpayKey,
+        amount: amount,
+        currency: currency || "INR",
+        name: "Alka Drops",
+        description: `Pure Alkaline Water Delivery (${cartCount} ${cartCount === 1 ? "item" : "items"})`,
+        image: "/favicon.svg",
+        order_id: orderId,
+        prefill: {
+          name: recipientName,
+          email: shippingForm.email || user.email || "support@alkadrops.com",
+          contact: cleanPhone,
+        },
+        notes: {
+          deliveryAddress: `${currentStreet}, ${shippingForm.city || "Bhubaneswar"}`,
+        },
+        theme: {
+          color: "#0284c7",
+        },
+        modal: {
+          ondismiss: () => {
+            setIsProcessingPayment(false);
+            showToast("Payment window closed. Cart remains saved.", "info");
+          },
+        },
+        handler: async (response) => {
+          try {
+            setIsProcessingPayment(true);
+            // 3. Verify signature and create order on backend
+            const verifyRes = await API.post("/orders/razorpay/verify-payment", {
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+              items: cart.map((item) => {
+                const rawId = item._id || item.id;
+                const isMongoId = rawId && String(rawId).match(/^[0-9a-fA-F]{24}$/);
+                return {
+                  product: isMongoId ? rawId : null,
+                  title: item.name || item.title || "Alkaline Water Bottle",
+                  price: Number(item.price) || 0,
+                  quantity: Math.max(1, Number(item.qty || item.quantity) || 1),
+                  image: item.image || "",
+                  size: item.size || item.liter || "1 Litre",
+                };
+              }),
+              shippingAddress: {
+                fullName: recipientName,
+                phone: cleanPhone,
+                email: shippingForm.email?.trim() || user.email || "support@alkadrops.com",
+                addressLine1: currentStreet,
+                addressLine2: shippingForm.addressLine2?.trim() || "",
+                city: shippingForm.city || user.address?.city || "Bhubaneswar",
+                state: shippingForm.state || user.address?.state || "Odisha",
+                postalCode: shippingForm.postalCode || user.address?.postalCode || "751012",
+              },
+              shippingCost: deliveryCharge || 0,
+              discountAmount: totalSavings || 0,
+              deliverySlot: shippingForm.deliverySlot || "Standard (1-2 days)",
+              notes: shippingForm.notes?.trim() || "",
+            });
+
+            if (verifyRes.data?.success && verifyRes.data?.order) {
+              clearCart();
+              setPlacedOrder(verifyRes.data.order);
+              showToast(`Payment successful! Order #${verifyRes.data.order.orderNumber} confirmed.`, "success");
+            } else {
+              throw new Error(verifyRes.data?.message || "Payment verification failed.");
+            }
+          } catch (vErr) {
+            console.error("Razorpay verification failed:", vErr);
+            showToast(vErr.response?.data?.message || vErr.message || "Failed to finalize order.", "error");
+          } finally {
+            setIsProcessingPayment(false);
+          }
+        },
       };
 
-      const res = await API.post("/orders", orderPayload);
-
-      if (res.data?.success && res.data?.order) {
-        setPlacedOrder(res.data.order);
-        clearCart();
-        showToast(`Order #${res.data.order.orderNumber} placed successfully!`, "success");
-
-        // Sync updated address & phone back to user profile in MongoDB
-        if (getCurrentUser()) {
-          API.put("/auth/profile", {
-            phone: cleanPhone,
-            address: {
-              street: shippingForm.addressLine1.trim(),
-              city: shippingForm.city.trim(),
-              state: shippingForm.state || "Odisha",
-              postalCode: shippingForm.postalCode?.trim() || "751012",
-            },
-          })
-            .then((pRes) => {
-              if (pRes.data?.user) {
-                localStorage.setItem("alka_user", JSON.stringify(pRes.data.user));
-                setUserProfile(pRes.data.user);
-              }
-            })
-            .catch((e) => console.log("Profile auto-sync skipped:", e.message));
-        }
-      } else {
-        throw new Error(res.data?.message || "Failed to place order.");
-      }
+      const razorpayInstance = new window.Razorpay(options);
+      razorpayInstance.on("payment.failed", (resp) => {
+        console.error("Razorpay payment failed:", resp.error);
+        showToast(`Payment failed: ${resp.error?.description || "Transaction declined."}`, "error");
+        setIsProcessingPayment(false);
+      });
+      razorpayInstance.open();
     } catch (err) {
-      console.error("Order submission error:", err);
-      setCheckoutError(
-        err.response?.data?.message || err.message || "Failed to submit order. Please try again."
-      );
-    } finally {
-      setIsSubmittingOrder(false);
+      console.error("Razorpay launch error:", err);
+      showToast(err.response?.data?.message || err.message || "Failed to launch Razorpay checkout.", "error");
+      setIsProcessingPayment(false);
     }
   };
 
@@ -541,8 +565,112 @@ const Addtocart = () => {
       </div>
 
       <div className="Addtocart-container">
-        {/* EMPTY CART */}
-        {cart.length === 0 ? (
+        {/* ORDER CONFIRMED VIEW (WHEN ORDER IS PLACED VIA RAZORPAY) */}
+        {placedOrder ? (
+          <div
+            className="Addtocart-order-success"
+            style={{
+              background: "#ffffff",
+              borderRadius: "24px",
+              padding: "48px 32px",
+              maxWidth: "680px",
+              margin: "30px auto",
+              boxShadow: "0 12px 36px rgba(2, 132, 199, 0.08)",
+              border: "1px solid #e2e8f0",
+              textAlign: "center",
+            }}
+          >
+            <div
+              className="Addtocart-success-badge"
+              style={{
+                background: "#dcfce7",
+                color: "#16a34a",
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "40px",
+                margin: "0 auto 20px",
+              }}
+            >
+              <FiCheckCircle />
+            </div>
+            <h2 style={{ fontSize: "28px", fontWeight: "800", color: "#0f172a", marginBottom: "8px" }}>
+              Order #{placedOrder.orderNumber} Confirmed!
+            </h2>
+            <p className="Addtocart-success-text" style={{ color: "#64748b", fontSize: "15px", maxWidth: "520px", margin: "0 auto 24px" }}>
+              Thank you for choosing Alka Drops! Your payment via Razorpay was successful and our dispatch team is preparing your fresh alkaline water.
+            </p>
+
+            <div
+              className="Addtocart-order-summary-box"
+              style={{
+                background: "#f8fafc",
+                borderRadius: "16px",
+                padding: "20px 24px",
+                border: "1px solid #e2e8f0",
+                marginBottom: "28px",
+                textAlign: "left",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
+            >
+              <div className="Addtocart-summary-row" style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#64748b", fontWeight: "600" }}>Recipient:</span>
+                <strong style={{ color: "#0f172a" }}>{placedOrder.shippingAddress?.fullName}</strong>
+              </div>
+              <div className="Addtocart-summary-row" style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#64748b", fontWeight: "600" }}>Contact Phone:</span>
+                <strong style={{ color: "#0f172a" }}>{placedOrder.shippingAddress?.phone}</strong>
+              </div>
+              <div className="Addtocart-summary-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <span style={{ color: "#64748b", fontWeight: "600" }}>Delivery Location:</span>
+                <strong style={{ color: "#0f172a", textAlign: "right", maxWidth: "340px" }}>
+                  {placedOrder.shippingAddress?.addressLine1}, {placedOrder.shippingAddress?.city} - {placedOrder.shippingAddress?.postalCode}
+                </strong>
+              </div>
+              <div className="Addtocart-summary-row" style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#64748b", fontWeight: "600" }}>Payment Gateway:</span>
+                <strong style={{ color: "#0284c7" }}>
+                  Razorpay Online (Paid {formatPrice(placedOrder.totalAmount)})
+                </strong>
+              </div>
+              {placedOrder.razorpayPaymentId && (
+                <div className="Addtocart-summary-row" style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "#64748b", fontWeight: "600" }}>Razorpay Payment ID:</span>
+                  <code style={{ background: "#e2e8f0", padding: "3px 8px", borderRadius: "6px", fontSize: "12.5px", color: "#334155" }}>
+                    {placedOrder.razorpayPaymentId}
+                  </code>
+                </div>
+              )}
+            </div>
+
+            <div className="Addtocart-success-actions" style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                className="Addtocart-primary-button"
+                onClick={() => navigate("/account?tab=orders")}
+                style={{ padding: "12px 24px", borderRadius: "10px", fontWeight: "700" }}
+              >
+                View My Orders
+              </button>
+              <button
+                type="button"
+                className="Addtocart-demo-button"
+                onClick={() => {
+                  setPlacedOrder(null);
+                  navigate("/shop");
+                }}
+                style={{ padding: "12px 24px", borderRadius: "10px", fontWeight: "700" }}
+              >
+                Continue Shopping
+              </button>
+            </div>
+          </div>
+        ) : cart.length === 0 ? (
           <div className="Addtocart-empty">
             <div className="Addtocart-empty-illustration">
               <div className="Addtocart-empty-circle">
@@ -587,7 +715,21 @@ const Addtocart = () => {
               {/* LEFT: PRODUCTS & DELIVERY ADDRESS */}
               <div className="Addtocart-products-section">
                 {/* LIVE DELIVERY ADDRESS ON LEFT SIDE */}
-                <div className="Addtocart-delivery-destination-left">
+                <div
+                  className="Addtocart-delivery-destination-left"
+                  style={
+                    addressWarning && !shippingForm.addressLine1
+                      ? {
+                          border: "2px solid #ef4444",
+                          background: "#fff1f2",
+                          boxShadow: "0 4px 14px rgba(239, 68, 68, 0.15)",
+                          borderRadius: "14px",
+                          padding: "16px",
+                          transition: "all 0.3s ease",
+                        }
+                      : {}
+                  }
+                >
                   <div className="Addtocart-dest-left-content">
                     <div className="Addtocart-dest-pin-badge">
                       <FiMapPin />
@@ -606,6 +748,11 @@ const Addtocart = () => {
                         {shippingForm.addressLine1 && shippingForm.city && (
                           <span className="Addtocart-dest-city-pill">{shippingForm.city}</span>
                         )}
+                        {addressWarning && !shippingForm.addressLine1 && (
+                          <span style={{ background: "#fee2e2", color: "#b91c1c", padding: "2px 8px", borderRadius: "6px", fontSize: "11.5px", fontWeight: "700" }}>
+                            Required for Checkout
+                          </span>
+                        )}
                       </div>
 
                       <p className="Addtocart-dest-address-text">
@@ -620,8 +767,8 @@ const Addtocart = () => {
                             {shippingForm.postalCode && <span> - {shippingForm.postalCode}</span>}
                           </>
                         ) : userProfile ? (
-                          <span style={{ color: "#d97706", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                            <FiAlertCircle /> No address added yet. Click &ldquo;+ Add Address&rdquo; to choose your delivery location.
+                          <span style={{ color: addressWarning ? "#dc2626" : "#d97706", display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: addressWarning ? "700" : "500" }}>
+                            <FiAlertCircle /> No delivery address selected yet. Please click &ldquo;+ Add Address&rdquo; to choose where to deliver.
                           </span>
                         ) : (
                           <span>Login to view your saved addresses for fast doorstep delivery in Bhubaneswar.</span>
@@ -874,19 +1021,36 @@ const Addtocart = () => {
                       </div>
                     </div>
 
-                    {/* CHECKOUT */}
+                    {/* RAZORPAY CHECKOUT */}
                     <button
                       type="button"
                       className="Addtocart-checkout-button"
-                      onClick={handleCheckout}
+                      onClick={handleProceedToRazorpay}
+                      disabled={isProcessingPayment}
+                      style={{
+                        background: isProcessingPayment
+                          ? "#64748b"
+                          : "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
+                        cursor: isProcessingPayment ? "not-allowed" : "pointer",
+                      }}
                     >
-                      <FiZap />
-                      Proceed to Checkout
-                      <FiArrowRight />
+                      {isProcessingPayment ? (
+                        <>
+                          <FiRefreshCw className="spin" />
+                          <span>Connecting to Razorpay...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiZap />
+                          <span>Proceed to Pay ({formatPrice(cartTotal)})</span>
+                          <FiArrowRight />
+                        </>
+                      )}
                     </button>
 
-                    <p className="Addtocart-checkout-caption">
-                      Review your order details before proceeding.
+                    <p className="Addtocart-checkout-caption" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "12.5px" }}>
+                      <FiShield style={{ color: "#16a34a", flexShrink: 0 }} />
+                      <span>100% Secure Checkout powered by Razorpay UPI, Cards &amp; NetBanking</span>
                     </p>
 
                     {/* TRUST */}
@@ -968,237 +1132,6 @@ const Addtocart = () => {
         )}
       </div>
 
-      {/* CHECKOUT MODAL */}
-      {isCheckoutOpen && (
-        <div className="Addtocart-modal-overlay" onClick={() => !isSubmittingOrder && setIsCheckoutOpen(false)}>
-          <div className="Addtocart-checkout-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="Addtocart-modal-header">
-              <div className="Addtocart-modal-title">
-                <FiPackage className="Addtocart-modal-title-icon" />
-                <div>
-                  <h3>{placedOrder ? "Order Confirmed!" : "Doorstep Delivery Checkout"}</h3>
-                  <p>{placedOrder ? "Thank you for choosing Alka Drops" : "Provide your address for speedy delivery in Bhubaneswar"}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                className="Addtocart-modal-close"
-                onClick={() => setIsCheckoutOpen(false)}
-                aria-label="Close checkout"
-              >
-                <FiX />
-              </button>
-            </div>
-
-            {placedOrder ? (
-              <div className="Addtocart-order-success">
-                <div className="Addtocart-success-badge">
-                  <FiCheckCircle />
-                </div>
-                <h2>Order #{placedOrder.orderNumber} Confirmed!</h2>
-                <p className="Addtocart-success-text">
-                  We've received your order and our dispatch team is preparing your fresh alkaline water.
-                </p>
-
-                <div className="Addtocart-order-summary-box">
-                  <div className="Addtocart-summary-row">
-                    <span>Customer:</span>
-                    <strong>{placedOrder.shippingAddress?.fullName}</strong>
-                  </div>
-                  <div className="Addtocart-summary-row">
-                    <span>Contact Phone:</span>
-                    <strong>{placedOrder.shippingAddress?.phone}</strong>
-                  </div>
-                  <div className="Addtocart-summary-row">
-                    <span>Delivery Address:</span>
-                    <strong>
-                      {placedOrder.shippingAddress?.addressLine1}, {placedOrder.shippingAddress?.city} - {placedOrder.shippingAddress?.postalCode}
-                    </strong>
-                  </div>
-                  <div className="Addtocart-summary-row">
-                    <span>Delivery Slot:</span>
-                    <strong>{placedOrder.deliverySlot || "Standard (1-2 days)"}</strong>
-                  </div>
-                  <div className="Addtocart-summary-row">
-                    <span>Payment Method:</span>
-                    <strong>{placedOrder.paymentMethod?.toUpperCase()} (Pay ₹{placedOrder.totalAmount} on delivery)</strong>
-                  </div>
-                </div>
-
-                <div className="Addtocart-success-actions">
-                  <button
-                    type="button"
-                    className="Addtocart-primary-button"
-                    onClick={() => {
-                      setIsCheckoutOpen(false);
-                      navigate("/shop");
-                    }}
-                  >
-                    Continue Shopping
-                  </button>
-                  <button
-                    type="button"
-                    className="Addtocart-demo-button"
-                    onClick={() => setIsCheckoutOpen(false)}
-                  >
-                    Done
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handlePlaceOrder} className="Addtocart-checkout-form">
-                {checkoutError && (
-                  <div className="Addtocart-form-alert error">
-                    {checkoutError}
-                  </div>
-                )}
-
-                <div className="Addtocart-form-grid">
-                  <div className="Addtocart-form-field">
-                    <label>
-                      <FiUser /> Full Name <span>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      placeholder="e.g. Ramesh Patel"
-                      value={shippingForm.fullName}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="Addtocart-form-field">
-                    <label>
-                      <FiPhone /> Mobile Number <span>*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder="10-digit mobile number"
-                      value={shippingForm.phone}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="Addtocart-form-field full-col">
-                    <label>
-                      <FiMail /> Email Address
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="your.email@example.com (optional)"
-                      value={shippingForm.email}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="Addtocart-form-field full-col">
-                    <label>
-                      <FiMapPin /> Delivery Address (House / Flat / Street / Landmark) <span>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="addressLine1"
-                      placeholder="e.g. Plot N5/22, IRC Village, Nayapalli"
-                      value={shippingForm.addressLine1}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="Addtocart-form-field">
-                    <label>City</label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={shippingForm.city}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="Addtocart-form-field">
-                    <label>Pincode</label>
-                    <input
-                      type="text"
-                      name="postalCode"
-                      value={shippingForm.postalCode}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="Addtocart-form-field">
-                    <label>Delivery Window</label>
-                    <select
-                      name="deliverySlot"
-                      value={shippingForm.deliverySlot}
-                      onChange={handleInputChange}
-                    >
-                      <option value="Morning (7 AM - 10 AM)">Morning (7 AM - 10 AM)</option>
-                      <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
-                      <option value="Evening (5 PM - 8 PM)">Evening (5 PM - 8 PM)</option>
-                      <option value="Standard (1-2 days)">Standard (1-2 days)</option>
-                    </select>
-                  </div>
-
-                  <div className="Addtocart-form-field">
-                    <label>Payment Method</label>
-                    <select
-                      name="paymentMethod"
-                      value={shippingForm.paymentMethod}
-                      onChange={handleInputChange}
-                    >
-                      <option value="cod">Cash on Delivery (COD)</option>
-                      <option value="upi">UPI / QR Code on Delivery</option>
-                    </select>
-                  </div>
-
-                  <div className="Addtocart-form-field full-col">
-                    <label>Order Notes / Instructions (Optional)</label>
-                    <input
-                      type="text"
-                      name="notes"
-                      placeholder="e.g. Ring doorbell twice, leave at reception"
-                      value={shippingForm.notes}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="Addtocart-checkout-footer">
-                  <div className="Addtocart-footer-summary">
-                    <span>Order Total ({cartCount} {cartCount === 1 ? "item" : "items"}):</span>
-                    <strong>{formatPrice(cartTotal)}</strong>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="Addtocart-place-order-btn"
-                    disabled={isSubmittingOrder}
-                  >
-                    {isSubmittingOrder ? (
-                      <>
-                        <FiRefreshCw className="spin" />
-                        <span>Processing Order...</span>
-                      </>
-                    ) : (
-                      <>
-                        <FiCheckCircle />
-                        <span>Place Order Now ({formatPrice(cartTotal)})</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* =========================================================================
           CHOOSE / ADD DELIVERY ADDRESS MODAL (IN CART - NO REDIRECT)
       ========================================================================= */}
@@ -1246,11 +1179,11 @@ const Addtocart = () => {
                       type="button"
                       className="Addtocart-addNewLink"
                       onClick={() => {
-                        setIsAddingNewInModal(true);
-                        setAddressModalError("");
+                        setIsAddressModalOpen(false);
+                        navigate("/account?tab=addresses");
                       }}
                     >
-                      <FiPlus /> + Add New Address
+                      <FiPlus /> Add New Address
                     </button>
                   </div>
 
@@ -1314,8 +1247,28 @@ const Addtocart = () => {
                   )}
 
                   {savedAddresses.length === 0 && (
-                    <div style={{ background: "#f8fafc", padding: "12px 14px", borderRadius: "10px", marginBottom: "14px", fontSize: "13px", color: "#475569" }}>
-                      You haven't saved any delivery address yet. Please add your address below to proceed with doorstep water delivery.
+                    <div style={{ background: "#f8fafc", padding: "14px 16px", borderRadius: "10px", marginBottom: "16px", fontSize: "13px", color: "#475569", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                      <span>You haven't saved any delivery address yet. Add your details below or manage your delivery locations directly in your account.</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAddressModalOpen(false);
+                          navigate("/account?tab=addresses");
+                        }}
+                        style={{
+                          background: "#0284c7",
+                          color: "#ffffff",
+                          border: "none",
+                          borderRadius: "8px",
+                          padding: "7px 14px",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                          fontSize: "12.5px",
+                          whiteSpace: "nowrap"
+                        }}
+                      >
+                        Go to My Addresses &rarr;
+                      </button>
                     </div>
                   )}
 

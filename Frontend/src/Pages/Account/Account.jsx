@@ -28,6 +28,7 @@ import {
   FiTrash2,
   FiUploadCloud,
   FiHeart,
+  FiPlus,
 } from "react-icons/fi";
 import { useShop } from "../../context/ShopContext";
 import API from "../../services/api";
@@ -67,8 +68,19 @@ const Account = () => {
   const [profilePhone, setProfilePhone] = useState("");
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
-  // Address Form state
-  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  // Address & Multi-Address Management state
+  const [isAddressFormOpen, setIsAddressFormOpen] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState(null); // null = new, "primary" or index/id
+  const [addressFormData, setAddressFormData] = useState({
+    label: "Home",
+    recipientName: "",
+    phone: "",
+    street: "",
+    city: "Bhubaneswar",
+    state: "Odisha",
+    postalCode: "751012",
+    isDefault: false,
+  });
   const [address, setAddress] = useState({
     street: "",
     city: "Bhubaneswar",
@@ -120,13 +132,24 @@ const Account = () => {
     const tabParam = params.get("tab");
     if (tabParam && ["profile", "subscriptions", "addresses", "orders", "security", "wishlist"].includes(tabParam)) {
       setActiveTab(tabParam);
-      if (tabParam === "addresses" && (params.get("selectAddress") === "true" || params.get("returnTo"))) {
-        if (!address.street) {
-          setIsEditingAddress(true);
+      if (tabParam === "addresses") {
+        if (!address.street || params.get("addNew") === "true") {
+          setIsAddressFormOpen(true);
+          setEditingAddressId(null);
+          setAddressFormData({
+            label: "Home",
+            recipientName: currentUser?.name || "",
+            phone: currentUser?.phone || "",
+            street: "",
+            city: "Bhubaneswar",
+            state: "Odisha",
+            postalCode: "751012",
+            isDefault: !address.street,
+          });
         }
       }
     }
-  }, [location.search, address.street]);
+  }, [location.search, address.street, currentUser]);
 
   // Sync user state on changes
   useEffect(() => {
@@ -409,25 +432,181 @@ const Account = () => {
     }
   };
 
-  // Save address updates
-  const handleSaveAddress = async (e) => {
+  // Compile all user delivery addresses (primary + additional saved)
+  const allSavedAddresses = useMemo(() => {
+    if (!currentUser) return [];
+    const list = [];
+    const primaryStreet = (currentUser.address?.street || address.street || "").trim();
+
+    if (primaryStreet) {
+      list.push({
+        _id: "primary",
+        label: "Primary Hub Address",
+        recipientName: currentUser.name || "Primary Contact",
+        phone: currentUser.phone || "",
+        street: primaryStreet,
+        city: currentUser.address?.city || address.city || "Bhubaneswar",
+        state: currentUser.address?.state || address.state || "Odisha",
+        postalCode: currentUser.address?.postalCode || address.postalCode || "751012",
+        isDefault: true,
+      });
+    }
+
+    if (Array.isArray(currentUser.addresses)) {
+      currentUser.addresses.forEach((addr, idx) => {
+        const addrStreet = (addr.street || "").trim();
+        if (addrStreet && addrStreet !== primaryStreet) {
+          list.push({
+            _id: addr._id || `addr-${idx}`,
+            label: addr.label || "Saved Address",
+            recipientName: addr.recipientName || currentUser.name || "Contact",
+            phone: addr.phone || currentUser.phone || "",
+            street: addrStreet,
+            city: addr.city || "Bhubaneswar",
+            state: addr.state || "Odisha",
+            postalCode: addr.postalCode || "751012",
+            isDefault: false,
+          });
+        }
+      });
+    }
+
+    return list;
+  }, [currentUser, address]);
+
+  // Open Form for Brand New Address
+  const handleOpenNewAddressForm = () => {
+    setEditingAddressId(null);
+    setAddressFormData({
+      label: "Home",
+      recipientName: currentUser?.name || "",
+      phone: currentUser?.phone || "",
+      street: "",
+      city: "Bhubaneswar",
+      state: "Odisha",
+      postalCode: "751012",
+      isDefault: allSavedAddresses.length === 0,
+    });
+    setIsAddressFormOpen(true);
+  };
+
+  // Open Form to Edit an Existing Address
+  const handleEditAddress = (addr) => {
+    setEditingAddressId(addr._id);
+    setAddressFormData({
+      label: addr.label || "Home",
+      recipientName: addr.recipientName || currentUser?.name || "",
+      phone: addr.phone || currentUser?.phone || "",
+      street: addr.street || "",
+      city: addr.city || "Bhubaneswar",
+      state: addr.state || "Odisha",
+      postalCode: addr.postalCode || "751012",
+      isDefault: Boolean(addr.isDefault),
+    });
+    setIsAddressFormOpen(true);
+  };
+
+  // Save / Update Address Form
+  const handleSaveAddressForm = async (e) => {
     e.preventDefault();
+    if (!addressFormData.street.trim()) {
+      setFeedbackMsg({ type: "error", text: "Please enter your house / street / flat details." });
+      return;
+    }
+    if (!addressFormData.recipientName.trim()) {
+      setFeedbackMsg({ type: "error", text: "Please provide recipient full name." });
+      return;
+    }
+    if (!addressFormData.phone.trim()) {
+      setFeedbackMsg({ type: "error", text: "Please provide contact mobile number." });
+      return;
+    }
+
     try {
       setIsSavingAddress(true);
       setFeedbackMsg({ type: "", text: "" });
 
-      const res = await API.put("/auth/profile", { address });
+      let currentAddresses = Array.isArray(currentUser?.addresses) ? [...currentUser.addresses] : [];
+      let updatedPrimary = currentUser?.address ? { ...currentUser.address } : { ...address };
+
+      const newAddressItem = {
+        label: addressFormData.label || "Home",
+        recipientName: addressFormData.recipientName.trim(),
+        phone: addressFormData.phone.trim(),
+        street: addressFormData.street.trim(),
+        city: addressFormData.city.trim() || "Bhubaneswar",
+        state: addressFormData.state.trim() || "Odisha",
+        postalCode: addressFormData.postalCode.trim() || "751012",
+        isDefault: Boolean(addressFormData.isDefault),
+      };
+
+      if (editingAddressId === "primary") {
+        updatedPrimary = {
+          street: newAddressItem.street,
+          city: newAddressItem.city,
+          state: newAddressItem.state,
+          postalCode: newAddressItem.postalCode,
+        };
+      } else if (editingAddressId) {
+        currentAddresses = currentAddresses.map((item, idx) => {
+          if (item._id === editingAddressId || `addr-${idx}` === editingAddressId) {
+            return { ...item, ...newAddressItem };
+          }
+          return item;
+        });
+        if (addressFormData.isDefault) {
+          updatedPrimary = {
+            street: newAddressItem.street,
+            city: newAddressItem.city,
+            state: newAddressItem.state,
+            postalCode: newAddressItem.postalCode,
+          };
+        }
+      } else {
+        if (addressFormData.isDefault || !updatedPrimary.street) {
+          if (updatedPrimary.street) {
+            currentAddresses.push({
+              label: "Previous Address",
+              recipientName: currentUser.name || "Contact",
+              phone: currentUser.phone || "",
+              street: updatedPrimary.street,
+              city: updatedPrimary.city || "Bhubaneswar",
+              state: updatedPrimary.state || "Odisha",
+              postalCode: updatedPrimary.postalCode || "751012",
+              isDefault: false,
+            });
+          }
+          updatedPrimary = {
+            street: newAddressItem.street,
+            city: newAddressItem.city,
+            state: newAddressItem.state,
+            postalCode: newAddressItem.postalCode,
+          };
+          newAddressItem.isDefault = true;
+        } else {
+          currentAddresses.push(newAddressItem);
+        }
+      }
+
+      const res = await API.put("/auth/profile", {
+        address: updatedPrimary,
+        addresses: currentAddresses,
+      });
 
       if (res.data?.success && res.data.user) {
         localStorage.setItem("alka_user", JSON.stringify(res.data.user));
         setCurrentUser(res.data.user);
+        setAddress(res.data.user.address || updatedPrimary);
         window.dispatchEvent(new Event("alkaAuthUpdated"));
-        setIsEditingAddress(false);
+        setIsAddressFormOpen(false);
+        setEditingAddressId(null);
         setFeedbackMsg({
           type: "success",
           text: returnTo
-            ? "Primary delivery address saved! Returning to cart..."
-            : "Primary delivery address updated successfully!",
+            ? "Delivery address saved! Returning to cart..."
+            : editingAddressId
+            ? "Address updated successfully!"
+            : "New delivery address added successfully!",
         });
 
         if (returnTo) {
@@ -439,12 +618,125 @@ const Account = () => {
     } catch (err) {
       setFeedbackMsg({
         type: "error",
-        text: err.response?.data?.message || "Failed to update delivery address.",
+        text: err.response?.data?.message || "Failed to save delivery address.",
       });
     } finally {
       setIsSavingAddress(false);
     }
   };
+
+  // Set Address as Default / Primary
+  const handleSetDefaultAddress = async (addr) => {
+    try {
+      setFeedbackMsg({ type: "", text: "" });
+      const newPrimary = {
+        street: addr.street,
+        city: addr.city || "Bhubaneswar",
+        state: addr.state || "Odisha",
+        postalCode: addr.postalCode || "751012",
+      };
+
+      const res = await API.put("/auth/profile", {
+        address: newPrimary,
+      });
+
+      if (res.data?.success && res.data.user) {
+        localStorage.setItem("alka_user", JSON.stringify(res.data.user));
+        setCurrentUser(res.data.user);
+        setAddress(newPrimary);
+        window.dispatchEvent(new Event("alkaAuthUpdated"));
+        setFeedbackMsg({
+          type: "success",
+          text: `"${addr.street}" set as your primary delivery address!`,
+        });
+      }
+    } catch (err) {
+      setFeedbackMsg({
+        type: "error",
+        text: err.response?.data?.message || "Failed to set default address.",
+      });
+    }
+  };
+
+  // Delete Saved Address
+  const handleDeleteAddress = async (addr) => {
+    if (!window.confirm(`Are you sure you want to remove address: "${addr.street}"?`)) {
+      return;
+    }
+
+    try {
+      setFeedbackMsg({ type: "", text: "" });
+      let currentAddresses = Array.isArray(currentUser?.addresses) ? [...currentUser.addresses] : [];
+      let currentPrimary = { ...(currentUser?.address || address) };
+
+      if (addr._id === "primary" || addr.isDefault) {
+        if (currentAddresses.length > 0) {
+          const nextDefault = currentAddresses[0];
+          currentPrimary = {
+            street: nextDefault.street,
+            city: nextDefault.city,
+            state: nextDefault.state,
+            postalCode: nextDefault.postalCode,
+          };
+          currentAddresses = currentAddresses.slice(1);
+        } else {
+          currentPrimary = { street: "", city: "Bhubaneswar", state: "Odisha", postalCode: "751012" };
+        }
+      } else {
+        currentAddresses = currentAddresses.filter(
+          (item, idx) => item._id !== addr._id && `addr-${idx}` !== addr._id
+        );
+      }
+
+      const res = await API.put("/auth/profile", {
+        address: currentPrimary,
+        addresses: currentAddresses,
+      });
+
+      if (res.data?.success && res.data.user) {
+        localStorage.setItem("alka_user", JSON.stringify(res.data.user));
+        setCurrentUser(res.data.user);
+        setAddress(currentPrimary);
+        window.dispatchEvent(new Event("alkaAuthUpdated"));
+        setFeedbackMsg({
+          type: "success",
+          text: "Address removed successfully.",
+        });
+      }
+    } catch (err) {
+      setFeedbackMsg({
+        type: "error",
+        text: err.response?.data?.message || "Failed to remove address.",
+      });
+    }
+  };
+
+  // Choose Address for Cart Delivery
+  const handleUseAddressForCart = async (addr) => {
+    try {
+      const newPrimary = {
+        street: addr.street,
+        city: addr.city || "Bhubaneswar",
+        state: addr.state || "Odisha",
+        postalCode: addr.postalCode || "751012",
+      };
+
+      await API.put("/auth/profile", { address: newPrimary });
+      const updatedUser = {
+        ...currentUser,
+        address: newPrimary,
+      };
+      localStorage.setItem("alka_user", JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
+      window.dispatchEvent(new Event("alkaAuthUpdated"));
+      navigate(returnTo || "/cart");
+    } catch {
+      navigate(returnTo || "/cart");
+    }
+  };
+
+  // Legacy single address handler
+  const handleSaveAddress = handleSaveAddressForm;
 
   // Save password update
   const handleSavePassword = async (e) => {
@@ -1449,6 +1741,22 @@ const Account = () => {
                     <h2 id="addresses-heading">My Addresses</h2>
                     <p>Manage your saved delivery locations for smooth checkout and automated drops.</p>
                   </div>
+                  <button
+                    type="button"
+                    className="Account-btnPrimary"
+                    onClick={handleOpenNewAddressForm}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "10px 18px",
+                      borderRadius: "10px",
+                      fontWeight: "700",
+                      fontSize: "14px",
+                    }}
+                  >
+                    <FiPlus /> Add New Address
+                  </button>
                 </div>
 
                 {returnTo && (
@@ -1488,11 +1796,11 @@ const Account = () => {
                           Choose or Add Delivery Address for Cart Checkout
                         </strong>
                         <p style={{ margin: "2px 0 0", color: "#0369a1", fontSize: "13px" }}>
-                          Save your address details below. Click &ldquo;Deliver to this Address&rdquo; to complete your order.
+                          Select any address below or add a new one to complete your doorstep delivery order.
                         </p>
                       </div>
                     </div>
-                    {address.street && !isEditingAddress && (
+                    {address.street && !isAddressFormOpen && (
                       <button
                         type="button"
                         onClick={() => navigate(returnTo)}
@@ -1507,40 +1815,82 @@ const Account = () => {
                           fontWeight: "700",
                         }}
                       >
-                        <FiCheck /> Use This Address &amp; Return to Cart
+                        <FiCheck /> Return to Cart
                       </button>
                     )}
                   </div>
                 )}
 
-                <div className="Account-cardBlock">
-                  <div className="Account-cardBlockHeader">
-                    <h4>
-                      <FiMapPin /> Primary Delivery Location
-                    </h4>
-                    {!isEditingAddress && (
+                {/* ADD / EDIT ADDRESS FORM */}
+                {isAddressFormOpen && (
+                  <div className="Account-cardBlock" style={{ border: "2px solid #0284c7", marginBottom: "26px", boxShadow: "0 8px 24px rgba(2, 132, 199, 0.08)" }}>
+                    <div className="Account-cardBlockHeader">
+                      <h4>
+                        <FiMapPin /> {editingAddressId ? "Edit Delivery Address" : "Add New Delivery Address"}
+                      </h4>
                       <button
                         type="button"
                         className="Account-editBtn"
-                        onClick={() => setIsEditingAddress(true)}
+                        onClick={() => {
+                          setIsAddressFormOpen(false);
+                          setEditingAddressId(null);
+                        }}
                       >
-                        <FiEdit2 /> {address.street ? "Edit Address" : "Add Address"}
+                        Cancel
                       </button>
-                    )}
-                  </div>
+                    </div>
 
-                  {isEditingAddress ? (
-                    <form onSubmit={handleSaveAddress}>
-                      <div className="Account-formGrid full" style={{ marginBottom: "16px" }}>
+                    <form onSubmit={handleSaveAddressForm}>
+                      {/* Address Type / Label Pills */}
+                      <div style={{ marginBottom: "16px" }}>
+                        <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#475569", marginBottom: "8px" }}>
+                          Address Type / Tag
+                        </label>
+                        <div className="Account-labelPills">
+                          {["Home", "Office", "Apartment", "Other"].map((lbl) => (
+                            <button
+                              key={lbl}
+                              type="button"
+                              className={`Account-labelPillBtn ${addressFormData.label === lbl ? "active" : ""}`}
+                              onClick={() => setAddressFormData({ ...addressFormData, label: lbl })}
+                            >
+                              {lbl}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="Account-formGrid" style={{ marginBottom: "16px" }}>
                         <div className="Account-field">
-                          <label>Street / Flat / House Landmark *</label>
+                          <label>Recipient Full Name *</label>
                           <input
                             type="text"
-                            value={address.street}
-                            onChange={(e) =>
-                              setAddress({ ...address, street: e.target.value })
-                            }
-                            placeholder="e.g. Plot No 120, IRC Village, Nayapalli"
+                            value={addressFormData.recipientName}
+                            onChange={(e) => setAddressFormData({ ...addressFormData, recipientName: e.target.value })}
+                            placeholder="e.g. Saroj Kumar Mallik"
+                            required
+                          />
+                        </div>
+                        <div className="Account-field">
+                          <label>Contact Phone Number *</label>
+                          <input
+                            type="tel"
+                            value={addressFormData.phone}
+                            onChange={(e) => setAddressFormData({ ...addressFormData, phone: e.target.value })}
+                            placeholder="10-digit mobile number"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="Account-formGrid full" style={{ marginBottom: "16px" }}>
+                        <div className="Account-field">
+                          <label>House / Flat No / Street Address / Landmark *</label>
+                          <input
+                            type="text"
+                            value={addressFormData.street}
+                            onChange={(e) => setAddressFormData({ ...addressFormData, street: e.target.value })}
+                            placeholder="e.g. Plot N5/22, IRC Village, Nayapalli"
                             required
                           />
                         </div>
@@ -1551,45 +1901,55 @@ const Account = () => {
                           <label>City *</label>
                           <input
                             type="text"
-                            value={address.city}
-                            onChange={(e) =>
-                              setAddress({ ...address, city: e.target.value })
-                            }
+                            value={addressFormData.city}
+                            onChange={(e) => setAddressFormData({ ...addressFormData, city: e.target.value })}
+                            placeholder="Bhubaneswar"
                             required
                           />
                         </div>
-
                         <div className="Account-field">
                           <label>State *</label>
                           <input
                             type="text"
-                            value={address.state}
-                            onChange={(e) =>
-                              setAddress({ ...address, state: e.target.value })
-                            }
+                            value={addressFormData.state}
+                            onChange={(e) => setAddressFormData({ ...addressFormData, state: e.target.value })}
+                            placeholder="Odisha"
                             required
                           />
                         </div>
-
                         <div className="Account-field">
                           <label>Postal PIN Code *</label>
                           <input
                             type="text"
-                            value={address.postalCode}
-                            onChange={(e) =>
-                              setAddress({ ...address, postalCode: e.target.value })
-                            }
-                            placeholder="e.g. 751012"
+                            value={addressFormData.postalCode}
+                            onChange={(e) => setAddressFormData({ ...addressFormData, postalCode: e.target.value })}
+                            placeholder="751012"
                             required
                           />
                         </div>
+                      </div>
+
+                      <div style={{ margin: "18px 0 22px", display: "flex", alignItems: "center", gap: "10px" }}>
+                        <input
+                          type="checkbox"
+                          id="isDefaultAddressCheck"
+                          checked={addressFormData.isDefault}
+                          onChange={(e) => setAddressFormData({ ...addressFormData, isDefault: e.target.checked })}
+                          style={{ width: "18px", height: "18px", accentColor: "#0284c7", cursor: "pointer" }}
+                        />
+                        <label htmlFor="isDefaultAddressCheck" style={{ fontSize: "14px", color: "#334155", cursor: "pointer", fontWeight: "600" }}>
+                          Set as Primary / Default Delivery Location
+                        </label>
                       </div>
 
                       <div className="Account-formActions">
                         <button
                           type="button"
                           className="Account-btnSecondary"
-                          onClick={() => setIsEditingAddress(false)}
+                          onClick={() => {
+                            setIsAddressFormOpen(false);
+                            setEditingAddressId(null);
+                          }}
                           disabled={isSavingAddress}
                         >
                           Cancel
@@ -1604,79 +1964,156 @@ const Account = () => {
                               <FiRefreshCw className="spin" /> Saving...
                             </>
                           ) : (
-                            "Save Address"
+                            <>
+                              <FiCheck /> {editingAddressId ? "Update Address" : "Save New Address"}
+                            </>
                           )}
                         </button>
                       </div>
                     </form>
-                  ) : address.street ? (
-                    <div className="Account-addressDisplayCard">
-                      <div className="Account-addressHubPill">
-                        <FiMapPin /> Primary Hub Address
-                      </div>
-                      <strong className="Account-addressRecipient">
-                        {currentUser.name}
-                      </strong>
-                      <p className="Account-addressLines">
-                        {address.street}
-                        <br />
-                        {address.city}, {address.state} &bull; PIN: {address.postalCode}
-                      </p>
-                      {currentUser.phone && (
-                        <div className="Account-addressPhone">
-                          <FiPhone /> Contact: {currentUser.phone}
-                        </div>
-                      )}
+                  </div>
+                )}
 
-                      <div style={{ marginTop: "18px", display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
-                        <button
-                          type="button"
-                          className="Account-btnPrimary"
-                          onClick={() => navigate(returnTo || "/cart")}
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            padding: "10px 18px",
-                            fontSize: "14px",
-                            fontWeight: "600",
-                            borderRadius: "10px",
-                          }}
-                        >
-                          <FiCheck /> {returnTo ? "Deliver to this Address & Return to Cart" : "Use this Address for Delivery"}
-                        </button>
-                        <button
-                          type="button"
-                          className="Account-btnSecondary"
-                          onClick={() => setIsEditingAddress(true)}
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            padding: "10px 16px",
-                            fontSize: "14px",
-                            borderRadius: "10px",
-                          }}
-                        >
-                          <FiEdit2 /> Edit Address
-                        </button>
-                      </div>
+                {/* SAVED ADDRESSES GRID */}
+                {allSavedAddresses.length === 0 && !isAddressFormOpen ? (
+                  <div
+                    style={{
+                      background: "#f8fafc",
+                      border: "2px dashed #cbd5e1",
+                      borderRadius: "16px",
+                      padding: "48px 24px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        borderRadius: "50%",
+                        background: "#e0f2fe",
+                        color: "#0284c7",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "26px",
+                        marginBottom: "16px",
+                      }}
+                    >
+                      <FiMapPin />
                     </div>
-                  ) : (
-                    <div style={{ color: "#64748b", padding: "10px 0" }}>
-                      <p style={{ margin: "0 0 12px" }}>
-                        No delivery address registered yet. Add one to enable one-click checkout.
-                      </p>
-                      <button
-                        type="button"
-                        className="Account-btnPrimary"
-                        onClick={() => setIsEditingAddress(true)}
+                    <h3 style={{ fontSize: "18px", color: "#0f172a", marginBottom: "8px" }}>
+                      No Saved Delivery Addresses
+                    </h3>
+                    <p style={{ color: "#64748b", fontSize: "14px", maxWidth: "420px", margin: "0 auto 20px" }}>
+                      Add your home or office address to receive pure alkaline water delivered right to your doorstep.
+                    </p>
+                    <button
+                      type="button"
+                      className="Account-btnPrimary"
+                      onClick={handleOpenNewAddressForm}
+                      style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+                    >
+                      <FiPlus /> Add First Address
+                    </button>
+                  </div>
+                ) : (
+                  <div className="Account-addressGrid">
+                    {allSavedAddresses.map((addr, idx) => (
+                      <div
+                        key={addr._id || idx}
+                        className={`Account-addressCardItem ${addr.isDefault ? "is-default" : ""}`}
                       >
-                        + Add Primary Address
-                      </button>
-                    </div>
-                  )}
-                </div>
+                        <div>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                            <span
+                              className="Account-addressHubPill"
+                              style={
+                                addr.isDefault
+                                  ? { background: "#e0f2fe", color: "#0369a1", borderColor: "#7dd3fc" }
+                                  : { background: "#f1f5f9", color: "#475569", borderColor: "#cbd5e1" }
+                              }
+                            >
+                              <FiMapPin /> {addr.label || (addr.isDefault ? "Primary Hub Address" : "Saved Location")}
+                            </span>
+                            {addr.isDefault && (
+                              <span style={{ fontSize: "11px", fontWeight: "700", color: "#16a34a", background: "#dcfce7", padding: "2px 8px", borderRadius: "9999px" }}>
+                                Default
+                              </span>
+                            )}
+                          </div>
+
+                          <strong className="Account-addressRecipient">
+                            {addr.recipientName}
+                          </strong>
+
+                          <p className="Account-addressLines">
+                            {addr.street}
+                            <br />
+                            {addr.city}, {addr.state} &bull; PIN: {addr.postalCode}
+                          </p>
+
+                          {addr.phone && (
+                            <div className="Account-addressPhone" style={{ marginBottom: "18px" }}>
+                              <FiPhone /> Contact: {addr.phone}
+                            </div>
+                          )}
+                        </div>
+
+                        <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "14px", marginTop: "auto", display: "flex", flexDirection: "column", gap: "10px" }}>
+                          <button
+                            type="button"
+                            className="Account-btnPrimary"
+                            onClick={() => handleUseAddressForCart(addr)}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "8px",
+                              padding: "9px 14px",
+                              fontSize: "13.5px",
+                              fontWeight: "600",
+                              borderRadius: "8px",
+                              width: "100%",
+                            }}
+                          >
+                            <FiCheck /> {returnTo ? "Deliver Here & Return to Cart" : "Use this Address for Delivery"}
+                          </button>
+
+                          <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end", flexWrap: "wrap" }}>
+                            {!addr.isDefault && (
+                              <button
+                                type="button"
+                                className="Account-btnSecondary"
+                                onClick={() => handleSetDefaultAddress(addr)}
+                                style={{ padding: "6px 12px", fontSize: "12.5px", borderRadius: "8px" }}
+                              >
+                                Make Default
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              className="Account-btnSecondary"
+                              onClick={() => handleEditAddress(addr)}
+                              style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "6px 12px", fontSize: "12.5px", borderRadius: "8px" }}
+                            >
+                              <FiEdit2 /> Edit
+                            </button>
+                            {allSavedAddresses.length > 1 && (
+                              <button
+                                type="button"
+                                className="Account-btnSecondary"
+                                onClick={() => handleDeleteAddress(addr)}
+                                style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "6px 12px", fontSize: "12.5px", borderRadius: "8px", color: "#dc2626" }}
+                              >
+                                <FiTrash2 /> Delete
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Subscription Orders History */}
                 {subOrders.length > 0 && (

@@ -194,6 +194,291 @@
 .OrderManagement-statusSelect.out-for-delivery { background: #fffbeb; color: #b45309; border-color: #fde68a; }
 .OrderManagement-statusSelect.delivered { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
 .OrderManagement-statusSelect.processing { background: #f0f9ff; color: #0284c7; border-color: #bae6fd; }
+
+/* Razorpay & Payment details */
+.OrderManagement-rzpPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  color: #334155;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: monospace;
+  margin-top: 4px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.OrderManagement-viewBtn {
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  color: #0d9488;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+.OrderManagement-viewBtn:hover {
+  background: #0d9488;
+  color: #ffffff;
+}
+
+/* Modal styles */
+.OrderManagement-modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.OrderManagement-modalDialog {
+  background: #ffffff;
+  border-radius: 18px;
+  max-width: 660px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid #e2e8f0;
+}
+
+.OrderManagement-modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.OrderManagement-modalHeader h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.OrderManagement-modalClose {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+}
+.OrderManagement-modalClose:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.OrderManagement-modalBody {
+  padding: 22px 24px;
+}
+
+.OrderManagement-modalGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.OrderManagement-modalCard {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.OrderManagement-modalCard h4 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #64748b;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.OrderManagement-modalCard p {
+  margin: 0 0 6px;
+  font-size: 13.5px;
+  color: #1e293b;
+}
+
+.OrderManagement-modalCard strong {
+  display: block;
+  font-size: 14px;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+/* Assign Delivery Partner Styles */
+.OrderManagement-assignCell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 190px;
+}
+
+.OrderManagement-assignSelect {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #1e293b;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.OrderManagement-assignSelect:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.OrderManagement-assignSelect.has-assigned {
+  background-color: #f0fdfa;
+  border-color: #99f6e4;
+  color: #0f766e;
+}
+
+.OrderManagement-assignedBadge {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.OrderManagement-assignedPartnerTag {
+  align-self: flex-start;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: #0d9488;
+  color: #ffffff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+
+.OrderManagement-assignedName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.OrderManagement-assignedMeta {
+  font-size: 11.5px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.OrderManagement-unassignedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  align-self: flex-start;
+}
+
+/* Modal Partner Box */
+.OrderManagement-modalPartnerBox {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.OrderManagement-modalPartnerAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.OrderManagement-modalPartnerAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.OrderManagement-modalPartnerDetails {
+  flex: 1;
+}
+
+.OrderManagement-quickSubmitBtn {
+  background: #f0fdfa;
+  border: 1px solid #99f6e4;
+  color: #0f766e;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.OrderManagement-quickSubmitBtn:hover {
+  background: #0d9488;
+  color: #ffffff;
+  border-color: #0d9488;
+}
+
+.OrderManagement-deliveredDoneBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 3px 8px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
 @media (max-width: 1024px) {
   .OrderManagement-statsGrid { grid-template-columns: repeat(2, 1fr); }
 }
@@ -202,5 +487,6 @@
   .OrderManagement-header { flex-direction: column; align-items: stretch; gap: 12px; }
   .OrderManagement-statsGrid { grid-template-columns: 1fr; }
   .OrderManagement-controlBar { flex-direction: column; align-items: stretch; }
+  .OrderManagement-modalGrid { grid-template-columns: 1fr; }
 }
 

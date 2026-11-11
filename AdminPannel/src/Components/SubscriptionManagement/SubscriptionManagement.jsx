@@ -222,9 +222,6 @@ const SubscriptionManagement = () => {
           </div>
           <div>
             <h1>Subscription Management</h1>
-            <p className="SubscriptionManagement-subtitle">
-              Post, manage, and configure subscription pricing cards displayed on http://localhost:5173/pricing
-            </p>
           </div>
         </div>
 

@@ -100,10 +100,56 @@ const subscriptionOrderSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+    assignedDeliveryBoy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DeliveryBoy",
+      default: null,
+    },
     deliveryBoy: {
+      id: { type: String, default: "" },
       name: { type: String, default: "Unassigned" },
       phone: { type: String, default: "" },
+      partnerId: { type: String, default: "" },
+      vehicleNumber: { type: String, default: "" },
     },
+    totalQuotaJars: {
+      type: Number,
+      default: 30,
+    },
+    bottlesDelivered: {
+      type: Number,
+      default: 0,
+    },
+    emptyJarsCollected: {
+      type: Number,
+      default: 0,
+    },
+    pendingEmptyJars: {
+      type: Number,
+      default: 0,
+    },
+    dailyDrops: [
+      {
+        dropDate: { type: Date, default: Date.now },
+        bottlesDelivered: { type: Number, default: 2 },
+        emptyJarsCollected: { type: Number, default: 0 },
+        emptyJarStatus: {
+          type: String,
+          enum: ["Collected", "Not Returned / Pending", "Partial Return", "Extra Collected"],
+          default: "Collected",
+        },
+        emptyJarReason: { type: String, default: "" },
+        deliveredBy: { type: String, default: "" },
+        partnerId: { type: String, default: "" },
+        status: {
+          type: String,
+          enum: ["Delivered", "Missed", "Skipped", "Pending"],
+          default: "Delivered",
+        },
+        notes: { type: String, default: "" },
+        deliveredAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

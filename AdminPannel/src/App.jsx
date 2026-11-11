@@ -27,7 +27,9 @@ import SubscriptionOrders from "./Components/SubscriptionOrders/SubscriptionOrde
 import UserManagement from "./Components/UserManagement/UserManagement";
 import DeliveryBoyId from "./Components/DeliveryBoyId/DeliveryBoyId";
 import AddDeliveryBoy from "./Components/DeliveryBoyId/AddDeliveryBoy";
+import DeliveryBoyDetail from "./Components/DeliveryBoyId/DeliveryBoyDetail";
 import AssigningBottle from "./Components/AssigningBottle/AssigningBottle";
+import DeliveryDispatch from "./Components/DeliveryDispatch/DeliveryDispatch";
 import Settings from "./Components/Settings/Settings";
 import ReportManagement from "./Components/ReportManagement/ReportManagement";
 import EnquiryManagement from "./Components/EnquiryManagement/EnquiryManagement";
@@ -98,11 +100,17 @@ const App = () => {
           <Route path="admin/delivery-boy-id" element={<DeliveryBoyId />} />
           <Route path="delivery-boy-id" element={<DeliveryBoyId />} />
 
+          <Route path="admin/delivery-boy/:id" element={<DeliveryBoyDetail />} />
+          <Route path="delivery-boy/:id" element={<DeliveryBoyDetail />} />
+
           <Route path="admin/add-delivery-boy" element={<AddDeliveryBoy />} />
           <Route path="add-delivery-boy" element={<AddDeliveryBoy />} />
 
           <Route path="admin/assigning-bottle" element={<AssigningBottle />} />
           <Route path="assigning-bottle" element={<AssigningBottle />} />
+
+          <Route path="admin/delivery-dispatch" element={<DeliveryDispatch />} />
+          <Route path="delivery-dispatch" element={<DeliveryDispatch />} />
 
           {/* SETTINGS */}
           <Route path="admin/settings" element={<Settings />} />

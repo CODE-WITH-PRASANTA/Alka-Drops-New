@@ -1,5 +1,6 @@
 const SubscriptionOrder = require("../models/SubscriptionOrder");
 const User = require("../models/User");
+const DeliveryBoy = require("../models/DeliveryBoy");
 
 // @desc    Create new subscription order
 // @route   POST /api/subscription-orders
@@ -158,7 +159,9 @@ const getAllSubscriptionOrders = async (req, res, next) => {
       ];
     }
 
-    const orders = await SubscriptionOrder.find(filter).sort({ createdAt: -1 });
+    const orders = await SubscriptionOrder.find(filter)
+      .populate("assignedDeliveryBoy")
+      .sort({ createdAt: -1 });
 
     const totalOrders = orders.length;
     const activeCount = orders.filter((o) => o.status === "Active").length;
@@ -357,26 +360,154 @@ const updateSubscriptionOrderStatus = async (req, res, next) => {
 const assignDeliveryPartner = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { deliveryBoyName, deliveryBoyPhone } = req.body;
+    const { deliveryBoyId, deliveryBoyName, deliveryBoyPhone } = req.body;
 
     const order = await SubscriptionOrder.findById(id);
     if (!order) {
       return res.status(404).json({ success: false, message: "Subscription order not found." });
     }
 
-    order.deliveryBoy = {
-      name: deliveryBoyName || "Unassigned",
-      phone: deliveryBoyPhone || "",
+    if (!deliveryBoyId || deliveryBoyId === "unassigned") {
+      if (deliveryBoyName && deliveryBoyName !== "Unassigned") {
+        order.assignedDeliveryBoy = null;
+        order.deliveryBoy = {
+          id: "",
+          name: deliveryBoyName,
+          phone: deliveryBoyPhone || "",
+          partnerId: "",
+          vehicleNumber: "",
+        };
+      } else {
+        order.assignedDeliveryBoy = null;
+        order.deliveryBoy = {
+          id: "",
+          name: "Unassigned",
+          phone: "",
+          partnerId: "",
+          vehicleNumber: "",
+        };
+      }
+    } else {
+      let rider = null;
+      if (deliveryBoyId.match(/^[0-9a-fA-F]{24}$/)) {
+        rider = await DeliveryBoy.findById(deliveryBoyId);
+      }
+      if (!rider) {
+        rider = await DeliveryBoy.findOne({ partnerId: deliveryBoyId });
+      }
+
+      if (rider) {
+        order.assignedDeliveryBoy = rider._id;
+        order.deliveryBoy = {
+          id: rider._id.toString(),
+          name: rider.name,
+          phone: rider.phone,
+          partnerId: rider.partnerId,
+          vehicleNumber: rider.vehicleNumber,
+        };
+      } else {
+        order.deliveryBoy = {
+          id: "",
+          name: deliveryBoyName || "Delivery Boy",
+          phone: deliveryBoyPhone || "",
+          partnerId: "",
+          vehicleNumber: "",
+        };
+      }
+    }
+
+    await order.save();
+    await order.populate("assignedDeliveryBoy");
+
+    res.json({
+      success: true,
+      message: `Assigned ${order.deliveryBoy.name} to subscription order #${order.orderNumber}.`,
+      order,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Record daily delivery drop for subscription order
+// @route   POST /api/subscription-orders/:id/record-drop
+// @access  Admin / Delivery Boy
+const recordSubscriptionDrop = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const {
+      bottlesDelivered = 2,
+      emptyJarsCollected = 0,
+      emptyJarReason = "",
+      deliveredBy,
+      partnerId,
+      status = "Delivered",
+      notes = "",
+    } = req.body;
+
+    const order = await SubscriptionOrder.findById(id).populate("assignedDeliveryBoy");
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Subscription order not found." });
+    }
+
+    const numDelivered = Math.max(0, Number(bottlesDelivered) || 0);
+    const numEmpties = Math.max(0, Number(emptyJarsCollected) || 0);
+    const riderName =
+      deliveredBy ||
+      (order.deliveryBoy?.name && order.deliveryBoy.name !== "Unassigned"
+        ? order.deliveryBoy.name
+        : "Delivery Boy");
+    const rPartnerId = partnerId || order.deliveryBoy?.partnerId || "";
+
+    let emptyJarStatus = "Collected";
+    if (numEmpties === 0) {
+      emptyJarStatus = "Not Returned / Pending";
+    } else if (numEmpties < numDelivered) {
+      emptyJarStatus = "Partial Return";
+    } else if (numEmpties > numDelivered) {
+      emptyJarStatus = "Extra Collected";
+    }
+
+    const dropEntry = {
+      dropDate: new Date(),
+      bottlesDelivered: numDelivered,
+      emptyJarsCollected: numEmpties,
+      emptyJarStatus,
+      emptyJarReason: emptyJarReason ? emptyJarReason.trim() : numEmpties === 0 ? "Customer did not return empty jar today" : "",
+      deliveredBy: riderName,
+      partnerId: rPartnerId,
+      status: status || "Delivered",
+      notes: notes ? notes.trim() : (numEmpties === 0 ? "Empty jar pending for next delivery" : "Daily drop delivered"),
+      deliveredAt: new Date(),
     };
+
+    if (!Array.isArray(order.dailyDrops)) {
+      order.dailyDrops = [];
+    }
+    order.dailyDrops.unshift(dropEntry);
+
+    if (status === "Delivered") {
+      order.bottlesDelivered = (order.bottlesDelivered || 0) + numDelivered;
+      order.emptyJarsCollected = (order.emptyJarsCollected || 0) + numEmpties;
+      order.pendingEmptyJars = Math.max(0, order.bottlesDelivered - order.emptyJarsCollected);
+
+      if (order.totalQuotaJars && order.bottlesDelivered >= order.totalQuotaJars) {
+        order.status = "Completed";
+      }
+    }
 
     await order.save();
 
     res.json({
       success: true,
-      message: `Assigned ${deliveryBoyName} to subscription order #${order.orderNumber}.`,
+      message: numEmpties === 0
+        ? `Drop recorded with 0 empties collected! Customer now has ${order.pendingEmptyJars} unreturned jar(s) pending.`
+        : `Today's drop of ${numDelivered} jar(s) recorded! (${numEmpties} empties collected).`,
+      drop: dropEntry,
       order,
     });
   } catch (error) {
+    console.error("Record Subscription Drop Error:", error);
     next(error);
   }
 };
@@ -410,6 +541,7 @@ module.exports = {
   updateMySubscriptionSchedule,
   updateSubscriptionOrderStatus,
   assignDeliveryPartner,
+  recordSubscriptionDrop,
   deleteSubscriptionOrder,
 };
 

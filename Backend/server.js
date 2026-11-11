@@ -96,6 +96,7 @@ app.use("/api/subscription-plans", require("./routes/subscriptionPlanRoutes"));
 app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/delivery-boys", require("./routes/deliveryBoyRoutes"));
 app.use("/api/subscription-orders", require("./routes/subscriptionOrderRoutes"));
+app.use("/api/mail", require("./routes/mailRoutes"));
 
 // Error handling middlewares
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
@@ -111,6 +112,10 @@ const server = app.listen(PORT, () => {
   console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
   console.log(`🌐 Environment:  ${process.env.NODE_ENV || "development"}`);
   console.log(`===============================================`);
+
+  // Verify SMTP Gmail Connection on server boot
+  const { verifySmtp } = require("./config/nodemailer");
+  verifySmtp().catch(() => {});
 });
 
 // Handle unhandled promise rejections

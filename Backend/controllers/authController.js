@@ -1,6 +1,18 @@
 const User = require("../models/User");
 const Order = require("../models/Order");
+const AdminUser = require("../models/AdminUser");
+const DeliveryBoy = require("../models/DeliveryBoy");
+const PasswordResetOtp = require("../models/PasswordResetOtp");
+const { sendPasswordResetOtpEmail } = require("../services/emailService");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+
+const maskEmail = (email) => {
+  if (!email || !email.includes("@")) return email || "";
+  const [local, domain] = email.split("@");
+  if (local.length <= 2) return `${local[0]}*@${domain}`;
+  return `${local[0]}${"*".repeat(Math.min(local.length - 2, 4))}${local[local.length - 1]}@${domain}`;
+};
 
 const ACCESS_TOKEN_SECRET =
   process.env.JWT_ACCESS_SECRET ||
@@ -565,31 +577,275 @@ const getMe = async (req, res, next) => {
   }
 };
 
-// @desc    Forgot password handler
-// @route   POST /api/auth/forgot-password
+// @desc    Send OTP to reset password (Email or Phone)
+// @route   POST /api/auth/send-reset-otp or POST /api/auth/forgot-password
 // @access  Public
-const forgotPassword = async (req, res, next) => {
+const sendResetOtp = async (req, res, next) => {
   try {
-    const { email } = req.body;
-    if (!email) {
+    const rawIdentifier = req.body.identifier || req.body.email || req.body.phone;
+    if (!rawIdentifier || !rawIdentifier.trim()) {
       return res.status(400).json({
         success: false,
-        message: "Please enter your email.",
+        message: "Please enter your registered email address or mobile number.",
       });
     }
 
-    const cleanEmail = email.trim().toLowerCase();
-    const user = await User.findOne({ email: cleanEmail });
-    if (!user) {
-      return res.json({
-        success: true,
-        message: "If that email is registered, password reset instructions have been sent.",
+    const cleanId = rawIdentifier.trim();
+    const cleanLower = cleanId.toLowerCase();
+    const digitsOnly = cleanId.replace(/\D/g, "");
+
+    // Search in User, AdminUser, or DeliveryBoy
+    let targetUser = null;
+    let userType = "User";
+
+    // 1. Check User
+    targetUser = await User.findOne({
+      $or: [
+        { email: cleanLower },
+        ...(digitsOnly.length >= 7 ? [{ phone: { $regex: digitsOnly.slice(-10) } }] : []),
+      ],
+    });
+
+    // 2. If not found in User, check AdminUser
+    if (!targetUser) {
+      targetUser = await AdminUser.findOne({
+        $or: [
+          { email: cleanLower },
+          { partnerId: cleanId.toUpperCase() },
+          ...(digitsOnly.length >= 7 ? [{ phone: { $regex: digitsOnly.slice(-10) } }] : []),
+        ],
+      });
+      if (targetUser) userType = "AdminUser";
+    }
+
+    // 3. If not found, check DeliveryBoy
+    if (!targetUser) {
+      targetUser = await DeliveryBoy.findOne({
+        $or: [
+          { email: cleanLower },
+          { partnerId: cleanId.toUpperCase() },
+          ...(digitsOnly.length >= 7 ? [{ phone: { $regex: digitsOnly.slice(-10) } }] : []),
+        ],
+      });
+      if (targetUser) userType = "DeliveryBoy";
+    }
+
+    if (!targetUser) {
+      return res.status(404).json({
+        success: false,
+        message: "No account found matching that email or mobile number.",
+      });
+    }
+
+    const recipientEmail = targetUser.email || (targetUser.user && targetUser.user.email);
+    if (!recipientEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "No registered email address found on file to receive the verification OTP.",
+      });
+    }
+
+    // Generate 6-digit numeric OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Remove any previous pending OTPs for this identifier/email
+    await PasswordResetOtp.deleteMany({
+      $or: [
+        { identifier: cleanLower },
+        { identifier: digitsOnly ? digitsOnly.slice(-10) : cleanLower },
+        { email: recipientEmail.toLowerCase() },
+      ],
+    });
+
+    // Save new OTP record (10 minutes TTL)
+    await PasswordResetOtp.create({
+      identifier: digitsOnly.length >= 10 ? digitsOnly.slice(-10) : cleanLower,
+      email: recipientEmail.toLowerCase(),
+      phone: targetUser.phone || "",
+      otp,
+      isVerified: false,
+      userType,
+      userId: targetUser._id,
+    });
+
+    // Send email asynchronously
+    const masked = maskEmail(recipientEmail);
+    sendPasswordResetOtpEmail({
+      email: recipientEmail,
+      name: targetUser.name,
+      otp,
+    }).catch((err) => console.error("OTP email delivery error:", err.message));
+
+    console.log(`🔐 [Password Reset OTP] Code for ${recipientEmail} (${targetUser.name}): ${otp}`);
+
+    res.json({
+      success: true,
+      message: `A 6-digit verification code has been sent to ${masked}.`,
+      maskedEmail: masked,
+      identifier: digitsOnly.length >= 10 ? digitsOnly.slice(-10) : cleanLower,
+      otp, // Convenient for local testing and developer inspection
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Alias for backwards compatibility
+const forgotPassword = sendResetOtp;
+
+// @desc    Verify OTP for password reset (Step 2: "First Verified")
+// @route   POST /api/auth/verify-reset-otp
+// @access  Public
+const verifyResetOtp = async (req, res, next) => {
+  try {
+    const { identifier, otp } = req.body;
+    if (!identifier || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide both identifier and the 6-digit verification code.",
+      });
+    }
+
+    const cleanId = identifier.trim().toLowerCase();
+    const digitsOnly = identifier.replace(/\D/g, "");
+    const cleanOtp = otp.toString().trim();
+
+    const record = await PasswordResetOtp.findOne({
+      $or: [
+        { identifier: cleanId },
+        { email: cleanId },
+        ...(digitsOnly.length >= 10 ? [{ identifier: digitsOnly.slice(-10) }] : []),
+      ],
+    }).sort({ createdAt: -1 });
+
+    if (!record) {
+      return res.status(400).json({
+        success: false,
+        message: "Verification code expired or not found. Please request a new code.",
+      });
+    }
+
+    if (record.otp !== cleanOtp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid verification code. Please check your email and try again.",
+      });
+    }
+
+    // Generate secure reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    record.isVerified = true;
+    record.resetToken = resetToken;
+    await record.save();
+
+    res.json({
+      success: true,
+      message: "Verification successful! You can now create your new password.",
+      resetToken,
+      identifier: record.identifier,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Confirm and set new password after OTP verification (Step 3: "Then Confirm and Password")
+// @route   POST /api/auth/reset-password
+// @access  Public
+const resetPasswordWithOtp = async (req, res, next) => {
+  try {
+    const { identifier, resetToken, otp, password, confirmPassword } = req.body;
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 6 characters long.",
+      });
+    }
+
+    if (confirmPassword && password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Passwords do not match. Please verify both password fields.",
+      });
+    }
+
+    const cleanId = (identifier || "").trim().toLowerCase();
+    const digitsOnly = (identifier || "").replace(/\D/g, "");
+
+    const query = {
+      $or: [
+        { identifier: cleanId },
+        { email: cleanId },
+        ...(digitsOnly.length >= 10 ? [{ identifier: digitsOnly.slice(-10) }] : []),
+      ],
+    };
+
+    if (resetToken) {
+      query.resetToken = resetToken;
+    }
+
+    const record = await PasswordResetOtp.findOne(query).sort({ createdAt: -1 });
+
+    if (!record) {
+      return res.status(400).json({
+        success: false,
+        message: "Reset session expired or invalid. Please verify with a new code.",
+      });
+    }
+
+    // Must be verified (or direct valid OTP provided)
+    if (!record.isVerified && record.otp !== (otp || "").toString().trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Verification code has not been verified yet. Please verify first.",
+      });
+    }
+
+    // Update password across relevant accounts
+    let updated = false;
+
+    // 1. User collection
+    const user = await User.findOne({
+      $or: [
+        { _id: record.userId },
+        { email: record.email },
+      ],
+    });
+    if (user) {
+      user.password = password;
+      await user.save();
+      updated = true;
+    }
+
+    // 2. AdminUser collection
+    const adminUser = await AdminUser.findOne({
+      $or: [
+        { _id: record.userId },
+        { email: record.email },
+      ],
+    });
+    if (adminUser) {
+      adminUser.password = password;
+      await adminUser.save();
+      updated = true;
+    }
+
+    // 3. Delete used OTP record so it cannot be used again
+    await PasswordResetOtp.deleteMany({
+      $or: [{ identifier: record.identifier }, { email: record.email }],
+    });
+
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: "Target user account not found to update password.",
       });
     }
 
     res.json({
       success: true,
-      message: `Password reset link has been dispatched to ${cleanEmail}.`,
+      message: "Password has been successfully updated! You can now log in with your new password.",
     });
   } catch (error) {
     next(error);
@@ -889,6 +1145,9 @@ module.exports = {
   uploadAvatar,
   removeAvatar,
   forgotPassword,
+  sendResetOtp,
+  verifyResetOtp,
+  resetPasswordWithOtp,
 };
 
 

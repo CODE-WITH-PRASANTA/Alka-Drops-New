@@ -853,7 +853,9 @@ const OrderManagement = () => {
               <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px" }}>
                 <strong style={{ fontSize: "14px", color: "#0f172a" }}>{deliverySubmitModal.order.customer}</strong>
                 <p style={{ margin: "4px 0", fontSize: "12.5px", color: "#475569" }}>{deliverySubmitModal.order.address}</p>
-                <span style={{ fontSize: "12px", color: "#0284c7" }}>📞 {deliverySubmitModal.order.phone}</span>
+                <span style={{ fontSize: "12px", color: "#0284c7", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <FiPhone size={12} /> {deliverySubmitModal.order.phone}
+                </span>
               </div>
 
               <div>

@@ -239,6 +239,29 @@ const createDeliveryBoy = async (req, res) => {
       avatar: avatar?.trim() || "",
     });
 
+    // Step 3: Ensure AdminUser account exists for immediate portal and rider login
+    try {
+      const AdminUser = require("../models/AdminUser");
+      const existingAdmin = await AdminUser.findOne({ email: cleanEmail });
+      if (!existingAdmin) {
+        const adminAccount = new AdminUser({
+          name: name.trim(),
+          email: cleanEmail,
+          password: userPassword,
+          phone: phone.trim(),
+          role: "delivery_boy",
+          partnerId,
+          deliveryBoyRef: deliveryBoy._id,
+          avatar: avatar?.trim() || "",
+          status: "Active",
+          dutyStatus: status === "Off Duty" ? "Off Duty" : "On Duty",
+        });
+        await adminAccount.save();
+      }
+    } catch (adminSyncErr) {
+      console.error("AdminUser sync error:", adminSyncErr.message);
+    }
+
     // Send onboarding credentials email asynchronously via Nodemailer
     const { sendDeliveryAgentCredentialsEmail } = require("../services/emailService");
     sendDeliveryAgentCredentialsEmail({

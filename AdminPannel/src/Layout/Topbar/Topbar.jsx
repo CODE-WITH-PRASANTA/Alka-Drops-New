@@ -28,9 +28,11 @@ import {
   MessageSquare,
   PackageCheck,
   Boxes,
+  Droplets,
 } from "lucide-react";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAdminAuth } from "../../context/AdminAuthContext";
 
 import "./Topbar.css";
 
@@ -80,6 +82,21 @@ const routeTitles = {
 
   "/admin/user-management": "User Management",
   "/user-management": "User Management",
+
+  "/admin/delivery-dispatch": "Delivery Dispatch Run Sheet",
+  "/delivery-dispatch": "Delivery Dispatch Run Sheet",
+
+  "/admin/delivery-dashboard": "Delivery Partner Dashboard",
+  "/delivery-dashboard": "Delivery Partner Dashboard",
+
+  "/admin/delivery-subscriptions": "Subscription Daily Drops",
+  "/delivery-subscriptions": "Subscription Daily Drops",
+
+  "/admin/delivery-shop-orders": "Shop Retail Orders",
+  "/delivery-shop-orders": "Shop Retail Orders",
+
+  "/admin/delivery-attendance": "Attendance",
+  "/delivery-attendance": "Attendance",
 
   "/admin/delivery-boy-id": "Delivery Boy ID Generation",
   "/delivery-boy-id": "Delivery Boy ID Generation",
@@ -146,6 +163,21 @@ const routeIcons = {
 
   "/admin/user-management": Users,
   "/user-management": Users,
+
+  "/admin/delivery-dashboard": LayoutDashboard,
+  "/delivery-dashboard": LayoutDashboard,
+
+  "/admin/delivery-subscriptions": Droplets,
+  "/delivery-subscriptions": Droplets,
+
+  "/admin/delivery-shop-orders": ShoppingCart,
+  "/delivery-shop-orders": ShoppingCart,
+
+  "/admin/delivery-attendance": CalendarDays,
+  "/delivery-attendance": CalendarDays,
+
+  "/admin/delivery-dispatch": PackageCheck,
+  "/delivery-dispatch": PackageCheck,
 
   "/admin/delivery-boy-id": Truck,
   "/delivery-boy-id": Truck,
@@ -219,6 +251,7 @@ const prettify = (pathname) => {
 const Topbar = ({ toggleSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { adminUser, logout } = useAdminAuth();
 
   /* =========================================
      SEARCH STATE
@@ -409,12 +442,8 @@ const Topbar = ({ toggleSidebar }) => {
 
   const handleLogout = () => {
     setProfileOpen(false);
-
-    // Add your actual authentication logout logic here.
-    // Example:
-    // localStorage.removeItem("token");
-
-    navigate("/login");
+    logout();
+    navigate("/admin/login");
   };
 
   /* =========================================
@@ -802,15 +831,12 @@ const Topbar = ({ toggleSidebar }) => {
             {/* PROFILE INFO */}
 
             <div className="alka-profile-info">
-
               <span className="alka-profile-name">
-                Admin
+                {adminUser?.name || "Admin"}
               </span>
-
               <span className="alka-profile-role">
-                Administrator
+                {adminUser?.role === "delivery_boy" ? "Delivery Partner" : "Administrator"}
               </span>
-
             </div>
 
             {/* CHEVRON */}
@@ -844,9 +870,9 @@ const Topbar = ({ toggleSidebar }) => {
 
                 <div className="alka-profile-dropdown-text">
 
-                  <strong>Admin</strong>
+                  <strong>{adminUser?.name || "Admin"}</strong>
 
-                  <small>Administrator</small>
+                  <small>{adminUser?.role === "delivery_boy" ? "Delivery Partner" : "Administrator"}</small>
 
                 </div>
 

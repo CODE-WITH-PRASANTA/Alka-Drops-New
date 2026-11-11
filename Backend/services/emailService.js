@@ -176,11 +176,50 @@ const sendDeliveryAgentCredentialsEmail = async ({ agent, credentials }) => {
   return await sendMail({ to, subject, html });
 };
 
+/**
+ * Send password reset OTP verification email
+ */
+const sendPasswordResetOtpEmail = async ({ email, name, otp }) => {
+  const subject = `${otp} is your Alka Drops verification code`;
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,0.05);">
+      <div style="background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%); padding: 26px 20px; color: #ffffff; text-align: center;">
+        <h1 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.5px;">ALKA DROPS</h1>
+        <p style="margin: 6px 0 0; opacity: 0.95; font-size: 13px;">Security &amp; Password Reset Verification</p>
+      </div>
+      <div style="padding: 28px 24px; color: #1e293b; line-height: 1.6;">
+        <p style="margin: 0 0 14px; font-size: 14.5px;">Hello <strong>${name || "Alka Drops User"}</strong>,</p>
+        <p style="margin: 0 0 20px; font-size: 14px; color: #475569;">
+          We received a request to reset your password. Use the verification code below to verify your identity and set a new password:
+        </p>
+
+        <div style="text-align: center; margin: 26px 0;">
+          <div style="display: inline-block; background: #f0fdfa; border: 2px dashed #0d9488; border-radius: 12px; padding: 16px 36px;">
+            <span style="font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #0d9488; font-family: monospace;">${otp}</span>
+          </div>
+          <div style="margin-top: 10px; font-size: 12px; color: #64748b;">This OTP code expires in <strong>10 minutes</strong>.</div>
+        </div>
+
+        <div style="background: #f8fafc; border-left: 4px solid #0284c7; padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 12.5px; color: #475569; margin-bottom: 22px;">
+          <strong>Security Tip:</strong> Never share this code with anyone. Alka Drops staff will never call or message asking for your verification code.
+        </div>
+
+        <p style="margin: 0; font-size: 12px; color: #94a3b8; text-align: center;">
+          If you didn't request a password reset, you can safely ignore this email.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return await sendMail({ to: email, subject, html });
+};
+
 module.exports = {
   sendMail,
   sendTestEmail,
   sendWelcomeEmail,
   sendOrderConfirmationEmail,
   sendDeliveryAgentCredentialsEmail,
+  sendPasswordResetOtpEmail,
 };
 

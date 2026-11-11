@@ -148,7 +148,22 @@ const Login = ({ defaultMode = "login" }) => {
     terms: false,
   });
 
-  const [forgotData, setForgotData] = useState({ email: "" });
+  // Forgot Password 3-step OTP state:
+  // Step 1: Send OTP -> Step 2: "First Verified" -> Step 3: "Then Confirm and Password"
+  const [forgotStep, setForgotStep] = useState(1);
+  const [forgotData, setForgotData] = useState({
+    identifier: "",
+    otp: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [forgotMeta, setForgotMeta] = useState({
+    maskedEmail: "",
+    resetToken: "",
+    demoOtp: "",
+  });
+  const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
+  const [showForgotConfirmPassword, setShowForgotConfirmPassword] = useState(false);
 
   const [loginErrors, setLoginErrors] = useState({});
   const [registerErrors, setRegisterErrors] = useState({});
@@ -209,6 +224,9 @@ const Login = ({ defaultMode = "login" }) => {
   const switchMode = (nextMode) => {
     if (isSubmitting || nextMode === mode) return;
     resetMessages();
+    if (nextMode === "login") {
+      setForgotStep(1);
+    }
     setMode(nextMode);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -410,40 +428,151 @@ const Login = ({ defaultMode = "login" }) => {
     }
   };
 
-  /* ---------- FORGOT PASSWORD ---------- */
+  /* ---------- FORGOT PASSWORD (OTP BASED 3-STEP INTEGRATION) ---------- */
 
-  const handleForgotSubmit = async (event) => {
-    event.preventDefault();
+  // Step 1: Send OTP
+  const handleForgotSendOtp = async (event) => {
+    if (event) event.preventDefault();
     if (isSubmitting) return;
 
-    if (!EMAIL_PATTERN.test(forgotData.email.trim())) {
-      setForgotErrors({ email: "Please enter a valid email address." });
+    const id = (forgotData.identifier || "").trim();
+    if (!id) {
+      setForgotErrors({ identifier: "Please enter your registered email or 10-digit mobile number." });
       return;
     }
 
     setIsSubmitting(true);
     setForgotStatus({ type: "", message: "" });
+    setForgotErrors({});
 
     try {
-      const res = await API.post("/auth/forgot-password", {
-        email: forgotData.email.trim(),
-      });
-
+      const res = await API.post("/auth/send-reset-otp", { identifier: id });
       if (mounted.current) {
+        setForgotMeta({
+          maskedEmail: res.data?.maskedEmail || id,
+          resetToken: "",
+          demoOtp: res.data?.otp || "",
+        });
         setForgotStatus({
           type: "success",
-          message:
-            res.data?.message ||
-            `If an account exists for ${forgotData.email.trim()}, a password reset link has been sent.`,
+          message: res.data?.message || "Verification code sent successfully!",
         });
+        setForgotStep(2); // Advance to "first verified"
       }
     } catch (err) {
       if (mounted.current) {
         setForgotStatus({
           type: "error",
-          message:
-            err.response?.data?.message ||
-            "Failed to send password reset link. Please try again.",
+          message: err.response?.data?.message || "Could not find an account with that email/phone.",
+        });
+      }
+    } finally {
+      if (mounted.current) setIsSubmitting(false);
+    }
+  };
+
+  // Step 2: "First Verified" (Verify OTP)
+  const handleForgotVerifyOtp = async (event) => {
+    if (event) event.preventDefault();
+    if (isSubmitting) return;
+
+    const otpCode = (forgotData.otp || "").trim();
+    if (otpCode.length !== 6) {
+      setForgotErrors({ otp: "Please enter the complete 6-digit verification code." });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setForgotStatus({ type: "", message: "" });
+    setForgotErrors({});
+
+    try {
+      const res = await API.post("/auth/verify-reset-otp", {
+        identifier: forgotData.identifier.trim(),
+        otp: otpCode,
+      });
+
+      if (mounted.current) {
+        setForgotMeta((prev) => ({
+          ...prev,
+          resetToken: res.data?.resetToken || "",
+        }));
+        setForgotStatus({
+          type: "success",
+          message: "Verification confirmed! Now set your new password.",
+        });
+        setForgotStep(3); // Advance to "then confirm and password"
+      }
+    } catch (err) {
+      if (mounted.current) {
+        setForgotStatus({
+          type: "error",
+          message: err.response?.data?.message || "Invalid or expired verification code. Please check and try again.",
+        });
+      }
+    } finally {
+      if (mounted.current) setIsSubmitting(false);
+    }
+  };
+
+  // Step 3: "Then Confirm and Password" (Reset Password)
+  const handleForgotResetPassword = async (event) => {
+    if (event) event.preventDefault();
+    if (isSubmitting) return;
+
+    const errors = {};
+    if (!forgotData.newPassword || forgotData.newPassword.length < 6) {
+      errors.newPassword = "Password must be at least 6 characters long.";
+    }
+    if (forgotData.newPassword !== forgotData.confirmPassword) {
+      errors.confirmPassword = "Passwords do not match. Please verify.";
+    }
+
+    setForgotErrors(errors);
+    if (Object.keys(errors).length) return;
+
+    setIsSubmitting(true);
+    setForgotStatus({ type: "", message: "" });
+
+    try {
+      const res = await API.post("/auth/reset-password", {
+        identifier: forgotData.identifier.trim(),
+        resetToken: forgotMeta.resetToken,
+        otp: forgotData.otp.trim(),
+        password: forgotData.newPassword,
+        confirmPassword: forgotData.confirmPassword,
+      });
+
+      if (mounted.current) {
+        setForgotStatus({
+          type: "success",
+          message: res.data?.message || "Password updated successfully! Redirecting to login...",
+        });
+
+        // Set login prefill
+        setLoginData((prev) => ({
+          ...prev,
+          email: forgotData.identifier.includes("@") ? forgotData.identifier.trim() : prev.email,
+          password: "",
+        }));
+
+        window.setTimeout(() => {
+          if (!mounted.current) return;
+          setForgotStep(1);
+          setForgotData({ identifier: "", otp: "", newPassword: "", confirmPassword: "" });
+          resetMessages();
+          setLoginStatus({
+            type: "success",
+            message: "Password reset complete! Please log in with your new password.",
+          });
+          setMode("login");
+        }, 1800);
+      }
+    } catch (err) {
+      if (mounted.current) {
+        setForgotStatus({
+          type: "error",
+          message: err.response?.data?.message || "Failed to update password. Please try again.",
         });
       }
     } finally {
@@ -807,39 +936,244 @@ const Login = ({ defaultMode = "login" }) => {
                   </p>
                 </div>
               ) : (
-                <div className="Login-panel" key="forgot-panel">
-                  <div className="Login-heading">
-                    <h2>Forgot Password?</h2>
-                    <p>
-                      Enter your registered email and we will send you a link to
-                      reset your password.
-                    </p>
+                <div className="Login-panel Login-panel--otpFlow" key="forgot-panel">
+                  {/* Stepper Progress */}
+                  <div className="Login-stepper">
+                    <div className={`Login-stepItem ${forgotStep >= 1 ? "active" : ""} ${forgotStep > 1 ? "completed" : ""}`}>
+                      <span className="stepNum">{forgotStep > 1 ? "✓" : "1"}</span>
+                      <span className="stepLabel">Account</span>
+                    </div>
+                    <div className={`stepLine ${forgotStep > 1 ? "completed" : ""}`} />
+                    <div className={`Login-stepItem ${forgotStep >= 2 ? "active" : ""} ${forgotStep > 2 ? "completed" : ""}`}>
+                      <span className="stepNum">{forgotStep > 2 ? "✓" : "2"}</span>
+                      <span className="stepLabel">Verify OTP</span>
+                    </div>
+                    <div className={`stepLine ${forgotStep > 2 ? "completed" : ""}`} />
+                    <div className={`Login-stepItem ${forgotStep === 3 ? "active" : ""}`}>
+                      <span className="stepNum">3</span>
+                      <span className="stepLabel">New Password</span>
+                    </div>
                   </div>
 
-                  <form className="Login-form" onSubmit={handleForgotSubmit} noValidate>
-                    <LoginField
-                      id="forgot-email"
-                      label="Email Address"
-                      icon={FiMail}
-                      type="email"
-                      name="email"
-                      placeholder="Registered Email Address"
-                      autoComplete="email"
-                      value={forgotData.email}
-                      onChange={handleForgotChange}
-                      error={forgotErrors.email}
-                    />
+                  {/* STEP 1: Enter Email / Phone -> Send Code */}
+                  {forgotStep === 1 && (
+                    <>
+                      <div className="Login-heading">
+                        <h2>Reset Password</h2>
+                        <p>
+                          Enter your registered email address or mobile number to receive a 6-digit verification code.
+                        </p>
+                      </div>
 
-                    <LoginStatus status={forgotStatus} />
+                      <form className="Login-form" onSubmit={handleForgotSendOtp} noValidate>
+                        <LoginField
+                          id="forgot-identifier"
+                          label="Registered Email or Mobile"
+                          icon={FiMail}
+                          type="text"
+                          name="identifier"
+                          placeholder="e.g. name@example.com or 9823045671"
+                          autoComplete="username"
+                          value={forgotData.identifier}
+                          onChange={(e) => {
+                            setForgotData((prev) => ({ ...prev, identifier: e.target.value }));
+                            setForgotErrors({});
+                          }}
+                          error={forgotErrors.identifier}
+                        />
 
-                    <button
-                      type="submit"
-                      className="Login-submit"
-                      disabled={isSubmitting}
-                    >
-                      {submitContent("Send Reset Link", "Sending...")}
-                    </button>
-                  </form>
+                        <LoginStatus status={forgotStatus} />
+
+                        <button
+                          type="submit"
+                          className="Login-submit"
+                          disabled={isSubmitting}
+                        >
+                          {submitContent("Send Verification Code", "Sending Code...")}
+                        </button>
+                      </form>
+                    </>
+                  )}
+
+                  {/* STEP 2: "First Verified" (Enter and Verify OTP) */}
+                  {forgotStep === 2 && (
+                    <>
+                      <div className="Login-heading">
+                        <h2>Verify Security Code</h2>
+                        <p>
+                          We sent a 6-digit OTP to <strong>{forgotMeta.maskedEmail}</strong>. Please enter it to verify your identity.
+                        </p>
+                      </div>
+
+                      <form className="Login-form" onSubmit={handleForgotVerifyOtp} noValidate>
+                        <div className="Login-field">
+                          <label className="Login-field-label" htmlFor="forgot-otp">
+                            6-Digit Verification Code (OTP)
+                          </label>
+                          <div className={`Login-field-box ${forgotErrors.otp ? "Login-field-box--error" : ""}`}>
+                            <span className="Login-field-icon" aria-hidden="true">
+                              <FiCheckCircle />
+                            </span>
+                            <input
+                              id="forgot-otp"
+                              className="Login-field-input Login-otpInput"
+                              type="text"
+                              inputMode="numeric"
+                              maxLength={6}
+                              placeholder="• • • • • •"
+                              value={forgotData.otp}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                                setForgotData((prev) => ({ ...prev, otp: val }));
+                                setForgotErrors({});
+                              }}
+                              autoFocus
+                            />
+                          </div>
+                          {forgotErrors.otp && (
+                            <span className="Login-field-error" role="alert">
+                              {forgotErrors.otp}
+                            </span>
+                          )}
+                        </div>
+
+                        {forgotMeta.demoOtp && (
+                          <button
+                            type="button"
+                            className="Login-quickOtpPill"
+                            onClick={() => {
+                              setForgotData((prev) => ({ ...prev, otp: forgotMeta.demoOtp }));
+                              setForgotErrors({});
+                            }}
+                          >
+                            <span>One-Tap Fill OTP:</span> <strong>{forgotMeta.demoOtp}</strong>
+                          </button>
+                        )}
+
+                        <LoginStatus status={forgotStatus} />
+
+                        <button
+                          type="submit"
+                          className="Login-submit"
+                          disabled={isSubmitting || forgotData.otp.length !== 6}
+                        >
+                          {submitContent("Verify OTP", "Verifying...")}
+                        </button>
+
+                        <div className="Login-otpSubActions">
+                          <button
+                            type="button"
+                            className="Login-link"
+                            onClick={handleForgotSendOtp}
+                            disabled={isSubmitting}
+                          >
+                            Resend Code
+                          </button>
+                          <span className="dot">•</span>
+                          <button
+                            type="button"
+                            className="Login-link"
+                            onClick={() => {
+                              setForgotStep(1);
+                              setForgotErrors({});
+                              setForgotStatus({ type: "", message: "" });
+                            }}
+                          >
+                            Change Email / Mobile
+                          </button>
+                        </div>
+                      </form>
+                    </>
+                  )}
+
+                  {/* STEP 3: "Then Confirm and Password" (New Password & Confirm) */}
+                  {forgotStep === 3 && (
+                    <>
+                      <div className="Login-heading">
+                        <div className="Login-verifiedBadge">
+                          <FiCheckCircle size={15} /> OTP Code Verified
+                        </div>
+                        <h2>Create New Password</h2>
+                        <p>
+                          Identity confirmed! Please choose a new, secure password for your account.
+                        </p>
+                      </div>
+
+                      <form className="Login-form" onSubmit={handleForgotResetPassword} noValidate>
+                        <div className="Login-field-group">
+                          <LoginField
+                            id="forgot-new-password"
+                            label="New Password"
+                            icon={FiLock}
+                            type={showForgotNewPassword ? "text" : "password"}
+                            name="newPassword"
+                            placeholder="At least 6 characters"
+                            value={forgotData.newPassword}
+                            onChange={(e) => {
+                              setForgotData((prev) => ({ ...prev, newPassword: e.target.value }));
+                              setForgotErrors({});
+                            }}
+                            error={forgotErrors.newPassword}
+                            trailing={passwordToggle(
+                              showForgotNewPassword,
+                              setShowForgotNewPassword,
+                              "new password"
+                            )}
+                          />
+
+                          {forgotData.newPassword && (
+                            <div className="Login-strength" aria-live="polite">
+                              <div className="Login-strength-bars">
+                                {[1, 2, 3, 4].map((level) => (
+                                  <span
+                                    key={level}
+                                    className={
+                                      getPasswordScore(forgotData.newPassword) >= level
+                                        ? `Login-strength-bar Login-strength-bar--on Login-strength-bar--level${getPasswordScore(forgotData.newPassword)}`
+                                        : "Login-strength-bar"
+                                    }
+                                  />
+                                ))}
+                              </div>
+                              <span className="Login-strength-label">
+                                {STRENGTH_LABELS[getPasswordScore(forgotData.newPassword)]}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        <LoginField
+                          id="forgot-confirm-password"
+                          label="Confirm Password"
+                          icon={FiLock}
+                          type={showForgotConfirmPassword ? "text" : "password"}
+                          name="confirmPassword"
+                          placeholder="Re-enter password to confirm"
+                          value={forgotData.confirmPassword}
+                          onChange={(e) => {
+                            setForgotData((prev) => ({ ...prev, confirmPassword: e.target.value }));
+                            setForgotErrors({});
+                          }}
+                          error={forgotErrors.confirmPassword}
+                          trailing={passwordToggle(
+                            showForgotConfirmPassword,
+                            setShowForgotConfirmPassword,
+                            "confirm password"
+                          )}
+                        />
+
+                        <LoginStatus status={forgotStatus} />
+
+                        <button
+                          type="submit"
+                          className="Login-submit"
+                          disabled={isSubmitting}
+                        >
+                          {submitContent("Confirm & Update Password", "Updating Password...")}
+                        </button>
+                      </form>
+                    </>
+                  )}
 
                   <button
                     type="button"

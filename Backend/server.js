@@ -95,6 +95,7 @@ app.use("/api/comments", require("./routes/commentRoutes"));
 app.use("/api/subscription-plans", require("./routes/subscriptionPlanRoutes"));
 app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/delivery-boys", require("./routes/deliveryBoyRoutes"));
+app.use("/api/admin-users", require("./routes/adminUserRoutes"));
 app.use("/api/subscription-orders", require("./routes/subscriptionOrderRoutes"));
 app.use("/api/mail", require("./routes/mailRoutes"));
 

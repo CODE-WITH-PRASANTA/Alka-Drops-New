@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
   FiTruck,
   FiCheckCircle,
@@ -19,6 +20,11 @@ import {
   FiShield,
   FiChevronRight,
   FiAlertTriangle,
+  FiDroplet,
+  FiShoppingCart,
+  FiExternalLink,
+  FiArrowRight,
+  FiLayers,
 } from "react-icons/fi";
 import API from "../../services/api";
 import "./DeliveryDispatch.css";
@@ -137,7 +143,8 @@ const DeliveryDispatch = () => {
         address: `${sub.deliveryAddress?.street ? sub.deliveryAddress.street + ", " : ""}${
           sub.deliveryAddress?.city || "Bhubaneswar"
         }${sub.deliveryAddress?.postalCode ? " - " + sub.deliveryAddress.postalCode : ""}`,
-        planTitle: sub.planTitle,
+        planTitle: sub.planTitle || "Alka Alkaline Water Subscription",
+        deliveryFrequency: sub.deliveryFrequency || "Daily",
         quotaInfo: `${sub.bottlesPerDelivery || 2} Jars (${sub.deliveryFrequency || "Daily"})`,
         bottlesNeeded: Number(sub.bottlesPerDelivery) || 2,
         pendingEmptyJars: Number(pendingJars) || 0,
@@ -197,6 +204,10 @@ const DeliveryDispatch = () => {
         phone: ord.shippingAddress?.phone || ord.phone || "N/A",
         address: address,
         planTitle: `Shop Order (₹${Number(ord.totalAmount || ord.amount || 0).toLocaleString("en-IN")})`,
+        totalAmount: Number(ord.totalAmount || ord.amount || 0),
+        paymentMethod: ord.paymentMethod || "Razorpay / Prepaid",
+        paymentStatus: ord.paymentStatus || "Paid",
+        itemsSummary: itemsSummary,
         quotaInfo: itemsSummary,
         bottlesNeeded: estimatedJars,
         pendingEmptyJars: Number(pendingShopJars) || 0,
@@ -301,6 +312,15 @@ const DeliveryDispatch = () => {
     search,
     todayStr,
   ]);
+
+  // Split into Subscription and Shop groups for clear separation
+  const subscriptionTasks = useMemo(() => {
+    return filteredTasks.filter((t) => t.type === "subscription");
+  }, [filteredTasks]);
+
+  const shopTasks = useMemo(() => {
+    return filteredTasks.filter((t) => t.type === "shop");
+  }, [filteredTasks]);
 
   // Summary statistics across entire sheet
   const stats = useMemo(() => {
@@ -416,20 +436,228 @@ const DeliveryDispatch = () => {
     }
   };
 
-  return (
-    <div className="AlkaDispatch">
-      {/* Sleek Top Bar (Single Row, No Bulky Headings) */}
-      <div className="AlkaDispatch-topBar">
-        <div className="AlkaDispatch-topBarLeft">
-          <div className="AlkaDispatch-titleGroup">
-            <h1 className="AlkaDispatch-title">Delivery Dispatch</h1>
-            <span className="AlkaDispatch-liveBadge">
-              <span className="AlkaDispatch-pulseDot"></span> LIVE DISPATCH
+  // Render a Single Task Card
+  const renderCard = (task) => (
+    <div
+      key={task.taskId}
+      className={`AlkaDispatch-taskCard ${task.isCompleted ? "is-delivered" : ""} type-${task.type}`}
+    >
+      {/* Card Top Strip */}
+      <div className="AlkaDispatch-cardHead">
+        <div className="AlkaDispatch-badgeRow">
+          <span className={`AlkaDispatch-typeTag ${task.type}`}>
+            {task.type === "subscription" ? (
+              <>
+                <FiDroplet className="tagIcon" /> Subscription Drop
+              </>
+            ) : (
+              <>
+                <FiShoppingCart className="tagIcon" /> Shop Retail
+              </>
+            )}
+          </span>
+          <span className="AlkaDispatch-orderNum">#{task.orderNumber}</span>
+        </div>
+
+        <div className="AlkaDispatch-headRight">
+          <span className="AlkaDispatch-slotChip">
+            <FiClock /> {task.timeSlot.split("(")[0].trim()}
+          </span>
+          <span
+            className={`AlkaDispatch-statusBadge ${
+              task.isCompleted
+                ? "delivered"
+                : task.statusLabel.toLowerCase().includes("out")
+                ? "transit"
+                : "pending"
+            }`}
+          >
+            {task.isCompleted ? (
+              <>
+                <FiCheckCircle className="badgeIcon" /> Delivered
+              </>
+            ) : task.statusLabel.toLowerCase().includes("out") ? (
+              <>
+                <FiTruck className="badgeIcon" /> Out for Delivery
+              </>
+            ) : (
+              <>
+                <FiClock className="badgeIcon" /> {task.statusLabel}
+              </>
+            )}
+          </span>
+        </div>
+      </div>
+
+      {/* Customer Info Row */}
+      <div className="AlkaDispatch-custInfo">
+        <div className="AlkaDispatch-avatar">
+          {task.customerName.charAt(0).toUpperCase()}
+        </div>
+        <div className="AlkaDispatch-custDetails">
+          <h4 className="AlkaDispatch-custName">{task.customerName}</h4>
+          <div className="AlkaDispatch-phoneRow">
+            <a
+              href={`tel:${task.phone}`}
+              className="AlkaDispatch-phoneLink"
+              title="Direct Call Customer"
+            >
+              <FiPhone /> <span>{task.phone}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Destination Address */}
+      <div className="AlkaDispatch-addressBox">
+        <FiMapPin className="AlkaDispatch-addressPin" />
+        <span className="AlkaDispatch-addressText" title={task.address}>
+          {task.address}
+        </span>
+      </div>
+
+      {/* Dedicated Channel Specific Integration Panel */}
+      {task.type === "subscription" ? (
+        <div className="AlkaDispatch-integrationPanel subPanel">
+          <div className="AlkaDispatch-panelHeader">
+            <div className="panelHeaderLeft">
+              <FiDroplet className="subIcon" />
+              <strong>{task.planTitle}</strong>
+            </div>
+            <Link
+              to="/admin/subscription-orders"
+              className="AlkaDispatch-pageLink"
+              title="Open in Subscription Orders Management"
+            >
+              <span>Manage in Subscriptions</span>
+              <FiArrowRight />
+            </Link>
+          </div>
+          <div className="AlkaDispatch-panelMeta">
+            <span className="metaItem">
+              Frequency: <strong>{task.deliveryFrequency}</strong>
             </span>
-            <span className="AlkaDispatch-datePill">
-              <FiCalendar /> {formattedToday}
+            <span className="metaDivider">•</span>
+            <span className="metaItem">
+              Due Today: <strong>{task.bottlesNeeded} × 20L Jars</strong>
             </span>
           </div>
+        </div>
+      ) : (
+        <div className="AlkaDispatch-integrationPanel shopPanel">
+          <div className="AlkaDispatch-panelHeader">
+            <div className="panelHeaderLeft">
+              <FiShoppingCart className="shopIcon" />
+              <strong>Retail Purchase</strong>
+            </div>
+            <Link
+              to="/admin/order-management"
+              className="AlkaDispatch-pageLink"
+              title="Open in Order Management"
+            >
+              <span>Manage in Orders</span>
+              <FiArrowRight />
+            </Link>
+          </div>
+          <div className="AlkaDispatch-panelMeta">
+            <span className="metaItem">
+              Items: <strong>{task.quotaInfo}</strong>
+            </span>
+            <span className="metaDivider">•</span>
+            <span className="metaItem price">
+              Amount: <strong>₹{Number(task.totalAmount || 0).toLocaleString("en-IN")}</strong>
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Empty Jar Status Banner */}
+      <div
+        className={`AlkaDispatch-emptyBanner ${
+          task.pendingEmptyJars > 0 ? "warning" : "balanced"
+        }`}
+      >
+        <div className="AlkaDispatch-emptyBannerLeft">
+          {task.pendingEmptyJars > 0 ? (
+            <FiAlertTriangle className="iconWarn" />
+          ) : (
+            <FiCheck className="iconOk" />
+          )}
+          <span>
+            {task.pendingEmptyJars > 0
+              ? `${task.pendingEmptyJars} Empty Jar(s) with Customer`
+              : "Empty Jar Balance OK (0 Due)"}
+          </span>
+        </div>
+        {task.pendingEmptyJars > 0 && (
+          <span className="AlkaDispatch-collectPill">Collect Today</span>
+        )}
+      </div>
+
+      {/* Assigned Partner Footer */}
+      <div className="AlkaDispatch-partnerRow">
+        <div className="AlkaDispatch-partnerName">
+          <FiShield style={{ color: "#0d9488" }} />
+          <span>
+            Partner: <strong>{task.assignedRiderName}</strong>{" "}
+            {task.assignedPartnerId && `(${task.assignedPartnerId})`}
+          </span>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="AlkaDispatch-cardActions">
+        {task.isCompleted ? (
+          <div className="AlkaDispatch-doneNotice">
+            <FiCheckCircle /> Delivered & Empties Reconciled
+          </div>
+        ) : (
+          <>
+            {!task.statusLabel.toLowerCase().includes("out") && (
+              <button
+                type="button"
+                className="AlkaDispatch-actionBtn outForDelivery"
+                onClick={() => handleMarkOutForDelivery(task)}
+              >
+                <FiTruck /> Out for Delivery
+              </button>
+            )}
+            <button
+              type="button"
+              className="AlkaDispatch-actionBtn submitDelivered"
+              onClick={() => openSubmitModal(task)}
+            >
+              <FiCheckCircle />
+              {task.type === "subscription" ? "Record Drop & Empties" : "Submit Delivered"}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="AlkaDispatch">
+      {/* Sleek Action Toolbar (Zero Redundant Title Headings - Handled by Topbar) */}
+      <div className="AlkaDispatch-topBar">
+        <div className="AlkaDispatch-toolbarLinks">
+          <Link
+            to="/admin/subscription-orders"
+            className="AlkaDispatch-headerQuickLink"
+            title="Go to Subscription Orders Management"
+          >
+            <FiDroplet />
+            <span>Subscription Orders</span>
+          </Link>
+
+          <Link
+            to="/admin/order-management"
+            className="AlkaDispatch-headerQuickLink"
+            title="Go to Order Management"
+          >
+            <FiShoppingCart />
+            <span>Order Management</span>
+          </Link>
         </div>
 
         <div className="AlkaDispatch-topBarRight">
@@ -478,6 +706,34 @@ const DeliveryDispatch = () => {
           </div>
         </div>
 
+        <div
+          className={`AlkaDispatch-kpiCard clickable ${typeFilter === "subscription" ? "active-kpi" : ""}`}
+          onClick={() => setTypeFilter(typeFilter === "subscription" ? "all" : "subscription")}
+          title="Filter Subscription Drops"
+        >
+          <div className="AlkaDispatch-kpiIcon subs">
+            <FiDroplet />
+          </div>
+          <div className="AlkaDispatch-kpiInfo">
+            <span className="AlkaDispatch-kpiLabel">Subscription Drops</span>
+            <strong className="AlkaDispatch-kpiValue">{stats.subCount}</strong>
+          </div>
+        </div>
+
+        <div
+          className={`AlkaDispatch-kpiCard clickable ${typeFilter === "shop" ? "active-kpi" : ""}`}
+          onClick={() => setTypeFilter(typeFilter === "shop" ? "all" : "shop")}
+          title="Filter Shop Retail Orders"
+        >
+          <div className="AlkaDispatch-kpiIcon shop">
+            <FiShoppingCart />
+          </div>
+          <div className="AlkaDispatch-kpiInfo">
+            <span className="AlkaDispatch-kpiLabel">Shop Retail Orders</span>
+            <strong className="AlkaDispatch-kpiValue">{stats.shopCount}</strong>
+          </div>
+        </div>
+
         <div className="AlkaDispatch-kpiCard">
           <div className="AlkaDispatch-kpiIcon transit">
             <FiTruck />
@@ -485,16 +741,6 @@ const DeliveryDispatch = () => {
           <div className="AlkaDispatch-kpiInfo">
             <span className="AlkaDispatch-kpiLabel">Out for Delivery</span>
             <strong className="AlkaDispatch-kpiValue">{stats.outForDelivery}</strong>
-          </div>
-        </div>
-
-        <div className="AlkaDispatch-kpiCard">
-          <div className="AlkaDispatch-kpiIcon pending">
-            <FiClock />
-          </div>
-          <div className="AlkaDispatch-kpiInfo">
-            <span className="AlkaDispatch-kpiLabel">Pending Pickup</span>
-            <strong className="AlkaDispatch-kpiValue">{stats.pending}</strong>
           </div>
         </div>
 
@@ -508,7 +754,11 @@ const DeliveryDispatch = () => {
           </div>
         </div>
 
-        <div className="AlkaDispatch-kpiCard">
+        <div
+          className={`AlkaDispatch-kpiCard clickable ${onlyEmptiesDue ? "active-kpi" : ""}`}
+          onClick={() => setOnlyEmptiesDue(!onlyEmptiesDue)}
+          title="Toggle Empties Due Filter"
+        >
           <div className="AlkaDispatch-kpiIcon empties">
             <FiAlertTriangle />
           </div>
@@ -528,7 +778,7 @@ const DeliveryDispatch = () => {
             <FiSearch className="AlkaDispatch-searchIcon" />
             <input
               type="text"
-              placeholder="Search by order #, customer, mobile, locality..."
+              placeholder="Search by order #, customer, phone, locality..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="AlkaDispatch-searchInput"
@@ -544,7 +794,7 @@ const DeliveryDispatch = () => {
             )}
           </div>
 
-          {/* Delivery Boy Selector */}
+          {/* Delivery Boy Selector (Zero emojis) */}
           <div className="AlkaDispatch-selectWrap">
             <FiUser className="AlkaDispatch-selectIcon" />
             <select
@@ -552,17 +802,17 @@ const DeliveryDispatch = () => {
               onChange={(e) => setSelectedRiderId(e.target.value)}
               className="AlkaDispatch-select"
             >
-              <option value="all">👥 All Delivery Partners ({unifiedTasks.length})</option>
+              <option value="all">All Delivery Partners ({unifiedTasks.length})</option>
               {deliveryBoys.map((b) => (
                 <option key={b._id} value={b._id}>
                   {b.name} ({b.partnerId || "Rider"}) • {riderCounters[b._id] || 0} tasks
                 </option>
               ))}
-              <option value="unassigned">⚠️ Unassigned Runs ({riderCounters.unassigned || 0})</option>
+              <option value="unassigned">Unassigned Runs ({riderCounters.unassigned || 0})</option>
             </select>
           </div>
 
-          {/* Time Slot Filter */}
+          {/* Time Slot Filter (Zero emojis) */}
           <div className="AlkaDispatch-selectWrap">
             <FiClock className="AlkaDispatch-selectIcon" />
             <select
@@ -570,14 +820,14 @@ const DeliveryDispatch = () => {
               onChange={(e) => setSlotFilter(e.target.value)}
               className="AlkaDispatch-select"
             >
-              <option value="all">⏰ All Time Slots</option>
-              <option value="morning">🌅 Morning (7 AM - 10 AM)</option>
-              <option value="afternoon">☀️ Afternoon (11 AM - 3 PM)</option>
-              <option value="evening">🌆 Evening (4 PM - 8 PM)</option>
+              <option value="all">All Time Slots</option>
+              <option value="morning">Morning (7 AM - 10 AM)</option>
+              <option value="afternoon">Afternoon (11 AM - 3 PM)</option>
+              <option value="evening">Evening (4 PM - 8 PM)</option>
             </select>
           </div>
 
-          {/* Date Scope Filter */}
+          {/* Date Scope Filter (Zero emojis) */}
           <div className="AlkaDispatch-selectWrap dateWrap">
             <FiCalendar className="AlkaDispatch-selectIcon" />
             <select
@@ -585,36 +835,42 @@ const DeliveryDispatch = () => {
               onChange={(e) => setDateFilter(e.target.value)}
               className="AlkaDispatch-select"
             >
-              <option value="all">📅 All Schedule Dates</option>
-              <option value="today">⚡ Today's Runs Only</option>
+              <option value="all">All Schedule Dates</option>
+              <option value="today">Today's Runs Only</option>
             </select>
           </div>
         </div>
 
-        {/* Row 2: Category & Status Segmented Pills + Reset */}
+        {/* Row 2: Category & Status Segmented Pills (Feather SVGs, Zero Emojis) */}
         <div className="AlkaDispatch-filterRow2">
-          {/* Order Type Pills */}
+          {/* Order Type Segmented Tabs */}
           <div className="AlkaDispatch-pillGroup">
             <button
               type="button"
               className={`AlkaDispatch-pill ${typeFilter === "all" ? "active" : ""}`}
               onClick={() => setTypeFilter("all")}
             >
-              All Types <span className="pillCount">{unifiedTasks.length}</span>
+              <FiLayers className="pillIcon" />
+              <span>All Types</span>
+              <span className="pillCount">{unifiedTasks.length}</span>
             </button>
             <button
               type="button"
-              className={`AlkaDispatch-pill ${typeFilter === "subscription" ? "active" : ""}`}
+              className={`AlkaDispatch-pill subPill ${typeFilter === "subscription" ? "active" : ""}`}
               onClick={() => setTypeFilter("subscription")}
             >
-              💧 Subscriptions <span className="pillCount">{stats.subCount}</span>
+              <FiDroplet className="pillIcon sub" />
+              <span>Subscriptions</span>
+              <span className="pillCount">{stats.subCount}</span>
             </button>
             <button
               type="button"
-              className={`AlkaDispatch-pill ${typeFilter === "shop" ? "active" : ""}`}
+              className={`AlkaDispatch-pill shopPill ${typeFilter === "shop" ? "active" : ""}`}
               onClick={() => setTypeFilter("shop")}
             >
-              🛒 Shop Orders <span className="pillCount">{stats.shopCount}</span>
+              <FiShoppingCart className="pillIcon shop" />
+              <span>Shop Orders</span>
+              <span className="pillCount">{stats.shopCount}</span>
             </button>
           </div>
 
@@ -634,7 +890,9 @@ const DeliveryDispatch = () => {
               className={`AlkaDispatch-pill status pending ${statusFilter === "pending" ? "active" : ""}`}
               onClick={() => setStatusFilter("pending")}
             >
-              ⏳ Pending <span className="pillCount">{stats.pending}</span>
+              <FiClock className="pillIcon" />
+              <span>Pending</span>
+              <span className="pillCount">{stats.pending}</span>
             </button>
             <button
               type="button"
@@ -643,7 +901,9 @@ const DeliveryDispatch = () => {
               }`}
               onClick={() => setStatusFilter("out_for_delivery")}
             >
-              🚚 Out for Delivery <span className="pillCount">{stats.outForDelivery}</span>
+              <FiTruck className="pillIcon" />
+              <span>Out for Delivery</span>
+              <span className="pillCount">{stats.outForDelivery}</span>
             </button>
             <button
               type="button"
@@ -652,7 +912,9 @@ const DeliveryDispatch = () => {
               }`}
               onClick={() => setStatusFilter("delivered")}
             >
-              ✅ Delivered <span className="pillCount">{stats.delivered}</span>
+              <FiCheckCircle className="pillIcon" />
+              <span>Delivered</span>
+              <span className="pillCount">{stats.delivered}</span>
             </button>
           </div>
 
@@ -706,142 +968,87 @@ const DeliveryDispatch = () => {
           )}
         </div>
       ) : viewMode === "cards" ? (
-        /* CARDS GRID VIEW */
-        <div className="AlkaDispatch-cardsGrid">
-          {filteredTasks.map((task) => (
-            <div
-              key={task.taskId}
-              className={`AlkaDispatch-taskCard ${task.isCompleted ? "is-delivered" : ""}`}
-            >
-              {/* Card Top Strip */}
-              <div className="AlkaDispatch-cardHead">
-                <div className="AlkaDispatch-badgeRow">
-                  <span className={`AlkaDispatch-typeTag ${task.type}`}>
-                    {task.type === "subscription" ? "💧 Subscription" : "🛒 Shop Retail"}
-                  </span>
-                  <span className="AlkaDispatch-orderNum">#{task.orderNumber}</span>
+        /* CARDS GRID VIEW WITH SEPARATE INTEGRATED SECTIONS */
+        <div className="AlkaDispatch-sectionsContainer">
+          {/* SECTION 1: SUBSCRIPTION ORDERS QUEUE */}
+          {(typeFilter === "all" || typeFilter === "subscription") && (
+            <div className="AlkaDispatch-channelSection subChannelSection">
+              <div className="AlkaDispatch-sectionHeader">
+                <div className="AlkaDispatch-sectionHeaderLeft">
+                  <div className="AlkaDispatch-sectionIcon subIconWrap">
+                    <FiDroplet />
+                  </div>
+                  <div>
+                    <h2 className="AlkaDispatch-sectionTitle">Subscription Orders Dispatch Queue</h2>
+                    <span className="AlkaDispatch-sectionSub">
+                      Recurring daily alkaline water drops • {subscriptionTasks.length} active scheduled run(s)
+                    </span>
+                  </div>
                 </div>
-
-                <div className="AlkaDispatch-headRight">
-                  <span className="AlkaDispatch-slotChip">
-                    <FiClock /> {task.timeSlot.split("(")[0].trim()}
-                  </span>
-                  <span
-                    className={`AlkaDispatch-statusBadge ${
-                      task.isCompleted
-                        ? "delivered"
-                        : task.statusLabel.toLowerCase().includes("out")
-                        ? "transit"
-                        : "pending"
-                    }`}
+                <div className="AlkaDispatch-sectionHeaderRight">
+                  <Link
+                    to="/admin/subscription-orders"
+                    className="AlkaDispatch-sectionActionBtn"
+                    title="View & Manage All Subscription Orders"
                   >
-                    {task.isCompleted ? "✓ Delivered" : task.statusLabel}
-                  </span>
+                    <span>View in Subscription Management</span>
+                    <FiArrowRight />
+                  </Link>
                 </div>
               </div>
 
-              {/* Customer Info Row */}
-              <div className="AlkaDispatch-custInfo">
-                <div className="AlkaDispatch-avatar">
-                  {task.customerName.charAt(0).toUpperCase()}
+              {subscriptionTasks.length === 0 ? (
+                <div className="AlkaDispatch-sectionEmpty">
+                  <FiCheckCircle className="emptySecIcon" />
+                  <span>No subscription drops matching the active filters.</span>
                 </div>
-                <div className="AlkaDispatch-custDetails">
-                  <h4 className="AlkaDispatch-custName">{task.customerName}</h4>
-                  <div className="AlkaDispatch-phoneRow">
-                    <a
-                      href={`tel:${task.phone}`}
-                      className="AlkaDispatch-phoneLink"
-                      title="Direct Call Customer"
-                    >
-                      <FiPhone /> <span>{task.phone}</span>
-                    </a>
-                  </div>
+              ) : (
+                <div className="AlkaDispatch-cardsGrid">
+                  {subscriptionTasks.map((task) => renderCard(task))}
                 </div>
-              </div>
-
-              {/* Destination Address */}
-              <div className="AlkaDispatch-addressBox">
-                <FiMapPin className="AlkaDispatch-addressPin" />
-                <span className="AlkaDispatch-addressText" title={task.address}>
-                  {task.address}
-                </span>
-              </div>
-
-              {/* Drop Requirement & Plan Banner */}
-              <div className="AlkaDispatch-quotaBanner">
-                <div className="AlkaDispatch-quotaItem">
-                  <span className="qLabel">Items to Deliver:</span>
-                  <strong className="qVal">{task.quotaInfo}</strong>
-                </div>
-                <div className="AlkaDispatch-jarsCount">
-                  <span className="jarsNum">{task.bottlesNeeded}</span>
-                  <span className="jarsTxt">Jars Due</span>
-                </div>
-              </div>
-
-              {/* Empty Jar Status Banner */}
-              <div
-                className={`AlkaDispatch-emptyBanner ${
-                  task.pendingEmptyJars > 0 ? "warning" : "balanced"
-                }`}
-              >
-                <div className="AlkaDispatch-emptyBannerLeft">
-                  {task.pendingEmptyJars > 0 ? (
-                    <FiAlertTriangle className="iconWarn" />
-                  ) : (
-                    <FiCheck className="iconOk" />
-                  )}
-                  <span>
-                    {task.pendingEmptyJars > 0
-                      ? `${task.pendingEmptyJars} Empty Jar(s) with Customer`
-                      : "Empty Jar Balance OK (0 Due)"}
-                  </span>
-                </div>
-                {task.pendingEmptyJars > 0 && (
-                  <span className="AlkaDispatch-collectPill">Collect Today</span>
-                )}
-              </div>
-
-              {/* Assigned Partner Footer */}
-              <div className="AlkaDispatch-partnerRow">
-                <div className="AlkaDispatch-partnerName">
-                  <FiShield style={{ color: "#0d9488" }} />
-                  <span>
-                    Partner: <strong>{task.assignedRiderName}</strong>{" "}
-                    {task.assignedPartnerId && `(${task.assignedPartnerId})`}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="AlkaDispatch-cardActions">
-                {task.isCompleted ? (
-                  <div className="AlkaDispatch-doneNotice">
-                    <FiCheckCircle /> Delivered & Empties Reconciled
-                  </div>
-                ) : (
-                  <>
-                    {!task.statusLabel.toLowerCase().includes("out") && (
-                      <button
-                        type="button"
-                        className="AlkaDispatch-actionBtn outForDelivery"
-                        onClick={() => handleMarkOutForDelivery(task)}
-                      >
-                        <FiTruck /> Out for Delivery
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      className="AlkaDispatch-actionBtn submitDelivered"
-                      onClick={() => openSubmitModal(task)}
-                    >
-                      <FiCheckCircle /> Submit Delivered
-                    </button>
-                  </>
-                )}
-              </div>
+              )}
             </div>
-          ))}
+          )}
+
+          {/* SECTION 2: SHOP RETAIL ORDERS QUEUE */}
+          {(typeFilter === "all" || typeFilter === "shop") && (
+            <div className="AlkaDispatch-channelSection shopChannelSection">
+              <div className="AlkaDispatch-sectionHeader">
+                <div className="AlkaDispatch-sectionHeaderLeft">
+                  <div className="AlkaDispatch-sectionIcon shopIconWrap">
+                    <FiShoppingCart />
+                  </div>
+                  <div>
+                    <h2 className="AlkaDispatch-sectionTitle">Shop Retail Orders Dispatch Queue</h2>
+                    <span className="AlkaDispatch-sectionSub">
+                      Paid customer shop purchases & accessories • {shopTasks.length} active order(s)
+                    </span>
+                  </div>
+                </div>
+                <div className="AlkaDispatch-sectionHeaderRight">
+                  <Link
+                    to="/admin/order-management"
+                    className="AlkaDispatch-sectionActionBtn"
+                    title="View & Manage All Paid Shop Orders"
+                  >
+                    <span>View in Order Management</span>
+                    <FiArrowRight />
+                  </Link>
+                </div>
+              </div>
+
+              {shopTasks.length === 0 ? (
+                <div className="AlkaDispatch-sectionEmpty">
+                  <FiCheckCircle className="emptySecIcon" />
+                  <span>No shop retail orders matching the active filters.</span>
+                </div>
+              ) : (
+                <div className="AlkaDispatch-cardsGrid">
+                  {shopTasks.map((task) => renderCard(task))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         /* COMPACT RUN SHEET TABLE VIEW */
@@ -850,9 +1057,10 @@ const DeliveryDispatch = () => {
             <thead>
               <tr>
                 <th>Order / Task</th>
+                <th>Type & Channel</th>
                 <th>Customer & Contact</th>
                 <th>Destination Address</th>
-                <th>Items to Drop</th>
+                <th>Items & Quota</th>
                 <th>Slot</th>
                 <th>Assigned Partner</th>
                 <th>Empty Jars</th>
@@ -866,10 +1074,37 @@ const DeliveryDispatch = () => {
                   <td>
                     <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                       <span className="AlkaDispatch-tblOrder">#{task.orderNumber}</span>
-                      <span className={`AlkaDispatch-typeTag tbl ${task.type}`}>
-                        {task.type === "subscription" ? "💧 Sub Drop" : "🛒 Shop Order"}
-                      </span>
+                      {task.type === "subscription" ? (
+                        <Link
+                          to="/admin/subscription-orders"
+                          className="AlkaDispatch-tblChannelLink sub"
+                          title="View Subscription"
+                        >
+                          <FiDroplet /> Subscriptions <FiChevronRight />
+                        </Link>
+                      ) : (
+                        <Link
+                          to="/admin/order-management"
+                          className="AlkaDispatch-tblChannelLink shop"
+                          title="View Shop Order"
+                        >
+                          <FiShoppingCart /> Shop Orders <FiChevronRight />
+                        </Link>
+                      )}
                     </div>
+                  </td>
+                  <td>
+                    <span className={`AlkaDispatch-typeTag tbl ${task.type}`}>
+                      {task.type === "subscription" ? (
+                        <>
+                          <FiDroplet /> Subscription
+                        </>
+                      ) : (
+                        <>
+                          <FiShoppingCart /> Retail Order
+                        </>
+                      )}
+                    </span>
                   </td>
                   <td>
                     <div style={{ display: "flex", flexDirection: "column" }}>
@@ -891,6 +1126,11 @@ const DeliveryDispatch = () => {
                         {task.bottlesNeeded} × 20L Can
                       </strong>
                       <span style={{ fontSize: "11px", color: "#64748b" }}>{task.quotaInfo}</span>
+                      {task.type === "shop" && (
+                        <span style={{ fontSize: "11px", color: "#0284c7", fontWeight: 700 }}>
+                          ₹{Number(task.totalAmount || 0).toLocaleString("en-IN")} • {task.paymentStatus}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td>
@@ -909,10 +1149,12 @@ const DeliveryDispatch = () => {
                   <td>
                     {task.pendingEmptyJars > 0 ? (
                       <span className="AlkaDispatch-tblEmpty warn">
-                        ⚠️ {task.pendingEmptyJars} Due
+                        <FiAlertTriangle /> {task.pendingEmptyJars} Due
                       </span>
                     ) : (
-                      <span className="AlkaDispatch-tblEmpty ok">✓ 0 Due</span>
+                      <span className="AlkaDispatch-tblEmpty ok">
+                        <FiCheck /> 0 Due
+                      </span>
                     )}
                   </td>
                   <td>
@@ -925,7 +1167,17 @@ const DeliveryDispatch = () => {
                           : "pending"
                       }`}
                     >
-                      {task.isCompleted ? "✓ Delivered" : task.statusLabel}
+                      {task.isCompleted ? (
+                        <>
+                          <FiCheckCircle /> Delivered
+                        </>
+                      ) : task.statusLabel.toLowerCase().includes("out") ? (
+                        <>
+                          <FiTruck /> Out for Delivery
+                        </>
+                      ) : (
+                        task.statusLabel
+                      )}
                     </span>
                   </td>
                   <td style={{ textAlign: "right" }}>
@@ -963,7 +1215,7 @@ const DeliveryDispatch = () => {
         </div>
       )}
 
-      {/* SUBMIT DELIVERY MODAL */}
+      {/* SUBMIT DELIVERY MODAL (Zero emojis) */}
       {submitModal.isOpen && submitModal.item && (
         <div
           className="AlkaDispatch-modalOverlay"
@@ -973,9 +1225,16 @@ const DeliveryDispatch = () => {
             <div className="AlkaDispatch-modalHeader">
               <div>
                 <h3>Submit Delivery Confirmation</h3>
-                <span style={{ fontSize: "12px", color: "#64748b" }}>
-                  {submitModal.taskType === "subscription" ? "💧 Subscription Drop" : "🛒 Shop Order"}{" "}
-                  #{submitModal.item.orderNumber}
+                <span className="AlkaDispatch-modalSubtitle">
+                  {submitModal.taskType === "subscription" ? (
+                    <>
+                      <FiDroplet /> Subscription Drop #{submitModal.item.orderNumber}
+                    </>
+                  ) : (
+                    <>
+                      <FiShoppingCart /> Shop Order #{submitModal.item.orderNumber}
+                    </>
+                  )}
                 </span>
               </div>
               <button
@@ -992,8 +1251,8 @@ const DeliveryDispatch = () => {
               <div className="AlkaDispatch-formCustBox">
                 <strong>{submitModal.item.customerName}</strong>
                 <p>{submitModal.item.address}</p>
-                <span style={{ fontSize: "12px", color: "#0284c7" }}>
-                  📞 {submitModal.item.phone}
+                <span style={{ fontSize: "12px", color: "#0284c7", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <FiPhone /> {submitModal.item.phone}
                 </span>
               </div>
 

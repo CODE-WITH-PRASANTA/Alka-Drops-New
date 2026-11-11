@@ -259,7 +259,7 @@ const Dashboard = () => {
         {/* Card 1: Revenue & UPI */}
         <div className="AlkaDash-kpiCard revCard">
           <div className="AlkaDash-kpiHead">
-            <span className="AlkaDash-kpiLabel">Total Operations Revenue</span>
+            <span className="AlkaDash-kpiLabel">Total Revenue</span>
             <div className="AlkaDash-kpiIcon revIcon">
               <FiDollarSign />
             </div>
@@ -269,10 +269,7 @@ const Dashboard = () => {
           </div>
           <div className="AlkaDash-kpiFoot">
             <span className="AlkaDash-badge green">
-              <FiCheckCircle /> 100% VERIFIED UPI &amp; RAZORPAY
-            </span>
-            <span className="AlkaDash-kpiSubtext">
-              Shop ₹{kpi.shopRev.toLocaleString("en-IN")} + Subs ₹{kpi.subRev.toLocaleString("en-IN")}
+              <FiCheckCircle /> 100% VERIFIED UPI
             </span>
           </div>
         </div>
@@ -280,7 +277,7 @@ const Dashboard = () => {
         {/* Card 2: Orders & Drops */}
         <div className="AlkaDash-kpiCard">
           <div className="AlkaDash-kpiHead">
-            <span className="AlkaDash-kpiLabel">Total Orders &amp; Drops</span>
+            <span className="AlkaDash-kpiLabel">Orders &amp; Drops</span>
             <div className="AlkaDash-kpiIcon orderIcon">
               <FiShoppingBag />
             </div>
@@ -289,9 +286,6 @@ const Dashboard = () => {
           <div className="AlkaDash-kpiFoot">
             <span className="AlkaDash-badge teal">
               <FiTrendingUp /> +14.2% THIS WEEK
-            </span>
-            <span className="AlkaDash-kpiSubtext">
-              {orders.length} Retail + {kpi.totalOrders - orders.length} Daily Drops
             </span>
           </div>
         </div>
@@ -309,7 +303,6 @@ const Dashboard = () => {
             <span className="AlkaDash-badge blue">
               <FiActivity /> {kpi.totalDailyJars} JARS / DAY
             </span>
-            <span className="AlkaDash-kpiSubtext">Scheduled recurring customers</span>
           </div>
         </div>
 
@@ -330,14 +323,13 @@ const Dashboard = () => {
           <div className="AlkaDash-kpiFoot">
             {kpi.pendingEmpties > 0 ? (
               <span className="AlkaDash-badge amber">
-                <FiAlertCircle /> {kpi.pendingEmpties} CANS WITH CUSTOMERS
+                <FiAlertCircle /> {kpi.pendingEmpties} CANS DUE
               </span>
             ) : (
               <span className="AlkaDash-badge green">
-                <FiCheck /> 100% JARS BALANCED
+                <FiCheck /> 100% BALANCED
               </span>
             )}
-            <span className="AlkaDash-kpiSubtext">Warehouse jar return ledger</span>
           </div>
         </div>
 
@@ -359,7 +351,6 @@ const Dashboard = () => {
             <span className="AlkaDash-badge green">
               <FiShield /> 100% OPERATIONAL
             </span>
-            <span className="AlkaDash-kpiSubtext">Vans &amp; Cargo E-Bikes active</span>
           </div>
         </div>
       </section>

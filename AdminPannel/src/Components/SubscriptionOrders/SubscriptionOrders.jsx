@@ -14,6 +14,7 @@ import {
   FiTrash2,
   FiAlertCircle,
   FiCheck,
+  FiList,
 } from "react-icons/fi";
 import API from "../../services/api";
 import "./SubscriptionOrders.css";
@@ -477,8 +478,8 @@ const SubscriptionOrders = () => {
                           {item.assignedDeliveryBoy?.partnerId || item.deliveryBoy?.partnerId ? `(${item.assignedDeliveryBoy?.partnerId || item.deliveryBoy?.partnerId})` : ""}
                         </span>
                         {(item.assignedDeliveryBoy?.phone || item.deliveryBoy?.phone) && (
-                          <span style={{ color: "#64748b" }}>
-                            📞 {item.assignedDeliveryBoy?.phone || item.deliveryBoy?.phone}
+                          <span style={{ color: "#64748b", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                            <FiPhone size={12} /> {item.assignedDeliveryBoy?.phone || item.deliveryBoy?.phone}
                           </span>
                         )}
                       </div>
@@ -555,7 +556,7 @@ const SubscriptionOrders = () => {
                           onClick={() => setHistoryModal({ isOpen: true, order: item })}
                           title="View drops history log"
                         >
-                          📋 History ({item.dailyDrops.length})
+                          <FiList size={12} style={{ marginRight: "4px", verticalAlign: "middle" }} /> History ({item.dailyDrops.length})
                         </button>
                       )}
 
@@ -637,9 +638,9 @@ const SubscriptionOrders = () => {
                 <p style={{ margin: "4px 0", fontSize: "12.5px", color: "#475569" }}>
                   {dropModal.order.deliveryAddress?.street}, {dropModal.order.deliveryAddress?.city}
                 </p>
-                <div style={{ display: "flex", gap: "14px", fontSize: "12px", color: "#0d9488", fontWeight: "600" }}>
-                  <span>📞 {dropModal.order.customerPhone}</span>
-                  <span>⏰ {dropModal.order.deliverySlot}</span>
+                <div style={{ display: "flex", gap: "14px", fontSize: "12px", color: "#0d9488", fontWeight: "600", alignItems: "center" }}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><FiPhone size={12} /> {dropModal.order.customerPhone}</span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><FiClock size={12} /> {dropModal.order.deliverySlot}</span>
                 </div>
               </div>
 

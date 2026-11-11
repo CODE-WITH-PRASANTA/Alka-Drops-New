@@ -10,7 +10,6 @@ import {
   CalendarDays,
   UserRound,
   Truck,
-  ChartNoAxesColumn,
   Mail,
   Star,
   ChevronDown,
@@ -27,7 +26,31 @@ import {
 } from "lucide-react";
 
 import { NavLink, useLocation } from "react-router-dom";
+import { useAdminAuth } from "../../context/AdminAuthContext";
 import "./Sidebar.css";
+
+const deliveryMenuItems = [
+  {
+    title: "Delivery Dashboard",
+    path: "/admin/delivery-dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Subscription Drops",
+    path: "/admin/delivery-subscriptions",
+    icon: Droplets,
+  },
+  {
+    title: "Shop Retail Orders",
+    path: "/admin/delivery-shop-orders",
+    icon: ShoppingCart,
+  },
+  {
+    title: "Attendance",
+    path: "/admin/delivery-attendance",
+    icon: CalendarDays,
+  },
+];
 
 const menuItems = [
   { title: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
@@ -118,11 +141,6 @@ const menuItems = [
     ],
   },
   {
-    title: "Report Management",
-    path: "/admin/report-management",
-    icon: ChartNoAxesColumn,
-  },
-  {
     title: "Enquiry Management",
     path: "/admin/enquiry-management",
     icon: Mail,
@@ -136,12 +154,15 @@ const Sidebar = ({
   onCloseMobile = () => {},
 }) => {
   const location = useLocation();
+  const { adminUser, isDeliveryBoy } = useAdminAuth();
   const [openDropdown, setOpenDropdown] = useState(null);
+
+  const currentMenu = isDeliveryBoy ? deliveryMenuItems : menuItems;
 
   // Open the dropdown whose child matches the current URL.
   // Automatically keep dropdown open if current path matches any child
   useEffect(() => {
-    const activeParent = menuItems.find((item) =>
+    const activeParent = currentMenu.find((item) =>
       item.children?.some((child) => child.path === location.pathname)
     );
 
@@ -149,7 +170,7 @@ const Sidebar = ({
     if (activeParent) {
       setOpenDropdown(activeParent.title);
     }
-  }, [location.pathname]);
+  }, [location.pathname, currentMenu]);
 
   const handleDropdown = (title) => {
     setOpenDropdown((current) => (current === title ? null : title));
@@ -197,10 +218,12 @@ const Sidebar = ({
         </div>
 
         <div className="alka-sidebar-content">
-          <div className="alka-section-label">MAIN MENU</div>
+          <div className="alka-section-label">
+            {isDeliveryBoy ? "DELIVERY PARTNER MENU" : "MAIN MENU"}
+          </div>
 
           <nav className="alka-sidebar-nav">
-            {menuItems.map((item) => {
+            {currentMenu.map((item) => {
               const Icon = item.icon;
               const hasChildren = Boolean(item.children?.length);
               const isOpen = openDropdown === item.title;

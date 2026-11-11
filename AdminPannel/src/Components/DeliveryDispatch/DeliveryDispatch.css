@@ -11,7 +11,7 @@
 }
 
 /* =========================================
-   1. SLEEK TOP BAR (SINGLE ROW)
+   1. SLEEK ACTION TOOLBAR (ZERO REDUNDANT TITLES)
    ========================================= */
 
 .AlkaDispatch-topBar {
@@ -19,87 +19,45 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
-.AlkaDispatch-topBarLeft {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.AlkaDispatch-titleGroup {
+.AlkaDispatch-toolbarLinks {
   display: flex;
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-}
-
-.AlkaDispatch-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0;
-  letter-spacing: -0.4px;
-}
-
-.AlkaDispatch-liveBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #047857;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  letter-spacing: 0.5px;
-}
-
-.AlkaDispatch-pulseDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: #10b981;
-  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-  animation: alkaPulse 1.8s infinite;
-}
-
-@keyframes alkaPulse {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-  }
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
-}
-
-.AlkaDispatch-datePill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  color: #475569;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .AlkaDispatch-topBarRight {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+.AlkaDispatch-headerQuickLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 9px;
+  text-decoration: none;
+  transition: all 0.18s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.AlkaDispatch-headerQuickLink:hover {
+  background: #f8fafc;
+  color: #0d9488;
+  border-color: #0d9488;
+  transform: translateY(-1px);
 }
 
 .AlkaDispatch-viewToggle {
@@ -165,26 +123,30 @@
 }
 
 /* =========================================
-   2. KPI OVERVIEW ROW
+   2. KPI OVERVIEW ROW (6 BALANCED CARDS)
    ========================================= */
 
 .AlkaDispatch-kpiRow {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 14px;
   margin-bottom: 22px;
 }
 
 .AlkaDispatch-kpiCard {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1.5px solid #e2e8f0;
   border-radius: 14px;
-  padding: 16px 18px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.AlkaDispatch-kpiCard.clickable {
+  cursor: pointer;
 }
 
 .AlkaDispatch-kpiCard:hover {
@@ -192,14 +154,20 @@
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
 }
 
+.AlkaDispatch-kpiCard.active-kpi {
+  border-color: #0d9488;
+  background: #f0fdfa;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.12);
+}
+
 .AlkaDispatch-kpiIcon {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 19px;
   flex-shrink: 0;
 }
 
@@ -208,14 +176,19 @@
   color: #0d9488;
 }
 
+.AlkaDispatch-kpiIcon.subs {
+  background: #ecfeff;
+  color: #0891b2;
+}
+
+.AlkaDispatch-kpiIcon.shop {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
 .AlkaDispatch-kpiIcon.transit {
   background: #fef3c7;
   color: #b45309;
-}
-
-.AlkaDispatch-kpiIcon.pending {
-  background: #f1f5f9;
-  color: #475569;
 }
 
 .AlkaDispatch-kpiIcon.delivered {
@@ -234,15 +207,16 @@
 }
 
 .AlkaDispatch-kpiLabel {
-  font-size: 11.5px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  line-height: 1.3;
 }
 
 .AlkaDispatch-kpiValue {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   color: #0f172a;
   line-height: 1.2;
@@ -274,7 +248,7 @@
 
 .AlkaDispatch-searchWrap {
   flex: 1.4;
-  min-width: 260px;
+  min-width: 250px;
   position: relative;
   display: flex;
   align-items: center;
@@ -399,10 +373,22 @@
   transition: all 0.18s ease;
 }
 
+.AlkaDispatch-pill .pillIcon {
+  font-size: 14px;
+}
+
+.AlkaDispatch-pill .pillIcon.sub {
+  color: #0891b2;
+}
+
+.AlkaDispatch-pill .pillIcon.shop {
+  color: #2563eb;
+}
+
 .AlkaDispatch-pill .pillCount {
   font-size: 11px;
   font-weight: 700;
-  padding: 1px 6px;
+  padding: 1px 7px;
   border-radius: 9999px;
   background: #e2e8f0;
   color: #334155;
@@ -419,9 +405,34 @@
   color: #ffffff;
 }
 
-.AlkaDispatch-pill.status.active.pending .pillCount { background: #f59e0b; color: #ffffff; }
-.AlkaDispatch-pill.status.active.transit .pillCount { background: #0284c7; color: #ffffff; }
-.AlkaDispatch-pill.status.active.delivered .pillCount { background: #10b981; color: #ffffff; }
+.AlkaDispatch-pill.subPill.active {
+  color: #0f766e;
+}
+
+.AlkaDispatch-pill.subPill.active .pillCount {
+  background: #0891b2;
+}
+
+.AlkaDispatch-pill.shopPill.active {
+  color: #1d4ed8;
+}
+
+.AlkaDispatch-pill.shopPill.active .pillCount {
+  background: #2563eb;
+}
+
+.AlkaDispatch-pill.status.active.pending .pillCount {
+  background: #f59e0b;
+  color: #ffffff;
+}
+.AlkaDispatch-pill.status.active.transit .pillCount {
+  background: #0284c7;
+  color: #ffffff;
+}
+.AlkaDispatch-pill.status.active.delivered .pillCount {
+  background: #10b981;
+  color: #ffffff;
+}
 
 .AlkaDispatch-divider {
   width: 1px;
@@ -484,7 +495,139 @@
 }
 
 /* =========================================
-   4. CARDS GRID VIEW
+   4. DEDICATED SECTIONS (SUBSCRIPTION VS SHOP)
+   ========================================= */
+
+.AlkaDispatch-sectionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.AlkaDispatch-channelSection {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.AlkaDispatch-channelSection.subChannelSection {
+  border-top: 4px solid #0d9488;
+}
+
+.AlkaDispatch-channelSection.shopChannelSection {
+  border-top: 4px solid #2563eb;
+}
+
+.AlkaDispatch-sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.AlkaDispatch-sectionHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.AlkaDispatch-sectionIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.AlkaDispatch-sectionIcon.subIconWrap {
+  background: #f0fdfa;
+  color: #0d9488;
+  border: 1px solid #ccfbf1;
+}
+
+.AlkaDispatch-sectionIcon.shopIconWrap {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #dbeafe;
+}
+
+.AlkaDispatch-sectionTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 3px 0;
+  letter-spacing: -0.3px;
+}
+
+.AlkaDispatch-sectionSub {
+  font-size: 12.5px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.AlkaDispatch-sectionHeaderRight {
+  display: flex;
+  align-items: center;
+}
+
+.AlkaDispatch-sectionActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: 9px;
+  text-decoration: none;
+  transition: all 0.18s ease;
+}
+
+.AlkaDispatch-sectionActionBtn:hover {
+  background: #0d9488;
+  color: #ffffff;
+  border-color: #0d9488;
+  transform: translateY(-1px);
+}
+
+.AlkaDispatch-channelSection.shopChannelSection .AlkaDispatch-sectionActionBtn:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.AlkaDispatch-sectionEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 30px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+  color: #64748b;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.AlkaDispatch-sectionEmpty .emptySecIcon {
+  color: #10b981;
+  font-size: 18px;
+}
+
+/* =========================================
+   5. CARDS GRID & CARD DESIGN
    ========================================= */
 
 .AlkaDispatch-cardsGrid {
@@ -500,7 +643,7 @@
   padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 13px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
@@ -538,6 +681,9 @@
   border-radius: 6px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .AlkaDispatch-typeTag.subscription {
@@ -550,6 +696,10 @@
   background: #eff6ff;
   color: #1d4ed8;
   border: 1px solid #dbeafe;
+}
+
+.AlkaDispatch-typeTag .tagIcon {
+  font-size: 12px;
 }
 
 .AlkaDispatch-orderNum {
@@ -584,6 +734,11 @@
   border-radius: 9999px;
   display: inline-flex;
   align-items: center;
+  gap: 4px;
+}
+
+.AlkaDispatch-statusBadge .badgeIcon {
+  font-size: 12px;
 }
 
 .AlkaDispatch-statusBadge.pending {
@@ -609,8 +764,8 @@
 }
 
 .AlkaDispatch-avatar {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
   color: #ffffff;
@@ -631,7 +786,7 @@
 }
 
 .AlkaDispatch-custName {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
@@ -650,105 +805,140 @@
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
-  background: #f0f9ff;
-  padding: 2px 8px;
-  border-radius: 6px;
-  transition: all 0.15s ease;
 }
 
 .AlkaDispatch-phoneLink:hover {
-  background: #0284c7;
-  color: #ffffff;
+  text-decoration: underline;
 }
 
-/* Address Box */
+/* Destination Address */
 .AlkaDispatch-addressBox {
   display: flex;
   align-items: flex-start;
   gap: 8px;
   background: #f8fafc;
+  padding: 8px 10px;
+  border-radius: 8px;
   border: 1px solid #f1f5f9;
-  border-radius: 10px;
-  padding: 9px 12px;
-  font-size: 12.5px;
-  color: #334155;
-  line-height: 1.45;
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.4;
 }
 
 .AlkaDispatch-addressPin {
   color: #0d9488;
   font-size: 15px;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .AlkaDispatch-addressText {
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
 }
 
-/* Drop Details Banner */
-.AlkaDispatch-quotaBanner {
+/* Dedicated Channel Specific Integration Panel */
+.AlkaDispatch-integrationPanel {
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.AlkaDispatch-integrationPanel.subPanel {
   background: #f0fdfa;
   border: 1px solid #ccfbf1;
-  border-radius: 10px;
-  padding: 10px 14px;
+}
+
+.AlkaDispatch-integrationPanel.shopPanel {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+}
+
+.AlkaDispatch-panelHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 }
 
-.AlkaDispatch-quotaItem {
+.panelHeaderLeft {
   display: flex;
-  flex-direction: column;
-}
-
-.AlkaDispatch-quotaItem .qLabel {
-  font-size: 11px;
-  font-weight: 600;
-  color: #0f766e;
-  text-transform: uppercase;
-}
-
-.AlkaDispatch-quotaItem .qVal {
-  font-size: 13px;
-  font-weight: 700;
-  color: #134e4a;
-}
-
-.AlkaDispatch-jarsCount {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  background: #ffffff;
-  border: 1px solid #99f6e4;
-  padding: 4px 10px;
-  border-radius: 8px;
+  gap: 6px;
+  font-size: 13px;
+  color: #0f172a;
 }
 
-.AlkaDispatch-jarsCount .jarsNum {
-  font-size: 16px;
-  font-weight: 800;
+.panelHeaderLeft .subIcon {
   color: #0d9488;
-  line-height: 1.1;
+  font-size: 15px;
 }
 
-.AlkaDispatch-jarsCount .jarsTxt {
-  font-size: 10px;
+.panelHeaderLeft .shopIcon {
+  color: #2563eb;
+  font-size: 15px;
+}
+
+.AlkaDispatch-pageLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
   font-weight: 700;
-  color: #64748b;
-  text-transform: uppercase;
+  color: #0d9488;
+  text-decoration: none;
+  background: #ffffff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #99f6e4;
+  transition: all 0.18s ease;
 }
 
-/* Empty Banner */
+.AlkaDispatch-integrationPanel.shopPanel .AlkaDispatch-pageLink {
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.AlkaDispatch-pageLink:hover {
+  background: #0d9488;
+  color: #ffffff;
+}
+
+.AlkaDispatch-integrationPanel.shopPanel .AlkaDispatch-pageLink:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.AlkaDispatch-panelMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+  flex-wrap: wrap;
+}
+
+.AlkaDispatch-panelMeta .metaDivider {
+  color: #cbd5e1;
+}
+
+.AlkaDispatch-panelMeta .metaItem strong {
+  color: #0f172a;
+}
+
+.AlkaDispatch-panelMeta .metaItem.price strong {
+  color: #1d4ed8;
+}
+
+/* Empty Jar Status Banner */
 .AlkaDispatch-emptyBanner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 7px 11px;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
@@ -806,7 +996,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .AlkaDispatch-actionBtn {
@@ -861,7 +1051,7 @@
 }
 
 /* =========================================
-   5. COMPACT RUN SHEET TABLE VIEW
+   6. COMPACT RUN SHEET TABLE VIEW
    ========================================= */
 
 .AlkaDispatch-tableCard {
@@ -898,79 +1088,108 @@
   vertical-align: middle;
 }
 
-.AlkaDispatch-table tr:hover td {
-  background: #fafbfc;
-}
-
-.AlkaDispatch-table tr.is-delivered-row td {
+.AlkaDispatch-table tr.is-delivered-row {
   background: #fbfdfc;
 }
 
+.AlkaDispatch-table tr:hover {
+  background: #f8fafc;
+}
+
 .AlkaDispatch-tblOrder {
-  font-weight: 700;
+  font-weight: 800;
   color: #0f172a;
 }
 
+.AlkaDispatch-tblChannelLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.AlkaDispatch-tblChannelLink.sub {
+  color: #0d9488;
+}
+
+.AlkaDispatch-tblChannelLink.shop {
+  color: #2563eb;
+}
+
+.AlkaDispatch-tblChannelLink:hover {
+  text-decoration: underline;
+}
+
 .AlkaDispatch-typeTag.tbl {
-  display: inline-block;
-  font-size: 10px;
-  padding: 1px 5px;
-  margin-top: 2px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .AlkaDispatch-tblCust {
   color: #0f172a;
+  font-weight: 700;
 }
 
 .AlkaDispatch-tblPhone {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 11.5px;
   color: #0284c7;
+  font-size: 11.5px;
   text-decoration: none;
-  font-weight: 600;
-  margin-top: 2px;
 }
 
 .AlkaDispatch-tblAddr {
   display: flex;
   align-items: flex-start;
   gap: 6px;
-  max-width: 260px;
   font-size: 12px;
   color: #475569;
+  max-width: 200px;
+  line-height: 1.35;
 }
 
 .AlkaDispatch-tblSlot {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #475569;
   background: #f1f5f9;
   padding: 3px 8px;
   border-radius: 6px;
+  display: inline-block;
 }
 
 .AlkaDispatch-tblPartner {
+  font-size: 12.5px;
   font-weight: 600;
-  color: #0f766e;
+  color: #0f172a;
+}
+
+.AlkaDispatch-tblEmpty {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
 }
 
 .AlkaDispatch-tblEmpty.warn {
-  font-size: 11px;
-  font-weight: 700;
   background: #fff7ed;
   color: #c2410c;
-  padding: 2px 7px;
-  border-radius: 6px;
   border: 1px solid #fed7aa;
 }
 
 .AlkaDispatch-tblEmpty.ok {
-  font-size: 11px;
-  font-weight: 600;
+  background: #f0fdf4;
   color: #15803d;
+  border: 1px solid #bbf7d0;
 }
 
 .AlkaDispatch-statusBadge.tbl {
@@ -981,15 +1200,15 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
-  font-weight: 700;
   color: #15803d;
+  font-weight: 700;
+  font-size: 12px;
 }
 
 .AlkaDispatch-tblBtn {
   border: none;
   border-radius: 8px;
-  padding: 6px 12px;
+  padding: 6px 10px;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -1009,54 +1228,6 @@
   color: #ffffff;
 }
 
-.AlkaDispatch-tblBtn.deliver:hover {
-  background: #0f766e;
-}
-
-/* =========================================
-   6. EMPTY STATE
-   ========================================= */
-
-.AlkaDispatch-emptyState {
-  background: #ffffff;
-  border: 1px dashed #cbd5e1;
-  border-radius: 16px;
-  padding: 48px 24px;
-  text-align: center;
-  max-width: 480px;
-  margin: 30px auto;
-}
-
-.AlkaDispatch-emptyIcon {
-  font-size: 44px;
-  color: #10b981;
-  margin-bottom: 12px;
-}
-
-.AlkaDispatch-emptyState h3 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 6px;
-}
-
-.AlkaDispatch-emptyState p {
-  font-size: 13.5px;
-  color: #64748b;
-  margin: 0 0 16px;
-}
-
-.AlkaDispatch-emptyResetBtn {
-  background: #0d9488;
-  color: #ffffff;
-  border: none;
-  padding: 8px 18px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
 /* =========================================
    7. SUBMIT DELIVERY MODAL
    ========================================= */
@@ -1064,40 +1235,57 @@
 .AlkaDispatch-modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(4px);
-  z-index: 1050;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  z-index: 1000;
+  padding: 16px;
 }
 
 .AlkaDispatch-modalDialog {
   background: #ffffff;
-  border-radius: 18px;
+  border-radius: 20px;
   width: 100%;
-  max-width: 540px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 520px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
+  animation: alkaModalSlide 0.2s ease-out;
+}
+
+@keyframes alkaModalSlide {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .AlkaDispatch-modalHeader {
-  padding: 18px 22px;
-  border-bottom: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .AlkaDispatch-modalHeader h3 {
+  margin: 0 0 2px 0;
   font-size: 17px;
   font-weight: 800;
   color: #0f172a;
-  margin: 0;
+}
+
+.AlkaDispatch-modalSubtitle {
+  font-size: 12px;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .AlkaDispatch-closeBtn {
@@ -1106,15 +1294,19 @@
   font-size: 18px;
   color: #94a3b8;
   cursor: pointer;
+  display: flex;
+  align-items: center;
   padding: 4px;
+  border-radius: 6px;
 }
 
 .AlkaDispatch-closeBtn:hover {
   color: #0f172a;
+  background: #f1f5f9;
 }
 
 .AlkaDispatch-modalForm {
-  padding: 20px 22px;
+  padding: 20px 22px 22px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -1125,18 +1317,20 @@
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .AlkaDispatch-formCustBox strong {
-  font-size: 14.5px;
+  font-size: 14px;
   color: #0f172a;
-  display: block;
 }
 
 .AlkaDispatch-formCustBox p {
-  font-size: 12.5px;
-  color: #475569;
-  margin: 4px 0 6px;
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
 }
 
 .AlkaDispatch-formGrid {

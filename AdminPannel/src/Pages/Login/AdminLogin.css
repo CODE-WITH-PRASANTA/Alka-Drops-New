@@ -1,0 +1,485 @@
+/* ==========================================================================
+   ALKA DROPS - ADMIN & DELIVERY PARTNER LOGIN PORTAL STYLES
+   ========================================================================== */
+
+.AdminLogin-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 20%, #f0fdfa 0%, #f8fafc 60%, #e2e8f0 100%);
+  padding: 24px;
+  font-family: inherit;
+}
+
+.AdminLogin-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Brand Section */
+.AdminLogin-brand {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.AdminLogin-logoWrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(13, 148, 136, 0.3);
+  margin-bottom: 4px;
+}
+
+.AdminLogin-brandName {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.AdminLogin-portalTag {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Role Segment Tabs */
+.AdminLogin-roleTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.AdminLogin-roleTab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.AdminLogin-roleTab:hover {
+  color: #0f172a;
+}
+
+.AdminLogin-roleTab.active {
+  background: #ffffff;
+  color: #0d9488;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* Alert */
+.AdminLogin-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.AdminLogin-alert.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.AdminLogin-alert.success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+/* Form Fields */
+.AdminLogin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.AdminLogin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.AdminLogin-fieldHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.AdminLogin-forgotLink {
+  background: transparent;
+  border: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #0d9488;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.AdminLogin-forgotLink:hover {
+  color: #0f766e;
+  text-decoration: underline;
+}
+
+.AdminLogin-field label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.AdminLogin-inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.AdminLogin-inputWrap .inputIcon {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.AdminLogin-inputWrap input {
+  width: 100%;
+  padding: 11px 42px 11px 40px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 13.5px;
+  color: #0f172a;
+  outline: none;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.AdminLogin-inputWrap input:focus {
+  background: #ffffff;
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.AdminLogin-eyeBtn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.AdminLogin-eyeBtn:hover {
+  color: #0f172a;
+}
+
+.AdminLogin-fieldHint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #0d9488;
+  font-weight: 600;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Submit Button */
+.AdminLogin-submitBtn {
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
+  transition: all 0.2s ease;
+  margin-top: 4px;
+}
+
+.AdminLogin-submitBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0f766e 0%, #0369a1 100%);
+  box-shadow: 0 6px 18px rgba(13, 148, 136, 0.35);
+  transform: translateY(-1px);
+}
+
+.AdminLogin-submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Demo Credentials Footer */
+.AdminLogin-demoFooter {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+}
+
+.AdminLogin-demoFooter .demoTitle {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.AdminLogin-demoFooter .demoButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.AdminLogin-demoFooter .demoPill {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.AdminLogin-demoFooter .demoPill:hover {
+  background: #f0fdfa;
+  border-color: #0d9488;
+  color: #0d9488;
+}
+
+/* ==========================================================================
+   OTP-BASED FORGOT PASSWORD FLOW
+   ========================================================================== */
+
+.AdminLogin-forgotSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.AdminLogin-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.AdminLogin-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.AdminLogin-step .stepCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #64748b;
+  font-size: 10.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.AdminLogin-step.active {
+  color: #0d9488;
+}
+
+.AdminLogin-step.active .stepCircle {
+  background: #0d9488;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);
+}
+
+.AdminLogin-step.completed {
+  color: #10b981;
+}
+
+.AdminLogin-step.completed .stepCircle {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.AdminLogin-stepper .stepDivider {
+  flex: 1;
+  height: 2px;
+  background: #e2e8f0;
+  margin: 0 6px;
+  transition: background 0.2s ease;
+}
+
+.AdminLogin-stepper .stepDivider.completed {
+  background: #10b981;
+}
+
+.AdminLogin-forgotHeading h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.AdminLogin-forgotHeading p {
+  font-size: 12.5px;
+  color: #64748b;
+  line-height: 1.45;
+  margin: 0 0 10px;
+}
+
+.AdminLogin-inputWrap input.otpInput {
+  letter-spacing: 6px;
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.AdminLogin-quickOtp {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0fdfa;
+  border: 1px dashed #0d9488;
+  color: #0f766e;
+  font-size: 11.5px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.15s ease;
+}
+
+.AdminLogin-quickOtp:hover {
+  background: #ccfbf1;
+}
+
+.AdminLogin-quickOtp strong {
+  font-family: monospace;
+  font-size: 12.5px;
+  letter-spacing: 1px;
+}
+
+.AdminLogin-verifiedTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+
+.AdminLogin-subActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.AdminLogin-subActions .textBtn {
+  background: none;
+  border: none;
+  color: #0d9488;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: 12px;
+}
+
+.AdminLogin-subActions .textBtn:hover {
+  text-decoration: underline;
+}
+
+.AdminLogin-subActions .dot {
+  color: #cbd5e1;
+}
+
+.AdminLogin-backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: all 0.2s ease;
+}
+
+.AdminLogin-backBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+

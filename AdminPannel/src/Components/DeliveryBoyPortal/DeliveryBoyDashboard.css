@@ -1,0 +1,1400 @@
+/* ==========================================================================
+   ALKA DROPS - DELIVERY PARTNER DASHBOARD (PREMIUM ENTERPRISE DESIGN)
+   ========================================================================== */
+
+.RiderDash {
+  padding: 24px 30px 60px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 60px);
+  color: #0f172a;
+  font-family: inherit;
+}
+
+.RiderDash-toast {
+  position: fixed;
+  top: 75px;
+  right: 24px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  animation: slideInToast 0.3s ease;
+}
+
+@keyframes slideInToast {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   1. HERO PROFILE & GPS COMMAND CARD (LEFT & RIGHT SPLIT)
+   ========================================= */
+
+.RiderDash-heroBar {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 22px 26px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.05);
+}
+
+/* LEFT DESIGN: Rider Profile & Fleet Details */
+.RiderDash-heroLeft {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.RiderDash-avatarWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.RiderDash-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 800;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.28);
+}
+
+.RiderDash-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.RiderDash-avatarDot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2.5px solid #ffffff;
+}
+
+.RiderDash-avatarDot.online {
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  animation: pulseDot 2s infinite;
+}
+
+.RiderDash-avatarDot.offline {
+  background: #94a3b8;
+}
+
+@keyframes pulseDot {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+  70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.RiderDash-profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.RiderDash-badgeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.RiderDash-partnerIdBadge {
+  font-size: 11px;
+  font-weight: 800;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.RiderDash-dutyBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.RiderDash-dutyBadge.onDuty {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.RiderDash-dutyBadge.offDuty {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.RiderDash-dutyBadge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.RiderDash-riderName {
+  font-size: 21px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 1px 0 4px;
+  letter-spacing: -0.3px;
+}
+
+.RiderDash-metaTags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.RiderDash-metaTags .metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 3px 9px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.RiderDash-metaTags .metaItem.phoneLink {
+  color: #0284c7;
+  text-decoration: none;
+}
+
+.RiderDash-metaTags .metaItem.phoneLink:hover {
+  border-color: #0284c7;
+}
+
+/* RIGHT DESIGN: Shift Attendance & Location Card */
+.RiderDash-heroRight {
+  border-left: 1.5px solid #f1f5f9;
+  padding-left: 26px;
+}
+
+.RiderDash-gpsCommandCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.RiderDash-commandTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.RiderDash-shiftMeta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.RiderDash-dateTxt {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.RiderDash-metaDot {
+  color: #cbd5e1;
+  font-size: 11px;
+}
+
+.RiderDash-shiftStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.RiderDash-shiftStatus.onDuty {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.RiderDash-shiftStatus.offDuty {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.RiderDash-shiftStatus .statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.RiderDash-shiftStatus.onDuty .statusDot {
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  animation: pulseDot 2s infinite;
+}
+
+.RiderDash-btnWrap {
+  flex-shrink: 0;
+}
+
+.RiderDash-shiftBtn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.RiderDash-shiftBtn.in {
+  background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+}
+
+.RiderDash-shiftBtn.in:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.35);
+}
+
+.RiderDash-shiftBtn.out {
+  background: #fff1f2;
+  border: 1.5px solid #fecdd3;
+  color: #e11d48;
+  box-shadow: 0 2px 6px rgba(225, 29, 72, 0.08);
+}
+
+.RiderDash-shiftBtn.out:hover {
+  background: #ffe4e6;
+  border-color: #fda4af;
+  transform: translateY(-1px);
+}
+
+/* Clean Location Card (Only Address, Zero Lat/Long) */
+.RiderDash-locationCard {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.RiderDash-locationCard:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.locationIconWrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  color: #0d9488;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.locationDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.locationPrimaryRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.locationTag {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.locationAreaBadge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0d9488;
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  padding: 1px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.locationAddress {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+}
+
+.locationRefreshBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.locationRefreshBtn:hover {
+  background: #f1f5f9;
+  color: #0d9488;
+  border-color: #0d9488;
+}
+
+.locationRefreshBtn .spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* =========================================
+   2. KPI METRICS GRID
+   ========================================= */
+
+.RiderDash-kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.RiderDash-kpiCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.RiderDash-kpiCard .iconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.RiderDash-kpiCard .iconWrap.total { background: #f0fdfa; color: #0d9488; }
+.RiderDash-kpiCard .iconWrap.pending { background: #fef3c7; color: #b45309; }
+.RiderDash-kpiCard .iconWrap.delivered { background: #dcfce7; color: #15803d; }
+.RiderDash-kpiCard .iconWrap.empties { background: #fff7ed; color: #c2410c; }
+
+.RiderDash-kpiCard .kpiLabel {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  display: block;
+}
+
+.RiderDash-kpiCard .kpiVal {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* =========================================
+   3. MODERN FILTER COMMAND BAR
+   ========================================= */
+
+.RiderDash-filterBar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 22px;
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.RiderDash-filterRow1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.RiderDash-searchWrap {
+  flex: 1;
+  min-width: 220px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.RiderDash-searchWrap .searchIcon {
+  position: absolute;
+  left: 12px;
+  font-size: 15px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.RiderDash-searchInput {
+  width: 100%;
+  padding: 9px 36px 9px 36px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 13px;
+  color: #0f172a;
+  outline: none;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.RiderDash-searchInput:focus {
+  background: #ffffff;
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.RiderDash-searchWrap .clearBtn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.RiderDash-searchWrap .clearBtn:hover {
+  color: #0f172a;
+}
+
+.RiderDash-periodTabs {
+  display: inline-flex;
+  align-items: center;
+  background: #f1f5f9;
+  padding: 3px;
+  border-radius: 10px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.RiderDash-periodTab {
+  border: none;
+  background: transparent;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.RiderDash-periodTab:hover {
+  color: #0f172a;
+}
+
+.RiderDash-periodTab.active {
+  background: #ffffff;
+  color: #0d9488;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.RiderDash-resetBtn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.RiderDash-resetBtn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.RiderDash-filterRow2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.RiderDash-dedicatedScope {
+  display: flex;
+  align-items: center;
+}
+
+.RiderDash-pageScopeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.RiderDash-pageScopeBadge.shop {
+  background: #faf5ff;
+  border-color: #e9d5ff;
+  color: #7e22ce;
+}
+
+.RiderDash-pageScopeBadge.shop .scopeIcon {
+  color: #8b5cf6;
+  font-size: 15px;
+}
+
+.RiderDash-pageScopeBadge.shop .pillCount {
+  background: #7e22ce;
+  color: #ffffff;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.RiderDash-pageScopeBadge.sub {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+  color: #0369a1;
+}
+
+.RiderDash-pageScopeBadge.sub .scopeIcon {
+  color: #0284c7;
+  font-size: 15px;
+}
+
+.RiderDash-pageScopeBadge.sub .pillCount {
+  background: #0284c7;
+  color: #ffffff;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.RiderDash-pageScopeBadge.att {
+  background: #f0fdfa;
+  border-color: #99f6e4;
+  color: #0f766e;
+}
+
+.RiderDash-pageScopeBadge.att .scopeIcon {
+  color: #0d9488;
+  font-size: 15px;
+}
+
+.RiderDash-pageScopeBadge.att .pillCount {
+  background: #0d9488;
+  color: #ffffff;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.RiderDash-pillGroup {
+  display: inline-flex;
+  align-items: center;
+  background: #f1f5f9;
+  padding: 3px;
+  border-radius: 10px;
+  gap: 2px;
+}
+
+.RiderDash-pill {
+  border: none;
+  background: transparent;
+  padding: 7px 13px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.RiderDash-pill:hover {
+  color: #0f172a;
+}
+
+.RiderDash-pill .pillIcon {
+  font-size: 13px;
+}
+
+.RiderDash-pill .pillIcon.sub { color: #0284c7; }
+.RiderDash-pill .pillIcon.shop { color: #8b5cf6; }
+.RiderDash-pill .pillIcon.att { color: #0d9488; }
+
+.RiderDash-pill .pillCount {
+  font-size: 11px;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.RiderDash-pill.active {
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.RiderDash-pill.active .pillCount {
+  background: #0d9488;
+  color: #ffffff;
+}
+
+.RiderDash-pill.statusPill.active.pending {
+  color: #b45309;
+}
+
+.RiderDash-pill.statusPill.active.pending .pillCount {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.RiderDash-pill.statusPill.active.delivered {
+  color: #15803d;
+}
+
+.RiderDash-pill.statusPill.active.delivered .pillCount {
+  background: #10b981;
+  color: #ffffff;
+}
+
+/* =========================================
+   4. DELIVERIES GRID & CARDS
+   ========================================= */
+
+.RiderDash-panelCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.RiderDash-panelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.RiderDash-panelHead h3 {
+  font-size: 16.5px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 3px;
+}
+
+.RiderDash-panelHead p {
+  font-size: 12.5px;
+  color: #64748b;
+  margin: 0;
+}
+
+.RiderDash-linkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0d9488;
+  text-decoration: none;
+  background: #f0fdfa;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccfbf1;
+}
+
+.RiderDash-deliveriesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.RiderDash-deliveryCard {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.RiderDash-deliveryCard:hover {
+  border-color: #0d9488;
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.08);
+}
+
+.RiderDash-deliveryCard.completed {
+  background: #fbfdfc;
+  border-color: #bbf7d0;
+}
+
+.RiderDash-cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.RiderDash-cardTop .tagRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.typeTag {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+.typeTag.subscription {
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #ccfbf1;
+}
+
+.typeTag.shop {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #dbeafe;
+}
+
+.orderCode {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.slotTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+
+.RiderDash-custInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.RiderDash-custInfo .custName {
+  font-size: 14.5px;
+  color: #0f172a;
+}
+
+.RiderDash-custInfo .phoneBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0284c7;
+  text-decoration: none;
+  background: #f0f9ff;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.RiderDash-addressBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.4;
+  background: #f8fafc;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.RiderDash-addressBox .pin {
+  color: #0d9488;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.RiderDash-volumeBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  padding-top: 4px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.RiderDash-volumeBox .volLabel strong {
+  color: #0d9488;
+}
+
+.RiderDash-volumeBox .warnEmpties {
+  color: #b45309;
+  font-weight: 700;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.RiderDash-volumeBox .okEmpties {
+  color: #15803d;
+  font-weight: 600;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.RiderDash-cardActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.RiderDash-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.RiderDash-btn.transit {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.RiderDash-btn.deliver {
+  background: #0d9488;
+  color: #ffffff;
+}
+
+.RiderDash-doneStamp {
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #15803d;
+  padding: 7px;
+  background: #dcfce7;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* =========================================
+   5. ATTENDANCE & GEOLOCATION TABLE
+   ========================================= */
+
+/* Attendance KPI Highlights Strip */
+.RiderDash-attKpiStrip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  padding: 16px 20px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.RiderDash-attKpi {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.RiderDash-attKpi .label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.RiderDash-attKpi .val {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.RiderDash-attKpi .val.success {
+  color: #059669;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.RiderDash-attendanceTableWrap {
+  overflow-x: auto;
+}
+
+.RiderDash-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.RiderDash-table th {
+  padding: 11px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  background: #f8fafc;
+}
+
+.RiderDash-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.RiderDash-tblDate {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.RiderDash-tblDate strong {
+  color: #0f172a;
+  font-size: 13.5px;
+}
+
+.RiderDash-tblDate small {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.RiderDash-tblGeoCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 280px;
+}
+
+.RiderDash-tblGeoCell .timeText {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.RiderDash-tblGeoCell .timeText.in {
+  color: #0f766e;
+}
+
+.RiderDash-tblGeoCell .timeText.out {
+  color: #475569;
+}
+
+.RiderDash-tblGeoCell .addressLine {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 11.5px;
+  color: #334155;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.RiderDash-tblGeoCell .addressLine .pin {
+  color: #0d9488;
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.RiderDash-tblHours {
+  color: #0f172a;
+  font-size: 13.5px;
+}
+
+.RiderDash-geoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0284c7;
+  text-decoration: none;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 2px 7px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.RiderDash-geoLink:hover {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.RiderDash-attBadge {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.RiderDash-attBadge.present,
+.RiderDash-attBadge.onduty {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.RiderDash-refreshBtn {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.RiderDash-empty {
+  text-align: center;
+  padding: 40px 20px;
+  grid-column: 1 / -1;
+}
+
+.RiderDash-empty h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 12px 0 4px;
+}
+
+.RiderDash-empty p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* =========================================
+   6. SUBMIT MODAL
+   ========================================= */
+
+.RiderDash-modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.RiderDash-modalDialog {
+  background: #ffffff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 500px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.RiderDash-modalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.RiderDash-modalHead h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.RiderDash-closeModal {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.RiderDash-modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.RiderDash-modalInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.RiderDash-modalField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.RiderDash-modalField label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.RiderDash-modalField input,
+.RiderDash-modalField textarea {
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+
+.RiderDash-modalField input:focus,
+.RiderDash-modalField textarea:focus {
+  border-color: #0d9488;
+}
+
+.RiderDash-jarNotice {
+  background: #fffbeb;
+  border: 1px dashed #fde68a;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.RiderDash-jarNotice .warnHead {
+  font-size: 12px;
+  font-weight: 700;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.RiderDash-jarNotice p {
+  margin: 0;
+  font-size: 11.5px;
+  color: #92400e;
+}
+
+.RiderDash-jarNotice select {
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+  outline: none;
+}
+
+.RiderDash-modalFoot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.RiderDash-cancelBtn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.RiderDash-submitBtn {
+  background: #0d9488;
+  border: none;
+  color: #ffffff;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+@media (max-width: 1024px) {
+  .RiderDash-heroBar {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .RiderDash-heroRight {
+    border-left: none;
+    border-top: 1.5px solid #f1f5f9;
+    padding-left: 0;
+    padding-top: 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  .RiderDash-kpiGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .RiderDash-filterRow1 {
+    flex-wrap: wrap;
+  }
+  .RiderDash-searchWrap {
+    min-width: 100%;
+  }
+  .RiderDash-filterRow2 {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .RiderDash-pillGroup {
+    width: 100%;
+    justify-content: space-between;
+    overflow-x: auto;
+  }
+}
